@@ -1,4 +1,4 @@
-module JOG_Space
+#module JOG_Space
 
 using MetaGraphs #add property to graph
 using Graphs #crete graph
@@ -17,7 +17,7 @@ using UUIDs #library for unique id
 using BenchmarkTools #library for check time and allocations of the function
 using Distributions #library for calculate normal distributions
 using CSV
-#include("/path/to/my/jl/file/functions.jl")
+#include("/path/to/my/jl/file/functions.jl")#DEVO INSERIRE QUI GLI ALTRI PROJECT
 #using ColorSchemes #library for colors
 #using ColorSchemes
 ####################### Inizio progetto #########################
@@ -140,7 +140,7 @@ end
 
 #convert a graph into dataframe,in which each row correspond to space of lattice
 function Graph_to_Dataframe(G::AbstractGraph)
-    df = DataFrame(Event = String[], Time = Float64[], Nodes = Any[],
+    df = DataFrame(Event = String[], Time = Float64[], Cell = UUID[],
                                                         Notes = Any[])
     return df
     #In notes we put 1)Parent,Mut if Event is duplicate with new driver
@@ -175,16 +175,13 @@ function cell_birth(G::AbstractGraph, cell::Int, pos::Int, df::DataFrame,
                       rng)
     id = uuid1(rng)
     id2 = uuid1(rng)
-    if id == id2
-        println("SONO UGUALI")
-        println(id, " ",id2)
-    end
     parent = get_prop(G, cell, :id) #trovo il vecchio id
     muts = get_prop(G, cell, :mutation) #prendo la mutazione
     r = rand()#controlle se ho una nuova mut driver
     if r > μ_dri #NO driver mut
         #aggiorno il Dataframe
-        push!(df, ["duplicate", time, [id, id2], [parent]])
+        push!(df, ["Duplicate", time, id, [parent]])
+        push!(df,["Duplicate", time, id2, [parent]])
         #aggiorno il Grafo
         set_props!(G, cell, Dict(:mutation => muts, :id => id))
         set_props!(G, pos, Dict(:mutation => muts, :id => id2))
@@ -204,7 +201,8 @@ function cell_birth(G::AbstractGraph, cell::Int, pos::Int, df::DataFrame,
         #@show new_mut
         push!(set_mut, new_mut)
         #@show set_mut
-        push!(df, ["duplicate", time, [id, id2], [parent, new_drive]])
+        push!(df, ["Mutation", time, id2, [parent, new_drive]])
+        push!(df, ["Duplicate", time, id, [parent]])
         #aggiorno il Grafo e la lista delle sottopopolazioni
         if rand() < 0.5 #prob casuale che la mutazione sia esterna o interna
             set_props!(G, cell, Dict(:mutation => muts, :id => id))
@@ -563,4 +561,4 @@ function simulate_evolution(G::AbstractGraph, Tf::AbstractFloat,
 end
 
 
-end # module
+#end # module
