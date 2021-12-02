@@ -82,6 +82,7 @@ function MetaDiGraph(
     """
 
     metagraph_from_dataframe(MetaDiGraph, df, origin, destination, weight, edge_attributes, vertex_attributes, vertex_id_col)
+    #metagraph_from_dataframe(MetaDiGraph, df, origin, destination, vertex_attributes, vertex_id_col)
 
 end
 
@@ -94,29 +95,29 @@ function metagraph_from_dataframe(graph_type,
                                   edge_attributes::Union{Vector{Symbol}, Symbol}=Vector{Symbol}(),
                                   vertex_attributes::DataFrame=DataFrame(),
                                   vertex_id_col::Symbol=Symbol())
-
     # Map node names to vertex IDs
-    nodes = sort!(unique!([df[:, origin]; df[:, destination]]))
-    vertex_names = DataFrame(name=nodes, vertex_id=eachindex(nodes))
-
+    nodes = sort!(unique!([df[:, origin]; df[:, destination]])) #ho tutti i nodi
+    vertex_names = DataFrame(name=nodes, vertex_id=eachindex(nodes))#id ∀ nodi
     # Merge in to original
     for c in [origin, destination]
         temp = rename(vertex_names, :vertex_id => Symbol(c, :_id))
         df = innerjoin(df, temp; on=c=>:name)
-    end
+    end #crea 2 colone con gli indici appena creati
 
     # Merge additional attributes to names
     if vertex_attributes != DataFrame()
         idsym = vertex_id_col == Symbol() ? first(propertynames(vertex_attributes)) : vertex_id_col
         vertex_names = leftjoin(vertex_names, vertex_attributes, on = :name => idsym)
     end
-
     # Create Graph
     mg = graph_type(nrow(vertex_names))
     for r in eachrow(df)
         add_edge!(mg, r[Symbol(origin, :_id)], r[Symbol(destination, :_id)])
     end
 
+    #add times on graph
+    times_df = df[:,[:Child, :Time]]
+    vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
     # Set vertex names and attributes
     attr_names = propertynames(vertex_names[!, Not(:vertex_id)])
     for r in eachrow(vertex_names)
@@ -150,4 +151,4 @@ function metagraph_from_dataframe(graph_type,
     return mg
 end
 
-end # module
+end # modules
