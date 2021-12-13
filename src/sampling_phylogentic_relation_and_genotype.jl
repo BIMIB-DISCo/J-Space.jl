@@ -1,7 +1,7 @@
-module sampling_phylogenetic_relation_and_genotype
-include("JOG_Space.jl")#uso alcune funzioni
-include("DataFrameGraphBridge.jl")
+#module sampling_phylogenetic_relation_and_genotype
 
+include("JOG_Space.jl")
+using MetaGraphs
 #function that return a list of sample
 function list_sampling_cell(G::AbstractGraph, Mode::String, L::Int;
                                                                   dist::Int = 0)
@@ -32,6 +32,7 @@ end #può essere più efficiente, list_cell potrebe contenere già le labels
 #function that create matrix relation of sampling phylogentic relation
 function create_matrix_relational(G::AbstractGraph, events_df::DataFrame,
                                sample_list::Vector{Any}, mutations::Vector{Any})
+
     matrix_R = DataFrame(Father = Any[], Child = Any[], Time = Float64[],
                                          Subpop_Child = Any[], Event = String[])
     set_mut = unique(get_drivermut(G))
@@ -47,9 +48,9 @@ function create_matrix_relational(G::AbstractGraph, events_df::DataFrame,
                 child = id_c
                 event = events_df[i, :Event]
                 filter!(s -> s != id_c, sample_list) #tolgo il sample trovato
-                push!(sample_list,father) #aggiungo il nuovo sample
+                push!(sample_list, father) #aggiungo il nuovo sample
                 if length(events_df[i, :Event]) == "Mutation"
-                    father_mut = filter!(m ->m != events_df[i, :Notes][2],
+                    father_mut = filter!(m -> m != events_df[i, :Notes][2],
                                                         mutations[sample_id][1])
                     push!(mutations, father_mut)
                  else
@@ -68,19 +69,21 @@ function create_matrix_relational(G::AbstractGraph, events_df::DataFrame,
 end
 
 #Create and plot tree
-function plot_tree(matrix::DataFrame, name::String)
+function create_tree(matrix::DataFrame; path::String = "")
 #!!!!!!!!!!!!||!!! DEVE ESSERE UN GRAFO DIRETTO, altrimenti non funziona il plot
     tree = MetaDiGraph(matrix, :Father, :Child)
-    GLMakie.activate!()
-    layout = Buchheim()
-    color = [:blue for i in 1:nv(tree)]
-    color[1] = :black
-    f, ax, p = graphplot(tree, layout = Buchheim(), node_color=color)
-    hidedecorations!(ax)
-    hidespines!(ax)
-    save(name, f)
-    display(f)
-    return tree
+    if path != ""
+        GLMakie.activate!()
+        color = [:blue for i in 1:nv(tree)]
+        color[1] = :black
+        f, ax, p = graphplot(tree, layout = Buchheim(), node_color=color, nlabels = [string(v) for v in vertices(tree)])
+        hidedecorations!(ax)
+        hidespines!(ax)
+        save(path, f)
+        display(f)
+    end
+    tree_reduce = reduce_tree(tree)
+    return tree_reduce
 end
 
 #function main of module
@@ -91,7 +94,7 @@ function sampling_phylogentic_relation(G::AbstractGraph, Mode::String,
     times = df[!, :Time]#df.Time
     tf = times[end]#non so se serve
     event_df = event_df[event_df.Event .!= "Death", :]
-    list_sample, list_mut = list_sampling_cell(G, Mode, L, dist=dist)
+    list_sample, list_mut = list_sampling_cell(G, Mode, L, dist = dist)
     matrix_R = create_matrix_relational(G, event_df, list_sample, list_mut)
     matrix_R_without_migration = matrix_R[matrix_R.Event .!= "Migration", :]
     return matrix_R_without_migration
@@ -113,167 +116,159 @@ function get_vertex_middle(tree::AbstractGraph, path::Vector{Int})
     vertix_middle = []
     for v in path
         if indegree(tree,v) == 1 && outdegree(tree,v) == 1
-            push!(vertix_middle,v)
+            push!(vertix_middle, v)
         end
     end
     return vertix_middle
 end
 
-#return index path for delete nodes/vertex
-function get_start_finish(path::Vector{Int},indexs::Vector{Int})
-    start = []
-    finish = []
-    push!(start,indexs[1]-1)
-    for i in 2:length(indexs)
-        #println("indexs[i]: ", indexs[i])
-        #println("indexs[i-1]: ", indexs[i-1])
-        if indexs[i] == indexs[i-1] + 2
-            #println("è la fine di una serie")
-            push!(finish, indexs[i] - 1)
-            #println("aggiorno finish con ->", indexs[i]-1)
-            #println("Finish: ", finish)
-            #println("i, length(indexs): ",i,"\t",length(indexs))
-            if i <= length(indexs)
-                #println("non sono arrivato alla fine")
-                push!(start, indexs[i] - 1)
-                #println("ho agggiornato lo start con -> ",indexs[i]-1)
-                #println(start)
-            end
-        elseif indexs[i] > indexs[i-1] + 2
-            #println("ho un salto maggiore, 2 o + nodi consecutivi che non devo cancellare")
-            push!(finish, indexs[i-1] + 1)
-            #println("aggiorno finish con ->",indexs[i-1] + 1)
-            #println("Finish: ", finish)
-            push!(start, indexs[i] - 1)
-            #println("ho agggiornato lo start con -> ",indexs[i]-1)
-            #println(start)
-        end
-    end
-    push!(finish,indexs[end]+1)
-
-    return start, finish
-end
-
-#function that return leaf with vertices to be eliminated
-function control_leaf(tree::AbstractGraph, leafs::Vector{Any})
-    leaf = 0
-    path = []
-    v_mid = []
-    for l in leafs
-        yen_k = yen_k_shortest_paths(tree, 1, l)
-        path = yen_k.paths[1]
-        v_mid = get_vertex_middle(tree, path)
-        if length(v_mid) != 0
-            leaf = l
-            break
-        end
-    end
-    return leaf, path, v_mid
-end
-
 #function that reduce tree
 function reduce_tree(tree::AbstractGraph)
-    check = true
-    nplot = 1 #da cancellare
-    #for i in 1:length(leafs)
-    while check
-        leafs = get_leafs(tree)
-        leaf, path, v_mid = control_leaf(tree, leafs)
-        if leaf == 0
-            break
-        end
-        println("ora guardo: ",leaf)
-        println("path: ",path)
+    #check = true
+    leafs = get_leafs(tree)
+    println("leafs: ",leafs)
+    t_r = SimpleDiGraph()
+    tree_reduce = MetaDiGraph(t_r)
+    map_nodes = []
+    for leaf in leafs
+        println("leaf: ",leaf)
+        yen_k = yen_k_shortest_paths(tree, 1, leaf)
+        path = yen_k.paths[1]
+        v_mid = get_vertex_middle(tree, path)
         println("v_mid: ",v_mid)
-        # color
-        color = [:black for i in 1:nv(tree)]
-        color[v_mid] .= :red
-        color[path[1]] = :green
-        color[leaf] = :blue
-        f, ax, p = graphplot(tree, layout = Buchheim(), node_color=color,
-        nlabels=[string(v) for v in vertices(tree)])
-        save("Plot\\"*string(nplot)*".png", f)
-        #fine color
-        indexs = [findall(id -> id == v, path)[1] for v in v_mid]
-        println("indexs: ",indexs)
-        println("inizia il while")
-        n = 0
-        while length(indexs) != 0
-            start, finish = get_start_finish(path,indexs)
-            println("start[i]: ",start[end])
-            println("finish[i]: ",finish[end])
-            vx_delete = path[start[end]+1:finish[end]-1]
-            println("vx_delete: ",vx_delete)
-            #println("num vertex: ",nv(tree))
-            add_edge!(tree, path[start[end]], path[finish[end]])#ricollego il grafo
-            println("ho aggiunto l'edge tra :",path[start[end]]," e ",path[finish[end]])
-            new_leaf = false
-            #if leaf in nv(tree)-length(vx_delete):nv(tree)
-            if leaf in (nv(tree)-length(vx_delete)+1):nv(tree)
-                println("n vertex on tree : ", nv(tree))
-                println("leaf: ", leaf)
-                #nuova leaf: num vertici - foglia - vertici maggiori della foglia
-                # -> perchè la delete dei nodi funziona cosi, la label dell'ultimo
-                #nodo
-                println("leaf .< vx_delete -> ", leaf .< vx_delete )
-                println("sum(leaf .< vx_delete) + 1", sum(leaf .< vx_delete))
-                id = nv(tree) - leaf - sum(leaf .< vx_delete) + 1
-                new_leaf = true
-                println("ho cambiato leaf")
-                println("id :", id)
+        filter!(v -> v ∉ v_mid, path) #tolgo i nodi da eliminare
+        for i in 1:length(path)
+            if path[i] ∉ map_nodes
+                add_vertex!(tree_reduce)
+                property = props(tree, path[i])
+                set_props!(tree_reduce, vertices(tree_reduce)[end], property)
+                push!(map_nodes, path[i])
+                if i != 1
+                    source = findall(s -> s == path[i-1], map_nodes)[1]
+                    dest = findall(d -> d == path[i], map_nodes)[1]
+                    add_edge!(tree_reduce, source, dest)
+                    println("ho aggiunto un nodo tra ", source, "e ", dest)
+                end
             end
-            #elimino vertici dall'albero
-            rem_vertices!(tree.graph, vx_delete)
-            println("ho cancellato il/i nodo/i")
-            sort!(vx_delete)
-            println("vx_delete ordinato ->", vx_delete)
-            new_leaf ? yen_k = yen_k_shortest_paths(tree, 1, vx_delete[id]) :
-                       yen_k = yen_k_shortest_paths(tree, 1, leaf)
-            path = yen_k.paths[1]
-            println("Nuovo path: ",path)
-            leaf = path[end]
-            v_mid = get_vertex_middle(tree, path)
-            println("v_mid: ",v_mid)
-            indexs = [convert(Int64,findall(id -> id == v, path)[1]) for v in v_mid]
-            println("indexs: ",indexs)
-            color = [:black for i in 1:nv(tree)]
-            color[v_mid] .= :red
-            color[path[1]] = :green
-            color[leaf] = :blue
-            f, ax, p = graphplot(tree, layout = Buchheim(), node_color=color,
-                                    nlabels=[string(v) for v in vertices(tree)])
-            println("salvo il plot ->",nplot,"_",n)
-            save("Plot\\"*string(nplot)*"_"*string(n)*".png", f)
-            n = n + 1
         end
-        nplot = nplot + 1
     end
-    color = [:black for i in 1:nv(tree)]
-    color[1] = :red
-    f, ax, p = graphplot(tree, layout = Buchheim(), node_color=color)
-    save("Plot\\fine1.png", f)
-    return tree
+    return tree_reduce
 end
 
+
+function max_shortest_path(Tree::AbstractMetaGraph, leafs::Vector{Any},
+                                                                      root::Int)
+    max = 1
+    len = 1
+    for l in leafs
+        yen_k = yen_k_shortest_paths(Tree, root, l)
+        path = yen_k.paths[1]
+        if len < length(path)
+            max = l
+            len = length(path)
+        end
+    end
+    return max
+end
+
+function check_leafs(Tree::AbstractMetaGraph, leafs::Vector{Any}, root::Int)
+    new_leafs = []
+    for l in leafs
+        yen_k = yen_k_shortest_paths(Tree, root, l)
+        if yen_k.paths != []
+            push!(new_leafs, l)
+        end
+    end
+    return new_leafs
+end
+
+function format_newick_1(Tree::AbstractMetaGraph, root::Int, dict::Dict,
+                                                             leafs::Vector{Any})
+    println("dict: ",dict)
+    if root != 1
+        leafs = check_leafs(Tree, leafs, root)
+    end
+    deepest_leaf = max_shortest_path(Tree, leafs, root)
+    println("deepest_leaf: ",deepest_leaf)
+    parent = dict[deepest_leaf][:in]
+    println("parent: ",parent)
+    child = dict[parent][:out]
+    println("child: ",child)
+    str = "("*string(child[1])*","*string(child[2])*")"*string(parent)
+    println("str -> ",str)
+    new_parent = dict[parent][:in]
+    println("nuovo parent: ",new_parent)
+    while new_parent != 0 && parent != root
+        child = dict[new_parent][:out]
+        println("child: ",child)
+        filter!(v -> v != parent, child)[1]
+        println("filtrato child :", child)
+        if get(dict[child[1]], :out, 0) == 0
+            str = "("*str*","*string(child[1])*")"*string(new_parent)
+            println("stringa aggiornata: ", str)
+        else
+            println("richiamo la funzione con la root: ",child[1])
+            str_int = format_newick_1(Tree, child[1], dict, leafs)
+            println("str_int: ",str_int)
+            str = "("*str*","*str_int*")"*string(new_parent)
+            println("stringa aggiornata con pezzo interno: ", str)
+        end
+        println("new parent: ",new_parent, " e root: ",root)
+        #if new_parent == root
+        #    println("sono uguali")
+        #    return str
+        #end
+        parent = new_parent
+        get(dict[new_parent], :in, 0) == 0 ? new_parent = 0 :
+                                             new_parent = dict[new_parent][:in]
+        println("nuovo parent: ",new_parent)
+        if new_parent == root && length(dict[new_parent][:out]) == 1
+            println("sono uguali")
+            str = "("*str*")"*string(new_parent)
+            new_parent = 0
+        end
+    end
+
+    return str
+end
+
+function dict_vertex(Tree::AbstractMetaGraph)
+    dict = Dict()
+    es = edges(Tree)
+    for e in es
+        s = src(e)
+        d = dst(e)
+        #add entry :out
+        check_source = get(dict, s, 0)
+        if check_source != 0
+            if get(get(dict, s, 0), :out, 0) != 0
+                push!(dict[s][:out],d)
+            else
+                dict[s] = Dict(:in => dict[s][:in], :out => [d])
+            end
+        else
+            dict[s] = Dict(:out => [d])
+        end
+        #add entry :in
+        check_dest = get(dict, d, 0)
+        if check_dest == 0
+            dict[d] = Dict(:in => s)
+        end
+    end
+    return dict
+end
+#=
 g_meta = spatial_graph(21, 21, dim = 1, n_cell=1)#creo il grafico
 
 df, G, n_cell_alive = simulate_evolution(g_meta, 150.0, 0.2, 0.01,
                                                             0.01, 0.005, 0.4)
 
-matrix_R = sampling_phylogentic_relation(G, "Random", df, 100)
-#matrix_R = sampling_phylogentic_relation(G, "Neighbourhood", df, 100, dist = 8)
+#matrix_R = sampling_phylogentic_relation(G, "Random", df, 100)
+matrix_R = sampling_phylogentic_relation(G, "Neighbourhood", df, 100, dist = 8)
 
-tree = plot_tree(matrix_R, "Plot\\tree_relation_original.png")
-
-
-matrix_R[matrix_R.Father .== get_prop(tree,1,:name),:]#da controllare per vedere
-                                                  #se ho una root in comune o no
-
-
-tree_backup = copy(tree)
-tree = copy(tree_backup)
-
+tree = create_tree(matrix_R, path = "Plot\\tree_relation_original.png")
+tree = create_tree(matrix_R)
 
 tree_red = reduce_tree(tree)
-
-end #module
+=#
+#end #module
