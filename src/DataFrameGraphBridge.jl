@@ -2,6 +2,7 @@ module DataFrameGraphBridge
 
 #QUESTO MODULO FUNZIONA COME L'OMONIMO GraphDataFrameBridge MA VIENE UTILIZZATA
 #LA LIBRERIA GRAPH AL POSTO DI lightgraph ORMAI OBSOLETA
+#ho aggiunto la possibilità di inserire il campo tempo
 using Graphs
 using MetaGraphs
 using DataFrames

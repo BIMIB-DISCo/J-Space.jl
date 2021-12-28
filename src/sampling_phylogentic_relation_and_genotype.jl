@@ -1,7 +1,10 @@
 #module sampling_phylogenetic_relation_and_genotype
 
 include("JOG_Space.jl")
-using MetaGraphs
+#using MetaGraphs #questo perchè è qui?
+using PhyloNetworks #create newick format
+using BioSequences #this library is used for create FASTA file
+using FASTX #this labrary is used for read FASTA file
 #function that return a list of sample
 function list_sampling_cell(G::AbstractGraph, Mode::String, L::Int;
                                                                   dist::Int = 0)
@@ -83,6 +86,10 @@ function create_tree(matrix::DataFrame; path::String = "")
         display(f)
     end
     tree_reduce = reduce_tree(tree)
+    color = [:blue for i in 1:nv(tree_reduce)]
+    color[1] = :black
+    f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color, nlabels = [string(v) for v in vertices(tree_reduce)] )
+    save(path, f)
     return tree_reduce
 end
 
@@ -126,16 +133,16 @@ end
 function reduce_tree(tree::AbstractGraph)
     #check = true
     leafs = get_leafs(tree)
-    println("leafs: ",leafs)
+    #println("leafs: ",leafs)
     t_r = SimpleDiGraph()
     tree_reduce = MetaDiGraph(t_r)
     map_nodes = []
     for leaf in leafs
-        println("leaf: ",leaf)
+    #    println("leaf: ",leaf)
         yen_k = yen_k_shortest_paths(tree, 1, leaf)
         path = yen_k.paths[1]
         v_mid = get_vertex_middle(tree, path)
-        println("v_mid: ",v_mid)
+    #    println("v_mid: ",v_mid)
         filter!(v -> v ∉ v_mid, path) #tolgo i nodi da eliminare
         for i in 1:length(path)
             if path[i] ∉ map_nodes
@@ -147,14 +154,16 @@ function reduce_tree(tree::AbstractGraph)
                     source = findall(s -> s == path[i-1], map_nodes)[1]
                     dest = findall(d -> d == path[i], map_nodes)[1]
                     add_edge!(tree_reduce, source, dest)
-                    println("ho aggiunto un nodo tra ", source, "e ", dest)
+    #                println("ho aggiunto un nodo tra ", source, "e ", dest)
                 end
             end
         end
     end
+    #set_prop!(tree_reduce, 1, :Time, 0.0)
     return tree_reduce
 end
 
+############ ART INPUT
 
 function max_shortest_path(Tree::AbstractMetaGraph, leafs::Vector{Any},
                                                                       root::Int)
@@ -182,53 +191,52 @@ function check_leafs(Tree::AbstractMetaGraph, leafs::Vector{Any}, root::Int)
     return new_leafs
 end
 
-function format_newick_1(Tree::AbstractMetaGraph, root::Int, dict::Dict,
+function create_newick(Tree::AbstractMetaGraph, root::Int64, dict::Dict,
                                                              leafs::Vector{Any})
-    println("dict: ",dict)
     if root != 1
         leafs = check_leafs(Tree, leafs, root)
     end
     deepest_leaf = max_shortest_path(Tree, leafs, root)
-    println("deepest_leaf: ",deepest_leaf)
     parent = dict[deepest_leaf][:in]
-    println("parent: ",parent)
     child = dict[parent][:out]
-    println("child: ",child)
-    str = "("*string(child[1])*","*string(child[2])*")"*string(parent)
-    println("str -> ",str)
+    t_p = get_prop(Tree, parent, :Time)
+    t_1 = get_prop(Tree, child[1], :Time) - t_p
+    t_2 = get_prop(Tree, child[2], :Time) - t_p
+    str = "(" * string(child[1]) * ":" * string(t_1) * "," * string(child[2]) *
+                                   ":" * string(t_2) * ")" * string(parent)
     new_parent = dict[parent][:in]
-    println("nuovo parent: ",new_parent)
+    t_np = t_p - get_prop(Tree, new_parent, :Time)
+    str = str * ":" * string(t_np)
     while new_parent != 0 && parent != root
         child = dict[new_parent][:out]
-        println("child: ",child)
         filter!(v -> v != parent, child)[1]
-        println("filtrato child :", child)
+        t_1 = get_prop(Tree, child[1], :Time)
+        t_1 = t_1 - get_prop(Tree, new_parent, :Time)
         if get(dict[child[1]], :out, 0) == 0
-            str = "("*str*","*string(child[1])*")"*string(new_parent)
-            println("stringa aggiornata: ", str)
+            str = "(" * str * "," * string(child[1]) * ":" * string(t_1) *
+                  ")" * string(new_parent)
         else
-            println("richiamo la funzione con la root: ",child[1])
-            str_int = format_newick_1(Tree, child[1], dict, leafs)
-            println("str_int: ",str_int)
-            str = "("*str*","*str_int*")"*string(new_parent)
-            println("stringa aggiornata con pezzo interno: ", str)
+            str_int = create_newick(Tree, child[1], dict, leafs)
+            str = "(" * str * "," * str_int * ")" *string(new_parent)
         end
-        println("new parent: ",new_parent, " e root: ",root)
-        #if new_parent == root
-        #    println("sono uguali")
-        #    return str
-        #end
         parent = new_parent
         get(dict[new_parent], :in, 0) == 0 ? new_parent = 0 :
                                              new_parent = dict[new_parent][:in]
-        println("nuovo parent: ",new_parent)
         if new_parent == root && length(dict[new_parent][:out]) == 1
-            println("sono uguali")
-            str = "("*str*")"*string(new_parent)
+            t_p = get_prop(Tree, parent, :Time)
+            str = "(" * str * ":" * string(t_p) * ")" * string(new_parent)
             new_parent = 0
         end
+        if new_parent != 0
+            t_p = get_prop(Tree, parent, :Time)
+            if typeof(get_prop(Tree, new_parent, :Time)) != Missing
+                t_np = t_p - get_prop(Tree, new_parent, :Time)
+                str = str * ":" * string(t_np)
+            else
+                str = str * ":" * string(t_p)
+            end
+        end
     end
-
     return str
 end
 
@@ -257,18 +265,44 @@ function dict_vertex(Tree::AbstractMetaGraph)
     end
     return dict
 end
-#=
-g_meta = spatial_graph(21, 21, dim = 1, n_cell=1)#creo il grafico
 
-df, G, n_cell_alive = simulate_evolution(g_meta, 150.0, 0.2, 0.01,
-                                                            0.01, 0.005, 0.4)
+function format_newick(Tree::AbstractMetaGraph)
+    dict = dict_vertex(Tree)
+    leafs = get_leafs(Tree)
+    s = create_newick(Tree, 1, dict, leafs)*";"
+    net = readTopology(s)
+    return net
+end
 
-#matrix_R = sampling_phylogentic_relation(G, "Random", df, 100)
-matrix_R = sampling_phylogentic_relation(G, "Neighbourhood", df, 100, dist = 8)
+function evolution_seq(net::HybridNetwork, Neutral_mut_rate::AbstractFloat,
+                                                                length_ROI::Int)
+    mutations = []
+    for e in net.edge
+        len = e.length
+        λ = Neutral_mut_rate * length_ROI * len
+        n_mut = rand(Poisson(λ), 1)[1]
+        push!(mutations,n_mut)
+    end
+    return mutations
+end
 
-tree = create_tree(matrix_R, path = "Plot\\tree_relation_original.png")
-tree = create_tree(matrix_R)
-
-tree_red = reduce_tree(tree)
-=#
-#end #module
+function create_input_ART(Tree::AbstractMetaGraph, neural_mut_rate::Float64;
+                                         path::String = "", len_ROI::Int = 6000)
+    net = format_newick(Tree)
+    if path != ""
+        open(FASTA.Reader, path) do reader
+            for record in reader
+                g_seq = FASTX.sequence(record)
+            end
+        end
+        len_ROI = length(g_seq)
+    else
+        g_seq = randdnaseq(len_ROI)
+        rec = FASTA.Record("MySeq", g_seq)
+        w = FASTA.Writer(open("my-out.fasta", "w"))
+        write(w, rec)
+        close(w)
+    end
+    mutations = evolution_seq(net, neural_mut_rate, len_ROI)
+    return net, g_seq
+end

@@ -143,6 +143,7 @@ function Graph_to_Dataframe(G::AbstractGraph)
     df = DataFrame(Event = String[], Time = Float64[], Cell = UUID[],
                                                         Notes = Any[])
     return df
+    #type of event || time of event || cell involved || Notes ->
     #In notes we put 1)Parent,Mut if Event is duplicate with new driver
                     #2)Parent if Event is duplicate without new driver
                     #3)undef if Event is death
