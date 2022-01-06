@@ -428,7 +428,7 @@ function call_ART(len_read::Int, mode::String; path = "")
             cd(f[1])
             command = `art_illumina -sam -i $file -l $len_read -ss HS25
                                                                 -f 10 -o $mode`
-            #run(command)
+            run(command)
             cd("..\\")
         end
     end
