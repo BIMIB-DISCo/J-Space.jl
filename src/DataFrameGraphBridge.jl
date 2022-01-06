@@ -119,6 +119,9 @@ function metagraph_from_dataframe(graph_type,
     #add times on graph
     times_df = df[:,[:Child, :Time]]
     vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
+    #add subpop_child on graph
+    subpop_df = df[:,[:Child, :Subpop_Child]]
+    vertex_names = leftjoin(vertex_names, subpop_df, on = :name => :Child)
     # Set vertex names and attributes
     attr_names = propertynames(vertex_names[!, Not(:vertex_id)])
     for r in eachrow(vertex_names)

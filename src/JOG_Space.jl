@@ -129,13 +129,13 @@ function get_drivermut(G::MetaGraph)
 end
 
 #function that return all drive mut
-function get_all_drivermut(G::MetaGraph)
-    driver_muts = []
+function get_all_mut(G::MetaGraph)
+    all_muts = []
     for i in 1:nv(G)
-        has_prop(G, i,:mutation) ? push!(driver_muts, get_prop(G,i,:mutation)) :
-                                   push!(driver_muts, [])
+        has_prop(G, i,:mutation) ? push!(all_muts, get_prop(G,i,:mutation)) :
+                                   push!(all_muts, [])
     end
-    return driver_muts
+    return all_muts
 end
 
 #convert a graph into dataframe,in which each row correspond to space of lattice
@@ -186,6 +186,9 @@ function cell_birth(G::AbstractGraph, cell::Int, pos::Int, df::DataFrame,
         #aggiorno il Grafo
         set_props!(G, cell, Dict(:mutation => muts, :id => id))
         set_props!(G, pos, Dict(:mutation => muts, :id => id2))
+        #println("vediamo che mut hanno")
+        #println("cell: ", get_prop(G, cell, :mutation))
+        #println("pos: ", get_prop(G, pos, :mutation))
         push!(ca_subpop[idx], pos)#aggiorno lista dei nodi delle subpop
     else #NEW Driver mut
         #println("ho una mutazione")
@@ -193,17 +196,20 @@ function cell_birth(G::AbstractGraph, cell::Int, pos::Int, df::DataFrame,
         ms = unique(collect(Iterators.flatten(set_mut)))#mutazioni già presenti
         [delete!(possible_mut, m) for m in ms][1]#tolgo le mut già presenti
         new_drive = rand(possible_mut) #seleziono una mutazione a caso
-        old_muts = collect(Iterators.flatten(muts))#flat mut for insert new_mut
+        #println("new_drive: ",new_drive)
+        old_muts = collect(Iterators.flatten(muts))#flat mut for insert new_drive
+        #println("old_muts: ", old_muts)
+        #println("muts :", muts)
         new_mut = push!(old_muts, new_drive)#create new "cluster" at mut
+        #println("new_mut: ", new_mut)
         #calcolo il nuovo alpha
-        #@show muts
-        #@show old_muts
         new_alpha_driver(G, cell, set_mut, α, driv_average_advantage)
         #@show new_mut
         push!(set_mut, new_mut)
         #@show set_mut
         push!(df, ["Mutation", time, id2, [parent, new_drive]])
         push!(df, ["Duplicate", time, id, [parent]])
+        #println("muts: ", muts)
         #aggiorno il Grafo e la lista delle sottopopolazioni
         if rand() < 0.5 #prob casuale che la mutazione sia esterna o interna
             set_props!(G, cell, Dict(:mutation => muts, :id => id))
@@ -345,7 +351,7 @@ function simulate_evolution_color(G::AbstractGraph, Tf::Float64,
     rng = MersenneTwister(1234)
     colors = []
     set_mut_pop = unique(get_drivermut(G)) #Insieme delle mutazioni
-    gad = get_all_drivermut(G)
+    gad = get_all_mut(G)
     color = color_index(gad, set_mut_pop)#ritorno i colori
     push!(colors, color)
     df = Graph_to_Dataframe(G)#creo il dataframe
@@ -389,7 +395,7 @@ function simulate_evolution_color(G::AbstractGraph, Tf::Float64,
                 mut = get_prop(G, cell, :mutation) #recupero mutazione
                 idx = findall(x -> x == mut, set_mut_pop)[1]
                 migration_cell(G, cell, pos, df, t_curr)
-                color = color_index(get_all_drivermut(G), set_mut_pop)
+                color = color_index(get_all_mut(G), set_mut_pop)
                 push!(colors, color)#aggiorno il colore
                 push!(cs_alive, pos) #aggiorno la lista dei nodi occupati
                 push!(ca_subpop[idx], pos)#update list of subpop nodes
@@ -405,7 +411,7 @@ function simulate_evolution_color(G::AbstractGraph, Tf::Float64,
             mut = get_prop(G, cell, :mutation) #recupero mutazione
             idx = findall(x -> x == mut, set_mut_pop)[1]
             cell_death(G, cell, df, t_curr)#funzione morte cellula
-            color = color_index(get_all_drivermut(G), set_mut_pop)#get colors
+            color = color_index(get_all_mut(G), set_mut_pop)#get colors
             push!(colors, color)#aggiorno il colore
             filter!(e -> e != cell, cs_alive)#tolgo la vecchia cell occupata
             filter!(e -> e != cell, ca_subpop[idx])# update list of subpop
@@ -421,7 +427,7 @@ function simulate_evolution_color(G::AbstractGraph, Tf::Float64,
                                             α, driv_average_advantage, t_curr,
                                                             ca_subpop, min, rng)
                 #return colors
-                color = color_index(get_all_drivermut(G), set_mut_pop)
+                color = color_index(get_all_mut(G), set_mut_pop)
                 push!(colors, color)#aggiorno il colore
                 push!(cs_alive, pos) #aggiorno la lista dei nodi occupati
                 n_cs_alive += 1 #number of cell alive on lattice
