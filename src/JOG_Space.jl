@@ -205,6 +205,12 @@ function cell_birth(G::AbstractGraph, cell::Int, pos::Int, df::DataFrame,
         #calcolo il nuovo alpha
         new_alpha_driver(G, cell, set_mut, α, driv_average_advantage)
         #@show new_mut
+        if new_mut == [1]
+            println("ms: ",ms)
+            println("new_drive: ",new_drive)
+            println("old_muts: ",old_muts)
+            println("new_mut: ",new_mut)
+        end
         push!(set_mut, new_mut)
         #@show set_mut
         push!(df, ["Mutation", time, id2, [parent, new_drive]])
@@ -558,13 +564,11 @@ function simulate_evolution(G::AbstractGraph, Tf::AbstractFloat,
                 push!(cs_alive, pos) #aggiorno la lista dei nodi occupati
                 n_cs_alive += 1 #number of cell alive on lattice
                 push!(list_len_node_occ, n_cs_alive)#update list nodes occ a t
-            else
-                e_f +=1
             end
         end
     end
 
-    return df, G, list_len_node_occ, e_f
+    return df, G, list_len_node_occ, set_mut_pop
 end
 
 
