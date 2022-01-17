@@ -437,7 +437,7 @@ end
 function simulate_MC(n_sim::Int64, rows::Int64, cols::Int64, Tf::Float64,
                         rate_birth::Float64, rate_death::Float64,
                            rate_migration::AbstractFloat, rate_new_mut::Float64,
-                              driv_average_advantage::Float64)
+                              driv_average_advantage::Float64, seed::Int)
     times_tot = []
     n_cell_alive_tot = []
     for i in 1:n_sim
@@ -446,7 +446,7 @@ function simulate_MC(n_sim::Int64, rows::Int64, cols::Int64, Tf::Float64,
         df, G, n_cell_alive = simulate_evolution(g_meta, Tf,
                                                 rate_birth, rate_death,
                                                 rate_migration, rate_new_mut,
-                                                driv_average_advantage)
+                                                driv_average_advantage, seed)
         push!(times_tot, df.Time)
         push!(n_cell_alive_tot, n_cell_alive)
     end
