@@ -1,6 +1,5 @@
 #module sampling_phylogenetic_relation_and_genotype
-#include("JOG_Space.jl")
-#using MetaGraphs #questo perchè è qui?
+
 using PhyloNetworks #create newick format
 using BioSequences #this library is used for create FASTA file
 using FASTX #this labrary is used for read FASTA file

@@ -1,4 +1,4 @@
-#module JOG_Space
+module JOG_Space
 
 using MetaGraphs #add property to graph
 using Graphs #crete graph
@@ -14,17 +14,20 @@ using Makie
 using Makie.MakieLayout
 using Random
 using UUIDs #library for unique id
-using BenchmarkTools #library for check time and allocations of the function
+#using BenchmarkTools #library for check time and allocations of the function
 using Distributions #library for calculate normal distributions
 using CSV
-#include("src\\sampling_phylogentic_relation_and_genotype.jl")
-include("sampling_phylogentic_relation_and_genotype.jl")
-include("Format_tree.jl")
-include("SingleCellExperiment.jl")
-include("Bulk_Experiment.jl")
-include("CallART.jl")
-include("DataFrameGraphBridge.jl")
 
+#file da esportare
+export
+#Simulation
+spatial_graph, simulate_evolution, simulate_MC,
+#Sampling
+sampling_phylogentic_relation, create_tree,
+#experiment
+SC_experiment, experiment_bulk,
+#non utili, servono per i plot
+plot_lattice_3D_web, animation_2D, create_heatmap
 ####################### Inizio progetto #########################
 #'''/!\ATTENZIONE/!\: per i plot interattivi, bisogna rendere disabled il plot
 #                    automatico dato che Atom e jupyter non supportano Makie '''
@@ -539,5 +542,11 @@ function simulate_evolution(G::AbstractGraph, Tf::AbstractFloat,
     return df, G, list_len_node_occ, set_mut_pop
 end
 
+include("sampling_phylogentic_relation_and_genotype.jl")
+include("Format_tree.jl")
+include("SingleCellExperiment.jl")
+include("Bulk_Experiment.jl")
+include("CallART.jl")
+include("DataFrameGraphBridge.jl")
 
-#end # module
+end # module
