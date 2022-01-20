@@ -42,6 +42,13 @@ function spatial_graph(row::Int, col::Int; dim::Int=1, n_cell::Int=1)
     return G_meta
 end
 
+function spatial_graph(path::String; n_cell::Int=1)
+
+    G = Graphs.grid((row, col,dim))
+    G_meta = initialize_graph(G, row,col, n_cell)
+    return G_meta
+end
+
 #initialize graph with un single cell in the middle of the lattice/square
 function initialize_graph(G::AbstractGraph, row::Int, col::Int, n_cell::Int)
     G_meta = MetaGraphs.MetaGraph(G)

@@ -128,12 +128,12 @@ function create_tree(matrix::DataFrame; path::String = "")
         save(path, f)
         display(f)
     end
-    tree_reduce = reduce_tree(tree)
-    color = [:blue for i in 1:nv(tree_reduce)]
-    color[1] = :black
-    f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
+    #tree_reduce = reduce_tree(tree)
+    #color = [:blue for i in 1:nv(tree_reduce)]
+    #color[1] = :black
+    #f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
                         nlabels = [string(v) for v in vertices(tree_reduce)] )
-    save(path, f)
+    #save(path, f)
     #create format newick
     net = format_newick(tree_reduce)
     return tree_reduce, net

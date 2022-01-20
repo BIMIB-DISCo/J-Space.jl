@@ -4,12 +4,19 @@ function evolution_seq(Tree::AbstractMetaGraph, Neutral_mut_rate::AbstractFloat,
     mutations = []
     #println("evolution_seq funzione")
     for e in edges(Tree)
-        len = get_prop(Tree, dst(e), :Time)
-    #    println("len: ",len)
-        λ = Neutral_mut_rate * length_ROI * len
-    #    println("valore λ: ", λ)
-        n_mut = rand(Poisson(λ), 1)[1]
-    #    println("num mut dalla distribuzione di poisson: ",n_mut)
+        Tfinal = get_prop(Tree, dst(e), :Time)#prima era len = ...
+    #   println("len: ",len)
+        λ = Neutral_mut_rate * length_ROI   #cambiato
+    #   println("valore λ: ", λ)
+    #   n_mut = rand(Poisson(λ), 1)[1]
+    #   println("num mut dalla distribuzione di poisson: ",n_mut)
+    ### modifica #####
+        t_curr = 0
+        n_mut = 0
+        while t_curr < Tfinal
+            t_curr = t_curr + rand(Exponential(1/λ), 1)[1]
+            n_mut += 1
+        end
         push!(mutations,n_mut)
         set_prop!(Tree, src(e), dst(e), :N_Mutations, n_mut)
     end
@@ -63,7 +70,7 @@ end
 
 
 #create a input for tool ART -> FASTA file and tree on format newick
-function SC_experiment(Tree::AbstractMetaGraph, neural_mut_rate::Float64;
+function Molecular_evolution(Tree::AbstractMetaGraph, neural_mut_rate::Float64;
                                          path::String = "", len_ROI::Int = 6000,
                                          single_cell::Bool=true)
 
@@ -84,10 +91,13 @@ function SC_experiment(Tree::AbstractMetaGraph, neural_mut_rate::Float64;
     end
 
     #compute mutations ∀ node
-    n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI)
-    check = check_num_path_mutation(Tree, len_ROI)
-    if check == true #qui in realtà è il path che pesa di più, con più mutazioni
-        return "ERROR: mutations are more than lenght ROI -> (file fasta)"
+    for i in 1:3
+        n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI)
+        check = check_num_path_mutation(Tree, len_ROI)
+        if check == true && i >= 3
+            return "ERROR: mutations are more than lenght ROI -> (file fasta)"
+        else
+            break
     end
     possible_position = Set(1:len_ROI)
     #g_seq_e = copy(g_seq) #reference g_seq not change
