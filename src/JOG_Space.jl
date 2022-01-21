@@ -18,7 +18,7 @@ using Makie
 using Makie.MakieLayout
 using Random
 using UUIDs                     # Library for unique id
-using BenchmarkTools # Library for checking time and allocations of
+#using BenchmarkTools # Library for checking time and allocations of
                      # the function
 using Distributions  # Library for calculate normal distributions
 using CSV
@@ -30,7 +30,7 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    SC_experiment, experiment_bulk,
+    Molecular_evolution, experiment_bulk, genomic_evolution,
     ## non utili, servono per i plot
     plot_lattice_3D_web, animation_2D, create_heatmap
 
@@ -270,7 +270,7 @@ function cell_birth(G::AbstractGraph,
         ## Aggiorno il Dataframe
         push!(df, ["Duplicate", time, id, [parent]])
         push!(df, ["Duplicate", time, id2, [parent]])
-        
+
         ## Aggiorno il Grafo
         set_props!(G, cell, Dict(:mutation => muts, :id => id))
         set_props!(G, pos, Dict(:mutation => muts, :id => id2))
@@ -288,7 +288,7 @@ function cell_birth(G::AbstractGraph,
         if new_mut == [1]
 
             ## This is only debugging, isn't it?
-            
+
             println("ms: ",ms)
             println("new_drive: ",new_drive)
             println("old_muts: ",old_muts)
@@ -514,7 +514,7 @@ function simulate_evolution_color(G::AbstractGraph,
         Aₙ = α_subpop ./ λ
         Bₙ = death / λ
         Mₙ = M / λ
-        
+
         ## Probability vector
         prob_vet = vcat(Aₙ, Bₙ, Mₙ)
         prob_cum = cumsum(prob_vet)
@@ -534,7 +534,7 @@ function simulate_evolution_color(G::AbstractGraph,
                 push!(cs_alive, pos) # Aggiorno la lista dei nodi occupati
                 push!(ca_subpop[idx], pos) # Update list of subpop nodes
                 filter!(e -> e != cell, cs_alive) # Tolgo la vecchia
-                                                  # cell occupata 
+                                                  # cell occupata
                 filter!(e -> e != cell, ca_subpop[idx]) # Update list of subpop
                 push!(list_len_node_occ, n_cs_alive)
             end

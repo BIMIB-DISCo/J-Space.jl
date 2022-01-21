@@ -100,7 +100,7 @@ function create_matrix_relational(G::AbstractGraph,
             push!(sample_list, father) # Aggiungo il nuovo sample
 
             ## println(sample_list)
-            
+
             if events_df[i, :Event] == "Mutation"
                 new_driver = events_df[i, :Notes][2]
                 ## father_mut = filter!(m -> m != events_df[i, :Notes][2],
@@ -178,13 +178,13 @@ function create_tree(matrix::DataFrame; path::String = "")
         save(path, f)
         display(f)
     end
-    
-    ## tree_reduce = reduce_tree(tree)
+
+    tree_reduce = reduce_tree(tree)
     ## color = [:blue for i in 1:nv(tree_reduce)]
     ## color[1] = :black
     # f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
 
-    nlabels = [string(v) for v in vertices(tree_reduce)] )
+    nlabels = [string(v) for v in vertices(tree_reduce)]
 
     ## save(path, f)
 

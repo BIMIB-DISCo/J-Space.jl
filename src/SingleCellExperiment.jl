@@ -1,7 +1,8 @@
 ### -*- Mode: Julia -*-
 
 ### SingleCellExperiment.jl
-
+import BioSequences
+using FASTX
 """
 Computes number of mutations for all edges.
 """
@@ -24,7 +25,7 @@ function evolution_seq(Tree::AbstractMetaGraph,
         ## Modifica!!!
         t_curr = 0
         n_mut = 0
-        while t_curr < Tfinal
+        while t_curr <= Tfinal
             t_curr = t_curr + rand(Exponential(1 / λ), 1)[1]
             n_mut += 1
         end
@@ -53,7 +54,7 @@ function transform_genome(genome::LongDNASeq, pos::Vector{Any})
         ## Come nella simulatione, ho una certa prob che avvenga una
         ## simulatione
         prob_cum = cumsum(transition_matrix[!, string(nucleotide)])
-        
+
         ## println("prob_cum: ",prob_cum)
         k = round( rand(), digits = 7) # with 7 decimals
         target_nucl = collect(k .<= prob_cum)
@@ -88,6 +89,7 @@ function check_num_path_mutation(Tree::AbstractMetaGraph, len_ROI::Int)
         end
         i += 1
     end
+    return check
 end
 
 
@@ -99,7 +101,6 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
                              path::String = "",
                              len_ROI::Int = 6000, # Why 6000?
                              single_cell::Bool = true)
-
     ## Create/load reference genome
     if path != ""
         open(FASTA.Reader, path) do reader
@@ -115,9 +116,9 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
         write(w, rec)
         close(w)
     end
-
     ## Compute mutations ∀ node
-    for i in 1:3
+    for i in [1,2,3]
+        check = false
         n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI)
         check = check_num_path_mutation(Tree, len_ROI)
         if check == true && i >= 3
@@ -126,7 +127,7 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
         else
             break
         end
-
+    end
         ## IMHO manca una 'end' qui!!!!
 
         possible_position = Set(1:len_ROI)
@@ -167,9 +168,9 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
         if single_cell
             mkpath("Fasta output") # Create folder
             for i in 1:length(leafs)
-                
+
                 ## Windows-ism!!!!
-                
+
                 w = FASTA.Writer(open("Fasta output\\sample"
                                       * string(leafs[i])
                                       * ".fasta",
@@ -182,8 +183,191 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
             end
         end
         return g_seq, fasta_samples, position_used
+end
+
+"""
+    comment gemonic evolution
+"""
+function genomic_evolution(Seq_f::LongDNASeq,
+                           Model_Selector::String, #Ploidity::Int,
+                           rate_Indel::AbstractFloat,
+                           size_indel::Int,
+                           branch_length::AbstractFloat,
+                           Model_Selector_matrix::DataFrame,
+                           prob_A::Vector{AbstractFloat},
+                           prob_C::Vector{AbstractFloat},
+                           prob_G::Vector{AbstractFloat},
+                           prob_T::Vector{AbstractFloat})
+
+    rng = MersenneTwister(1234)#create seed
+
+    sequence_father = copy(Seq_f)
+    len_father = length(sequence_father)
+
+    As = findall(x -> x == 'A', string(sequence_father))
+    n_A = length(As)
+    Cs = findall(x -> x == 'C', string(sequence_father))
+    n_C = length(Cs)
+    Gs = findall(x -> x == 'G', string(sequence_father))
+    n_G = length(Gs)
+    Ts = findall(x -> x == 'T', string(sequence_father))
+    n_T = length(Ts)
+    curr_time = 0
+
+    while curr_time <= branch_length
+        #evaluate rate
+        λ_A = n_A * sum(Model_Selector_matrix[:,1])
+        λ_C = n_C * sum(Model_Selector_matrix[:,2])
+        λ_G = n_G * sum(Model_Selector_matrix[:,3])
+        λ_T = n_T * sum(Model_Selector_matrix[:,4])
+        λ_indel = (len_father+1) * rate_Indel
+        λ_tot = sum([λ_A, λ_C, λ_G, λ_T, λ_indel])
+
+        curr_time = curr_time + rand(rng, Exponential(1 / λ_tot), 1)[1]
+
+        prob_vet = vcat(λ_A, λ_C, λ_G, λ_T, λ_indel) ./ λ_tot
+        prob_cum = cumsum(prob_vet)
+        k = rand(rng)
+
+        mutation = collect(k .<= prob_cum)
+        min_mutation = findfirst(mutation)
+
+        if min_mutation == 5 #indel
+            e = rand(rng, ["insertion", "deletion"])
+            #choose initial position
+            init_pos = rand(rng, 1:length(sequence_father))
+            if e == "insertion"
+                length_ins = rand(rng, Poisson(size_indel), 1)[1] + 1
+
+                if len_father - init_pos < length_ins
+                     length_ins = len_father - init_pos
+                 end
+
+                 init_pos_ins = rand(rng, 1:length(sequence_father))
+                 insertion_sequence =
+                                   sequence_father[init_pos:init_pos+length_ins]
+                 new_sequence = sequence_father[1:init_pos_ins]
+                 #new_sequence = LongSubSeq(sequence_father, 1:init_pos_ins)
+                 append!(new_sequence, insertion_sequence)
+                 append!(new_sequence, sequence_father[init_pos_ins + 1 : end])
+                 sequence_father = new_sequence
+                 len_father = len_father + length_ins
+                 #update
+                 #n_A += count("A" , string(insertion_sequence))
+                 #n_C += count("C" , string(insertion_sequence))
+                 #n_G += count("G" , string(insertion_sequence))
+                 #n_T += count("T" , string(insertion_sequence))
+             else #deletion
+                 length_del = rand(rng, Poisson(size_indel), 1)[1] + 1
+                 init_pos_del = rand(rng, 1:length(sequence_father))
+                 end_pos_del = min(len_father, init_pos_del + length_del)
+                 new_sequence = sequence_father[1:init_pos_del]
+
+                 if end_pos_del != len_father
+                     append!(new_sequence, sequence_father[end_pos_del + 1:end])
+                 end
+
+                 deletion_sequence = sequence_father[init_pos_del:end_pos_del]
+                 sequence_father = new_sequence
+                 len_father = len_father - length_del
+                 #update
+                 #n_A -= count("A" , string(deletion_sequence))
+                 #n_C -= count("C" , string(deletion_sequence))
+                 #n_G -= count("G" , string(deletion_sequence))
+                 #n_T -= count("T" , string(deletion_sequence))
+            end
+
+        elseif min_mutation == 4 #T
+            pos_mutation = rand(rng, Ts)
+            prob_cum_T = cumsum(prob_T)
+            k = rand(rng)
+            mutation = collect(k .<= prob_cum_T)
+            ff = findfirst(mutation)
+            new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
+            ## println("new_nucleotide: ",new_nucleotide)
+            sequence_father[pos_mutation] = DNA(new_nucleotide)
+
+        elseif min_mutation == 3 #G
+            pos_mutation = rand(rng, Gs)
+            prob_cum_G = cumsum(prob_G)
+            k = rand(rng)
+            mutation = collect(k .<= prob_cum_G)
+            ff = findfirst(mutation)
+            new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
+            sequence_father[pos_mutation] = DNA(new_nucleotide)
+
+        elseif min_mutation == 2 #C
+            pos_mutation = rand(rng, Cs)
+            prob_cum_C = cumsum(prob_C)
+            k = rand(rng)
+            mutation = collect(k .<= prob_cum_C)
+            ff = findfirst(mutation)
+            new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
+            sequence_father[pos_mutation] = DNA(new_nucleotide)
+
+        elseif min_mutation == 1 #A
+            pos_mutation = rand(rng, As)
+            prob_cum_A = cumsum(prob_A)
+            k = rand(rng)
+            mutation = collect(k .<= prob_cum_A)
+            ff = findfirst(mutation)
+            new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
+            sequence_father[pos_mutation] = DNA(new_nucleotide)
+        end
+        #update values
+        As = findall(x -> x == 'A', string(sequence_father))
+        n_A = length(As)
+        Cs = findall(x -> x == 'C', string(sequence_father))
+        n_C = length(Cs)
+        Gs = findall(x -> x == 'G', string(sequence_father))
+        n_G = length(Gs)
+        Ts = findall(x -> x == 'T', string(sequence_father))
+        n_T = length(Ts)
+    end
+    return sequence_father
+end
+
+"""
+    Molecular evolution with several substitution models
+"""
+function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
+                          Selector::String,
+                          rate_Indel::AbstractFloat,
+                          size_indel::Int)
+    #Model_Selector
+    Model_Selector_matrix =
+        DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
+                  C = [0.33333333, 0.0, 0.33333333, 0.33333333],
+                  G = [0.33333333, 0.33333333, 0.0, 0.33333333],
+                  T = [0.33333333, 0.33333333, 0.33333333, 0.0])
+
+    prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
+    prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
+    prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
+    prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
+    ##### fino a qui
+    for e in edges(Tree)
+        g_seq_e = LongDNASeq()
+        if has_prop(Tree, src(e), :Fasta)
+            # println("il source ha un file Fasta")
+            g_seq_e = copy(get_prop(Tree, src(e), :Fasta))
+        else
+            g_seq_e = copy(Ref)
+        end
+        sequence = genomic_evolution(g_seq, 
+                                     "isa",
+                                      0.0005,
+                                      300,
+                                      10.0,
+                                      Model_Selector_matrix,
+                                      prob_A,
+                                      prob_C,
+                                      prob_G,
+                                      prob_T)
     end
 
+
+end
     ### E lo strumento superiore mi fa immediatamente vedere che
     ### qui... Houston we have a problem.
 
