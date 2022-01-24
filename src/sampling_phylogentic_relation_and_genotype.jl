@@ -16,7 +16,8 @@ Returns a list of samples.
 """
 function list_sampling_cell(G::AbstractGraph,
                             Mode::String,
-                            L::Int;
+                            L::Int,
+                            seed::MersenneTwister;
                             dist::Int = 0)
     list_cell = []
     list_mut = []
@@ -24,7 +25,7 @@ function list_sampling_cell(G::AbstractGraph,
     if Mode == "Random"        # Choose random sample -> L = num sample
         set = collect(1:length(cs_alive))
         for i in 1:L
-            pos = rand(set)
+            pos = rand(seed, set)
             push!(list_cell, cs_alive[pos])
             filter!(s -> s != pos, set)
         end
@@ -136,14 +137,15 @@ function sampling_phylogentic_relation(G::AbstractGraph,
                                        Mode::String,
                                        df::DataFrame,
                                        L::Int,
-                                       set_mut::Vector{Any};
+                                       set_mut::Vector{Any},
+                                       seed::MersenneTwister;
                                        dist::Int = 0)
     event_df = copy(df)
     times = df[!, :Time]        # df.Time
     tf = times[end]             # Non so se serve
     event_df = event_df[event_df.Event .!= "Death", :]
     event_df = event_df[event_df.Event .!= "Migration", :]
-    list_sample, list_mut = list_sampling_cell(G, Mode, L, dist = dist)
+    list_sample, list_mut = list_sampling_cell(G, Mode, L, seed, dist = dist)
     matrix_R =
         create_matrix_relational(G,
                                  event_df,

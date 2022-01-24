@@ -8,7 +8,7 @@ Computes number of mutations for all edges.
 """
 function evolution_seq(Tree::AbstractMetaGraph,
                        Neutral_mut_rate::AbstractFloat, # AbstractFloat?
-                       length_ROI::Int)
+                       length_ROI::Int, seed::MersenneTwister)
     mutations = []
     ## println("evolution_seq funzione")
 
@@ -26,7 +26,7 @@ function evolution_seq(Tree::AbstractMetaGraph,
         t_curr = 0
         n_mut = 0
         while t_curr <= Tfinal
-            t_curr = t_curr + rand(Exponential(1 / λ), 1)[1]
+            t_curr = t_curr + rand(seed, Exponential(1 / λ), 1)[1]
             n_mut += 1
         end
         push!(mutations, n_mut)
@@ -39,7 +39,8 @@ end
 """
 Change genome in position pos.
 """
-function transform_genome(genome::LongDNASeq, pos::Vector{Any})
+function transform_genome(genome::LongDNASeq, pos::Vector{Any},
+                                                        seed::MersenneTwister)
     transition_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
                   C = [0.33333333, 0.0, 0.33333333, 0.33333333],
@@ -56,7 +57,7 @@ function transform_genome(genome::LongDNASeq, pos::Vector{Any})
         prob_cum = cumsum(transition_matrix[!, string(nucleotide)])
 
         ## println("prob_cum: ",prob_cum)
-        k = round( rand(), digits = 7) # with 7 decimals
+        k = round( rand(seed), digits = 7) # with 7 decimals
         target_nucl = collect(k .<= prob_cum)
         ## println("target_nucl: ",target_nucl)
         min = findfirst(target_nucl)
@@ -97,7 +98,8 @@ end
 Creates a input for tool ART -> FASTA file and tree on format Newick.
 """
 function Molecular_evolution(Tree::AbstractMetaGraph,
-                             neural_mut_rate::Float64;
+                             neural_mut_rate::Float64,
+                             seed::MersenneTwister;
                              path::String = "",
                              len_ROI::Int = 6000, # Why 6000?
                              single_cell::Bool = true)
@@ -110,7 +112,7 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
         end
         len_ROI = length(g_seq)
     else
-        g_seq = randdnaseq(len_ROI)
+        g_seq = randdnaseq(seed, len_ROI)
         rec = FASTA.Record("Reference", g_seq)
         w = FASTA.Writer(open("my-out.fasta", "w"))
         write(w, rec)
@@ -119,7 +121,7 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
     ## Compute mutations ∀ node
     for i in [1,2,3]
         check = false
-        n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI)
+        n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI, seed)
         check = check_num_path_mutation(Tree, len_ROI)
         if check == true && i >= 3
             ## If it is an error, signal one!
@@ -147,12 +149,12 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
             n_mut = get_prop(Tree, e, :N_Mutations)
             pos_edge = []
             for i = 1:n_mut
-                pos = rand(possible_position)
+                pos = rand(seed, possible_position)
                 delete!(possible_position, pos)
                 push!(pos_edge, pos)
                 push!(position_used, pos)
             end
-            g_seq_e = transform_genome(g_seq_e, pos_edge)
+            g_seq_e = transform_genome(g_seq_e, pos_edge, seed)
             set_prop!(Tree, dst(e), :Fasta, g_seq_e)
         end
 
@@ -194,12 +196,12 @@ function genomic_evolution(Seq_f::LongDNASeq,
                            size_indel::Int,
                            branch_length::AbstractFloat,
                            Model_Selector_matrix::DataFrame,
-                           prob_A::Vector{AbstractFloat},
-                           prob_C::Vector{AbstractFloat},
-                           prob_G::Vector{AbstractFloat},
-                           prob_T::Vector{AbstractFloat})
+                           prob_A::Vector{Float64},
+                           prob_C::Vector{Float64},
+                           prob_G::Vector{Float64},
+                           prob_T::Vector{Float64},
+                           seed::MersenneTwister)
 
-    rng = MersenneTwister(1234)#create seed
 
     sequence_father = copy(Seq_f)
     len_father = length(sequence_father)
@@ -223,27 +225,27 @@ function genomic_evolution(Seq_f::LongDNASeq,
         λ_indel = (len_father+1) * rate_Indel
         λ_tot = sum([λ_A, λ_C, λ_G, λ_T, λ_indel])
 
-        curr_time = curr_time + rand(rng, Exponential(1 / λ_tot), 1)[1]
+        curr_time = curr_time + rand(seed, Exponential(1 / λ_tot), 1)[1]
 
         prob_vet = vcat(λ_A, λ_C, λ_G, λ_T, λ_indel) ./ λ_tot
         prob_cum = cumsum(prob_vet)
-        k = rand(rng)
+        k = rand(seed)
 
         mutation = collect(k .<= prob_cum)
         min_mutation = findfirst(mutation)
 
         if min_mutation == 5 #indel
-            e = rand(rng, ["insertion", "deletion"])
+            e = rand(seed, ["insertion", "deletion"])
             #choose initial position
-            init_pos = rand(rng, 1:length(sequence_father))
+            init_pos = rand(seed, 1:length(sequence_father))
             if e == "insertion"
-                length_ins = rand(rng, Poisson(size_indel), 1)[1] + 1
+                length_ins = rand(seed, Poisson(size_indel), 1)[1] + 1
 
                 if len_father - init_pos < length_ins
                      length_ins = len_father - init_pos
                  end
 
-                 init_pos_ins = rand(rng, 1:length(sequence_father))
+                 init_pos_ins = rand(seed, 1:length(sequence_father))
                  insertion_sequence =
                                    sequence_father[init_pos:init_pos+length_ins]
                  new_sequence = sequence_father[1:init_pos_ins]
@@ -258,8 +260,8 @@ function genomic_evolution(Seq_f::LongDNASeq,
                  #n_G += count("G" , string(insertion_sequence))
                  #n_T += count("T" , string(insertion_sequence))
              else #deletion
-                 length_del = rand(rng, Poisson(size_indel), 1)[1] + 1
-                 init_pos_del = rand(rng, 1:length(sequence_father))
+                 length_del = rand(seed, Poisson(size_indel), 1)[1] + 1
+                 init_pos_del = rand(seed, 1:length(sequence_father))
                  end_pos_del = min(len_father, init_pos_del + length_del)
                  new_sequence = sequence_father[1:init_pos_del]
 
@@ -278,9 +280,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             end
 
         elseif min_mutation == 4 #T
-            pos_mutation = rand(rng, Ts)
+            pos_mutation = rand(seed, Ts)
             prob_cum_T = cumsum(prob_T)
-            k = rand(rng)
+            k = rand(seed)
             mutation = collect(k .<= prob_cum_T)
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
@@ -288,27 +290,27 @@ function genomic_evolution(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
         elseif min_mutation == 3 #G
-            pos_mutation = rand(rng, Gs)
+            pos_mutation = rand(seed, Gs)
             prob_cum_G = cumsum(prob_G)
-            k = rand(rng)
+            k = rand(seed)
             mutation = collect(k .<= prob_cum_G)
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
         elseif min_mutation == 2 #C
-            pos_mutation = rand(rng, Cs)
+            pos_mutation = rand(seed, Cs)
             prob_cum_C = cumsum(prob_C)
-            k = rand(rng)
+            k = rand(seed)
             mutation = collect(k .<= prob_cum_C)
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
         elseif min_mutation == 1 #A
-            pos_mutation = rand(rng, As)
+            pos_mutation = rand(seed, As)
             prob_cum_A = cumsum(prob_A)
-            k = rand(rng)
+            k = rand(seed)
             mutation = collect(k .<= prob_cum_A)
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
@@ -333,7 +335,9 @@ end
 function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
                           Selector::String,
                           rate_Indel::AbstractFloat,
-                          size_indel::Int)
+                          size_indel::Int,
+                          branch_length::AbstractFloat,
+                          seed::MersenneTwister)
     #Model_Selector
     Model_Selector_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
@@ -348,25 +352,28 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
     ##### fino a qui
     for e in edges(Tree)
         g_seq_e = LongDNASeq()
+        println(e)
         if has_prop(Tree, src(e), :Fasta)
             # println("il source ha un file Fasta")
             g_seq_e = copy(get_prop(Tree, src(e), :Fasta))
         else
             g_seq_e = copy(Ref)
         end
-        sequence = genomic_evolution(g_seq, 
+        sequence = genomic_evolution(g_seq_e,
                                      "isa",
-                                      0.0005,
-                                      300,
-                                      10.0,
+                                      rate_Indel,
+                                      size_indel,
+                                      branch_length,
                                       Model_Selector_matrix,
                                       prob_A,
                                       prob_C,
                                       prob_G,
-                                      prob_T)
+                                      prob_T,
+                                      seed)
+        set_prop!(Tree, dst(e), :Fasta, sequence)
     end
 
-
+    return Tree
 end
     ### E lo strumento superiore mi fa immediatamente vedere che
     ### qui... Houston we have a problem.

@@ -37,7 +37,7 @@ function create_bulk_groundtruth(G_seq::LongDNASeq,
         end
     end
     =#
-    
+
     df = DataFrame(MUT = Any[], VAF = AbstractFloat[])
     n_sample = length(Fasta_sample)
     Position_sort = sort(Position)
@@ -64,16 +64,16 @@ end
 "Function bulk_with_noise
 
 "
-function bulk_with_noise(Coverage, VAF, n_sample, FP, FN, Positions)
+function bulk_with_noise(Coverage, VAF, n_sample, FP, FN, Positions, seed)
     df_noise = DataFrame(MUT = Any[], VAF = AbstractFloat[])
     for i in 1:length(Positions)
-        n_reads = rand(Poisson(Coverage), 1)[1]
+        n_reads = rand(seed, Poisson(Coverage), 1)[1]
         # println("n_reads: ", n_reads)
-        n_read_muts = rand(Binomial(n_reads, VAF[i, :VAF]), 1)[1]
+        n_read_muts = rand(seed, Binomial(n_reads, VAF[i, :VAF]), 1)[1]
         # println("n_read_muts: ", n_read_muts)
-        n_FP = rand(Binomial(n_sample-n_read_muts, FP), 1)[1]
+        n_FP = rand(seed, Binomial(n_sample-n_read_muts, FP), 1)[1]
         # println("n_FP: ",n_FP)
-        n_FN = rand(Binomial(n_read_muts, FN), 1)[1]
+        n_FN = rand(seed, Binomial(n_read_muts, FN), 1)[1]
         # println("n_FN: ",n_FN)
         n_VAF_Noise = (n_read_muts + n_FP - n_FN)/n_sample
         # println("n_VAF_Noise: ", n_VAF_Noise)
@@ -88,7 +88,8 @@ end
 "
 function experiment_bulk(reference::LongDNASeq,
                          fasta_samples::Vector{Any},
-                         position_used::Vector{Any};
+                         position_used::Vector{Any},
+                         seed::MersenneTwister;
                          Noise::Bool = false,
                          coverage::AbstractFloat = 0,
                          FP::AbstractFloat = 0,
@@ -105,7 +106,7 @@ function experiment_bulk(reference::LongDNASeq,
                                        VAF_GT,
                                        n_sample,
                                        FP,
-                                       FN, position_used)
+                                       FN, position_used, seed)
         CSV.write("VAF_GT_Noise.vcf", VAF_GT_Noise, delim = ",")
     end
     return VAF_GT, VAF_GT_Noise #, g_seq
