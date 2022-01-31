@@ -8,7 +8,7 @@ N_starting_cells = 1 #start cell at the simualtion
 # ***
 # Otherwise matrix adjacency
 # ***#
-matrix_adjacency = "path/where/read/matrix" #or "", empty
+#matrix_adjacency = "path/matrix/adjacency" #or 1, if already exist
 
 [[Dynamic]]
 Model = "contact" #Model of interaction ["contact", "voter", "hvoter"]
@@ -38,7 +38,8 @@ neut_mut_rate = 0.000025 #rate of neutral mutation
 #*** if type_isa = 0 ***#
 sub_model = "model" #decide substitution matrix for mutation, possible value ->[]
 indel_size = 300
-indel_rate = 10.0
+indel_rate = 0.0005
+branch_length = 10.0
 params = [0.05, 0.03]
 
 [[BulkExperiment]]
@@ -48,7 +49,7 @@ FP = 0.0000005 #rate false positive
 FN = 0.0000002 #rate false negative
 
 [[ART]]
-command = "" #if user want write your call
+command = `` #if user want write your call
 #*** Otherwise write paramaters ***#
 profile = "HS25" #The name of Illumina sequencing system of the built-in profile used for simulation
 len_read = 150 #the length of reads to be simulated

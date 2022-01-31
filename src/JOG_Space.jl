@@ -22,7 +22,7 @@ using UUIDs                     # Library for unique id
                      # the function
 using Distributions  # Library for calculate normal distributions
 using CSV
-
+#using TOML
 ### File da esportare
 export
     ## Simulation
@@ -31,8 +31,10 @@ export
     sampling_phylogentic_relation, create_tree,
     ## Experiment
     Molecular_evolution, experiment_bulk, singlecell_NoISA,
+    ## ART
+    call_ART,
     ## non utili, servono per i plot
-    plot_lattice_3D_web, animation_2D, create_heatmap
+    plot_lattice, plot_lattice_3D_web, animation_2D, create_heatmap
 
 
 ### Inizio progetto

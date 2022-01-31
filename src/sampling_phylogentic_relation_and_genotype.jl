@@ -162,7 +162,7 @@ end
 """
 Create and plot tree
 """
-function create_tree(matrix::DataFrame; path::String = "")
+function create_tree(matrix::DataFrame, newick::Bool; path::String = "")
     # !!!!!!!!!!!!||!!! DEVE ESSERE UN GRAFO DIRETTO, altrimenti non
     # funziona il plot
     tree = MetaDiGraph(matrix, :Father, :Child)
@@ -191,8 +191,11 @@ function create_tree(matrix::DataFrame; path::String = "")
     ## save(path, f)
 
     ## Create format newick
-    net = format_newick(tree_reduce)
-    return tree_reduce, net
+    if newick == true
+        net = format_newick(tree_reduce)
+        return tree_reduce, net
+    end
+    return tree_reduce
 end
 
 

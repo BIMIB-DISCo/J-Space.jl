@@ -19,7 +19,7 @@ function create_tree_mutation_driver(set_mut::Vector{Any}, event_df::DataFrame)
     add_vertex!(tree)
     set_prop!(tree, 1, :Time, 0)
     set_prop!(tree, 1, :Mutation, 1)
-    
+
     ## Times
     df_mutations = event_df[event_df.Event .== "Mutation", :]
     times = df_mutations[!, :Time]
@@ -34,13 +34,13 @@ function create_tree_mutation_driver(set_mut::Vector{Any}, event_df::DataFrame)
             add_edge!(tree, 1, i)
         else
             len = length(muts)
-            
+
             ## Filtro tutte le muts in set_mut con una
             ## lunghezza -> len-1
-            
+
             possible_father =
                 [m for m in set_mut[1:i] if length(m) == len - 1]
-            
+
             ## Tra i risultati cerco il modo di verificare un array
             ## dentro un array
             father_id = findall(x -> x ⊆ muts, possible_father)[1]
@@ -48,7 +48,7 @@ function create_tree_mutation_driver(set_mut::Vector{Any}, event_df::DataFrame)
 
             ## trovato faccio il solito "gioco" di aggiungere vertice
             ## e le props
-            
+
             add_vertex!(tree)
             set_prop!(tree, i, :Time, times[i-1])
             set_prop!(tree, i, :Mutation, muts[end])
@@ -126,10 +126,14 @@ function create_newick(Tree::AbstractMetaGraph,
         string(t_2) *
         ")" *
         string(parent)
-    
+
     new_parent = dict[parent][:in]
-    t_np = t_p - get_prop(Tree, new_parent, :Time)
-    str = str * ":" * string(t_np)
+    if typeof(get_prop(Tree, new_parent, :Time)) != Missing
+        t_np = t_p - get_prop(Tree, new_parent, :Time)
+        str = str * ":" * string(t_np)
+    else
+        str = str * ":" * string(t_p)
+    end
     while new_parent != 0 && parent != root
         child = dict[new_parent][:out]
         filter!(v -> v != parent, child)[1]
@@ -145,11 +149,9 @@ function create_newick(Tree::AbstractMetaGraph,
         parent = new_parent
 
         ## Isn't this an 'if'?
-        
         get(dict[new_parent], :in, 0) == 0 ?
             new_parent = 0 :
             new_parent = dict[new_parent][:in]
-        
         if new_parent == root && length(dict[new_parent][:out]) == 1
             t_p = get_prop(Tree, parent, :Time)
             str = "(" * str * ":" * string(t_p) * ")" * string(new_parent)
@@ -213,4 +215,3 @@ end
 #end #module
 
 ### end of file -- Format_tree.jl
-

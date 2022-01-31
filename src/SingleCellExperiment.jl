@@ -95,29 +95,105 @@ end
 
 
 """
-Creates a input for tool ART -> FASTA file and tree on format Newick.
+Creates a input for tool ART -> FASTA file (WITHOUT FASTA).
 """
 function Molecular_evolution(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
-                             seed::MersenneTwister;
-                             path::String = "",
-                             len_ROI::Int = 6000, # Why 6000?
+                             seed::MersenneTwister,
+                             len_ROI::Int = 6000;
                              single_cell::Bool = true)
-    ## Create/load reference genome
-    if path != ""
-        open(FASTA.Reader, path) do reader
-            for record in reader
-                g_seq = FASTX.sequence(record)
+    ## Create reference genome
+    g_seq = randdnaseq(seed, len_ROI)
+    rec = FASTA.Record("Reference", g_seq)
+    w = FASTA.Writer(open("Reference.fasta", "w"))
+    write(w, rec)
+    close(w)
+
+    ## Compute mutations ∀ node
+    for i in [1,2,3]
+        check = false
+        n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI, seed)
+        check = check_num_path_mutation(Tree, len_ROI)
+        if check == true && i >= 3
+            ## If it is an error, signal one!
+            return "ERROR: mutations are more than lenght ROI -> (file fasta)."
+        else
+            break
+        end
+    end
+        ## IMHO manca una 'end' qui!!!!
+
+        possible_position = Set(1:len_ROI)
+        # g_seq_e = copy(g_seq) #reference g_seq not change
+
+        position_used = []
+
+        # create fasta ∀ nodes
+        for e in edges(Tree)
+            g_seq_e = LongDNASeq()
+            if has_prop(Tree, src(e), :Fasta)
+                # println("il source ha un file Fasta")
+                g_seq_e = copy(get_prop(Tree, src(e), :Fasta))
+            else
+                g_seq_e = copy(g_seq)
+            end
+            n_mut = get_prop(Tree, e, :N_Mutations)
+            pos_edge = []
+            for i = 1:n_mut
+                pos = rand(seed, possible_position)
+                delete!(possible_position, pos)
+                push!(pos_edge, pos)
+                push!(position_used, pos)
+            end
+            g_seq_e = transform_genome(g_seq_e, pos_edge, seed)
+            set_prop!(Tree, dst(e), :Fasta, g_seq_e)
+        end
+
+        # Return fasta of leaf nodes
+        leafs = get_leafs(Tree)
+        fasta_samples = []
+        for l in leafs
+            f = get_prop(Tree, l, :Fasta)
+            push!(fasta_samples, f)
+        end
+
+        ## write fasta on files if single_cell is true
+        if single_cell
+            mkpath("Fasta output") # Create folder
+            for i in 1:length(leafs)
+
+                ## Windows-ism!!!!
+
+                w = FASTA.Writer(open("Fasta output\\sample"
+                                      * string(leafs[i])
+                                      * ".fasta",
+                                      "w"))
+                rec = FASTA.Record("Sample"
+                                   * string(leafs[i]),
+                                   fasta_samples[i])
+                write(w, rec)
+                close(w)
             end
         end
-        len_ROI = length(g_seq)
-    else
-        g_seq = randdnaseq(seed, len_ROI)
-        rec = FASTA.Record("Reference", g_seq)
-        w = FASTA.Writer(open("my-out.fasta", "w"))
-        write(w, rec)
-        close(w)
+        return g_seq, fasta_samples, position_used
+end
+
+"""
+Creates a input for tool ART -> FASTA file (WITH REF FASTA).
+"""
+function Molecular_evolution(Tree::AbstractMetaGraph,
+                             neural_mut_rate::Float64,
+                             seed::MersenneTwister,
+                             path::String;
+                             single_cell::Bool = true)
+    ## load reference genome
+    open(FASTA.Reader, path) do reader
+        for record in reader
+            g_seq = FASTX.sequence(record)
+        end
     end
+    len_ROI = length(g_seq)
+
     ## Compute mutations ∀ node
     for i in [1,2,3]
         check = false
@@ -330,15 +406,23 @@ function genomic_evolution(Seq_f::LongDNASeq,
 end
 
 """
-    Molecular evolution with several substitution models
+    Molecular evolution with several substitution models (With ref)
 """
-function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
+function singlecell_NoISA(Tree::AbstractMetaGraph, path::String,
                           Selector::String,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
                           branch_length::AbstractFloat,
                           seed::MersenneTwister)
     Tree_SC = copy(Tree)
+
+    ## load reference genome
+    open(FASTA.Reader, path) do reader
+        for record in reader
+            Ref = FASTX.sequence(record)
+        end
+    end
+
     #Model_Selector
     Model_Selector_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
@@ -374,9 +458,79 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
         set_prop!(Tree_SC, dst(e), :Fasta, sequence)
     end
 
-    return Tree_SC
+    # Return fasta of leaf nodes
+    leafs = get_leafs(Tree_SC)
+    fasta_samples = []
+    for l in leafs
+        f = get_prop(Tree, l, :Fasta)
+        push!(fasta_samples, f)
+    end
+
+    return get_prop(Tree_SC, 1, :Fasta), fasta_samples, Tree_SC
 end
-    ### E lo strumento superiore mi fa immediatamente vedere che
-    ### qui... Houston we have a problem.
+
+"""
+    Molecular evolution with several substitution models (Without ref)
+"""
+function singlecell_NoISA(Tree::AbstractMetaGraph, Len::Int,
+                          Selector::String,
+                          rate_Indel::AbstractFloat,
+                          size_indel::Int,
+                          branch_length::AbstractFloat,
+                          seed::MersenneTwister)
+    Tree_SC = copy(Tree)
+
+    ## Create reference genome
+    Ref = randdnaseq(seed, Len)
+    rec = FASTA.Record("Reference", Ref)
+    w = FASTA.Writer(open("Reference.fasta", "w"))
+    write(w, rec)
+    close(w)
+
+    #Model_Selector
+    Model_Selector_matrix =
+        DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
+                  C = [0.33333333, 0.0, 0.33333333, 0.33333333],
+                  G = [0.33333333, 0.33333333, 0.0, 0.33333333],
+                  T = [0.33333333, 0.33333333, 0.33333333, 0.0])
+
+    prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
+    prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
+    prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
+    prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
+    ##### fino a qui
+    for e in edges(Tree_SC)
+        g_seq_e = LongDNASeq()
+        println(e)
+        if has_prop(Tree_SC, src(e), :Fasta)
+            # println("il source ha un file Fasta")
+            g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
+        else
+            g_seq_e = copy(Ref)
+        end
+        sequence = genomic_evolution(g_seq_e,
+                                     "isa",
+                                      rate_Indel,
+                                      size_indel,
+                                      branch_length,
+                                      Model_Selector_matrix,
+                                      prob_A,
+                                      prob_C,
+                                      prob_G,
+                                      prob_T,
+                                      seed)
+        set_prop!(Tree_SC, dst(e), :Fasta, sequence)
+    end
+
+    # Return fasta of leaf nodes
+    leafs = get_leafs(Tree_SC)
+    fasta_samples = []
+    for l in leafs
+        f = get_prop(Tree, l, :Fasta)
+        push!(fasta_samples, f)
+    end
+
+    return get_prop(Tree_SC, 1, :Fasta), fasta_samples, Tree_SC
+end
 
     ### end of file -- SingleCellExperiment.jl

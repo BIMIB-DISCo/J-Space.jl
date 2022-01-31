@@ -120,9 +120,25 @@ function call_ART(profile::String,
         command = command * "-ss $profile -i $file -l $len_read
                              -c $tot_num_reads -o $outfile_prefix"
     end
-    #Cmd(`sudo art_illumina $ef`) #cosi va    
+    #Cmd(`sudo art_illumina $ef`) #cosi va
     #non funziona, devo trovare il modo
     #cmd = @cmd(command)
     #cmd = @cmd("art_illumina -sam -i file -l len_read -ss HS25 -f 10 -o mode")
+end
+
+function call_ART(command::Cmd#= più dove salvare le cose=#)
+    #caso in cui ho tanti fasta -> da vedere
+    #cd("Fasta output\\")        # Cambio directory in cui voglio salvare.
+    for file in readdir()       # Scorro tutti i file
+        f = hcat(split.(file, ".")...)[1, :]
+        if length(f) > 1 && f[2] == "fasta"
+            mkpath(f[1])
+            cd(f[1])
+            run(command)
+            cd("..\\")
+        end
+    end
+    cd("..\\")
+
 end
 ### end of file -- CallART.jl
