@@ -1,0 +1,33 @@
+#This is an example of config files
+
+[[Config]]
+seed = 1234 #choose yout seed
+generate_reference = 0 # 0 if user have his ref, 1 if not have reference
+#*** if generate_reference == 1 ***#
+path_reference = "./reference.fasta" #path where reference is saved
+path_to_save_files = "./fileoutput"
+path_to_save_plot = "./plot"
+
+Generate_graph = 1 #1 if graph is not already avaliable
+Path_to_Graph = "./graph_AM.csv" #example path where read graph
+Type_of_graph = "matrix_adjacency" #??
+
+[[OutputGT]]
+Tree_Newick = 1 #1 if you want graph in newick format
+Final_configuration = 1 #if you want graph after simulation
+Driver_list = 1 #list of all driver mutation
+Driver_Tree = 1 #tree of driver mutation
+
+[[FileOutputExperiments]]
+Single_cell_genotype = "./Experiments/"
+Single_cell_fasta = 0 #1 if you want save fasta of cells
+Single_cell_noise = 1
+VAF_GT = 1 #if model substitution is ISA
+Bulk_noise = 1 #if model substitution is ISA
+reads = "" #??
+
+[[FileOutputPlot]]
+Time_of_sampling = 1
+Dynamic_genotype = 1
+Division_time = [10, 20, 50, 70, 100] #last element < t_max simulation
+Graph_configuration = 1
