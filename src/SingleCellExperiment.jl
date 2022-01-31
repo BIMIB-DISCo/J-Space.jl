@@ -338,6 +338,7 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
                           size_indel::Int,
                           branch_length::AbstractFloat,
                           seed::MersenneTwister)
+    Tree_SC = copy(Tree)
     #Model_Selector
     Model_Selector_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
@@ -350,12 +351,12 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
     prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
     prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
     ##### fino a qui
-    for e in edges(Tree)
+    for e in edges(Tree_SC)
         g_seq_e = LongDNASeq()
         println(e)
-        if has_prop(Tree, src(e), :Fasta)
+        if has_prop(Tree_SC, src(e), :Fasta)
             # println("il source ha un file Fasta")
-            g_seq_e = copy(get_prop(Tree, src(e), :Fasta))
+            g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
             g_seq_e = copy(Ref)
         end
@@ -370,10 +371,10 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Ref::LongDNASeq,
                                       prob_G,
                                       prob_T,
                                       seed)
-        set_prop!(Tree, dst(e), :Fasta, sequence)
+        set_prop!(Tree_SC, dst(e), :Fasta, sequence)
     end
 
-    return Tree
+    return Tree_SC
 end
     ### E lo strumento superiore mi fa immediatamente vedere che
     ### qui... Houston we have a problem.

@@ -1,0 +1,66 @@
+#This is an example of parameters files of dynamic
+
+[[Graph]]
+row = 21 #num row of lattice
+col = 21 #num col of lattice
+dim = 1 #deep of lattice
+N_starting_cells = 1 #start cell at the simualtion
+# ***
+# Otherwise matrix adjacency
+# ***#
+matrix_adjacency = "path/where/read/matrix" #or "", empty
+
+[[Dynamic]]
+Model = "contact" #Model of interaction ["contact", "voter", "hvoter"]
+Max_time = 200.0 #Time of the simulation
+rate_birth = 0.2 #Rate of birth
+rate_death = 0.01 #Rate of Death
+rate_migration = 0.01 #Rate of migration
+drive_mut_rate = 0.01 #Rate of mew drive mutation
+average_driver_mut_rate = 0.4 #Rate of average of the new driver mutation during proliferation
+std_driver_mut_rate = 0.1 #Rate of the standard deviation of average_driver_mut_rate
+
+[[Sampling]]
+Random_sampling = 1 #Choose mode sampling: 1 -> Random, 0 -> Neighbourhood
+num_cell = 10 #Num of cells of the sampling
+#***
+# If Random_sampling = 0
+# ***#
+pos_center = 0 #center of neighborshood, if = 0 -> position random
+radius_sampling = 10 #size radius of the sampling
+
+[[MolecularEvolution]]
+length_genome = 6000 #length of genome reference, if ref not given, else = 0
+type_isa = 1 #type of model evolution, if value 0 specificate submodel
+#diploide = 0 #if we choose a evolution with constrain
+#*** if type_isa = 1 ***#
+neut_mut_rate = 0.000025 #rate of neutral mutation
+#*** if type_isa = 0 ***#
+sub_model = "model" #decide substitution matrix for mutation, possible value ->[]
+indel_size = 300
+indel_rate = 10.0
+params = [0.05, 0.03]
+
+[[BulkExperiment]]
+coverage = 10.0
+#read_lenght = ??
+FP = 0.0000005 #rate false positive
+FN = 0.0000002 #rate false negative
+
+[[ART]]
+command = "" #if user want write your call
+#*** Otherwise write paramaters ***#
+profile = "HS25" #The name of Illumina sequencing system of the built-in profile used for simulation
+len_read = 150 #the length of reads to be simulated
+tot_num_reads = 10 #number of reads/read pairs to be generated per sequence
+outfile_prefix = "example" #the prefix of output filename
+ef = 1 #indicate to generate the zero sequencing errors SAM file as well the regular one
+#NOTE: the reads in the zero-error SAM file have the same alignment positions
+no_ALN = 0 #do not output ALN alignment file
+paired_end = 0 # indicate a paired-end read simulation or to generate reads from both ends of amplicons
+	                    #NOTE: art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000
+#*** if paired_end == 1, they are require **#
+mean_fragsize = 200 #the mean size of DNA/RNA fragments for paired-end simulations
+std_fragsize = 10 #the standard deviation of DNA/RNA fragment size for paired-end simulations
+
+mate_pair = 0 #indicate a mate-pair read simulation

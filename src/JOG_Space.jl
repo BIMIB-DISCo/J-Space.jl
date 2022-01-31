@@ -30,7 +30,7 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    Molecular_evolution, experiment_bulk, genomic_evolution,
+    Molecular_evolution, experiment_bulk, singlecell_NoISA,
     ## non utili, servono per i plot
     plot_lattice_3D_web, animation_2D, create_heatmap
 
@@ -258,6 +258,7 @@ function cell_birth(G::AbstractGraph,
                     set_mut::Vector{Any},
                     α::Vector{Float64},
                     driv_average_advantage::AbstractFloat,
+                    driv_std_advantage::AbstractFloat,
                     time::AbstractFloat,
                     ca_subpop::Vector{Any},
                     idx::Int,
@@ -289,7 +290,8 @@ function cell_birth(G::AbstractGraph,
         new_mut = push!(old_muts, new_drive) # Create new "cluster" at mut
 
         ## Calcolo il nuovo alpha
-        new_alpha_driver(G, cell, set_mut, α, driv_average_advantage, seed)
+        new_alpha_driver(G, cell, set_mut, α, driv_average_advantage,
+                                                       driv_std_advantage, seed)
         push!(set_mut, new_mut)
         push!(df, ["Mutation", time, id2, [parent, new_drive]])
         push!(df, ["Duplicate", time, id, [parent]])
@@ -338,10 +340,11 @@ function new_alpha_driver(G::AbstractMetaGraph,
                           Set_mut::Vector{Any},
                           α::Vector{Float64},
                           driv_average_advantage::AbstractFloat,
+                          driv_std_advantage::AbstractFloat,
                           seed::MersenneTwister)
     mut = get_prop(G, cell, :mutation)
     idx = findall(x -> x == mut, Set_mut)[1] # Ne esiste solo 1
-    norm = Normal(driv_average_advantage, driv_average_advantage / 2)
+    norm = Normal(driv_average_advantage, driv_std_advantage)
     new_α = α[idx] + abs(rand(seed, norm, 1)[1])
     push!(α, new_α)
 end
@@ -475,7 +478,7 @@ function create_heatmap(Tf::AbstractFloat,
     return zs2
 end
 
-
+#=
 """
 Evolution coloring function.
 """
@@ -624,7 +627,7 @@ function simulate_MC(n_sim::Int64,
     end
     return times_tot, n_cell_alive_tot
 end
-
+=#
 
 """
 Evolution simulation.
@@ -636,6 +639,7 @@ function simulate_evolution(G::AbstractGraph,
                             rate_migration::AbstractFloat,
                             μ_dri::AbstractFloat,
                             driv_average_advantage::AbstractFloat,
+                            driv_std_advantage::AbstractFloat,
                             model::String,
                             seed::MersenneTwister;
                             n_save_graph::Int = 1)
@@ -650,12 +654,12 @@ function simulate_evolution(G::AbstractGraph,
     push!(list_len_node_occ, n_cs_alive) # Update list nodes occ al tempo t
     #initialize metadata
     for alive in cs_alive
-        println("alive: ", alive)
+        #println("alive: ", alive)
         mutation = get_prop(G, alive, :mutation)
-        println("mut -> ", mutation)
+        #println("mut -> ", mutation)
         subpop = findall(m -> m == mutation, set_mut_pop)[1]
-        println("subpop: ", subpop)
-        println("fit: ", α[subpop])
+        #println("subpop: ", subpop)
+        #println("fit: ", α[subpop])
         set_prop!(G, alive, :Subpop, subpop)
         set_prop!(G, alive, :Fit, α[subpop])
     end
@@ -744,6 +748,7 @@ function simulate_evolution(G::AbstractGraph,
                                      set_mut_pop,
                                      α,
                                      driv_average_advantage,
+                                     driv_std_advantage,
                                      t_curr,
                                      ca_subpop,
                                      min,
