@@ -138,7 +138,8 @@ function sampling_phylogentic_relation(G::AbstractGraph,
                                        df::DataFrame,
                                        L::Int,
                                        set_mut::Vector{Any},
-                                       seed::MersenneTwister;
+                                       seed::MersenneTwister,
+                                       driver_tree::Int;
                                        dist::Int = 0)
     event_df = copy(df)
     times = df[!, :Time]        # df.Time
@@ -152,10 +153,12 @@ function sampling_phylogentic_relation(G::AbstractGraph,
                                  list_sample,
                                  list_mut,
                                  set_mut)
-    tree_mut = create_tree_mutation_driver(set_mut, event_df)
-    ## matrix_R_without_migration = matrix_R[matrix_R.Event .!= "Migration", :]
-    ## return matrix_R_without_migration
-    return matrix_R, tree_mut
+    if driver_tree == 1
+        tree_mut = create_tree_mutation_driver(set_mut, event_df)
+        return matrix_R, tree_mut
+    else
+        return matrix_R
+    end
 end
 
 

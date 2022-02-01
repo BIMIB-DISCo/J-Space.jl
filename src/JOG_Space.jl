@@ -10,8 +10,8 @@ using Plots                     # Library as support
 using NetworkLayout             # Layout for lattice
 using GraphMakie                # Plot graph
 using CairoMakie                # Library for heatmap
-using JSServe                   # Create page for plot
-using WGLMakie                  # Library for 2D/3D plot on web page
+#using JSServe                   # Create page for plot
+#using WGLMakie                  # Library for 2D/3D plot on web page
 using GLMakie                   # Library for 2D/3D plot
 using DataFrames                # Library for the main struct
 using Makie
@@ -21,7 +21,7 @@ using UUIDs                     # Library for unique id
 #using BenchmarkTools # Library for checking time and allocations of
                      # the function
 using Distributions  # Library for calculate normal distributions
-using CSV
+using CSV, Tables
 #using TOML
 ### File da esportare
 export
@@ -30,11 +30,11 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    Molecular_evolution, experiment_bulk, singlecell_NoISA,
+    Molecular_evolution, experiment_bulk, singlecell_NoISA, save_FastaQ
     ## ART
     call_ART,
     ## non utili, servono per i plot
-    plot_lattice, plot_lattice_3D_web, animation_2D, create_heatmap
+    plot_lattice, plot_tree, plot_lattice_3D_web, animation_2D, create_heatmap
 
 
 ### Inizio progetto
@@ -158,6 +158,22 @@ function get_drivermut_name_colors(G::MetaGraph, Set_mut::Vector{Any})
     return driver_muts, names, colors
 end
 
+"""
+Plots tree.
+"""
+function plot_tree(Tree::MetaGraph, path::String, who::String)
+      GLMakie.activate!()
+      color = [:black for i in 1:nv(tree)]
+      color[1] = :red
+      f, ax, p =
+      graphplot(Tree,
+                layout = Buchheim(),
+                node_color = color,
+                nlabels = [string(v) for v in vertices(tree)])
+      hidedecorations!(ax)
+      hidespines!(ax)
+      save(path*who*".png", f)
+end
 
 """
 Plots graph in 3D.

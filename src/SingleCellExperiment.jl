@@ -3,6 +3,38 @@
 ### SingleCellExperiment.jl
 import BioSequences
 using FASTX
+
+"""
+Save fasta.
+"""
+function save_FastaQ(Ref::LongDNASeq, fasta_samples::Vector{Any},
+                     tree::MetaGraphs, path_save_file::String)
+      ## write fasta on files if single_cell is true
+      leafs = get_leafs(tree)
+      mkpath(path_save_file*"\\Fasta output") # Create folder
+      path_for_fasta = path_save_file*"\\Fasta output"
+      for i in 1:length(leafs)
+          ## Windows-ism!!!!
+          w = FASTA.Writer(open(path_for_fasta
+                                * "\\sample"
+                                * string(leafs[i])
+                                * ".fasta",
+                                "w"))
+          rec = FASTA.Record("Sample"
+                             * string(leafs[i]),
+                             fasta_samples[i])
+          write(w, rec)
+          close(w)
+      end
+      w = FASTA.Writer(open(path_for_fasta
+                            * "\\reference"
+                            * ".fasta",
+                            "w"))
+      rec = FASTA.Record("Reference", Ref)
+      write(w, rec)
+      close(w)
+end
+
 """
 Computes number of mutations for all edges.
 """
@@ -100,8 +132,7 @@ Creates a input for tool ART -> FASTA file (WITHOUT FASTA).
 function Molecular_evolution(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
                              seed::MersenneTwister,
-                             len_ROI::Int = 6000;
-                             single_cell::Bool = true)
+                             len_ROI::Int)
     ## Create reference genome
     g_seq = randdnaseq(seed, len_ROI)
     rec = FASTA.Record("Reference", g_seq)
@@ -157,24 +188,6 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
             push!(fasta_samples, f)
         end
 
-        ## write fasta on files if single_cell is true
-        if single_cell
-            mkpath("Fasta output") # Create folder
-            for i in 1:length(leafs)
-
-                ## Windows-ism!!!!
-
-                w = FASTA.Writer(open("Fasta output\\sample"
-                                      * string(leafs[i])
-                                      * ".fasta",
-                                      "w"))
-                rec = FASTA.Record("Sample"
-                                   * string(leafs[i]),
-                                   fasta_samples[i])
-                write(w, rec)
-                close(w)
-            end
-        end
         return g_seq, fasta_samples, position_used
 end
 
@@ -184,8 +197,7 @@ Creates a input for tool ART -> FASTA file (WITH REF FASTA).
 function Molecular_evolution(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
                              seed::MersenneTwister,
-                             path::String;
-                             single_cell::Bool = true)
+                             path::String)
     ## load reference genome
     open(FASTA.Reader, path) do reader
         for record in reader
@@ -243,13 +255,15 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
         end
 
         ## write fasta on files if single_cell is true
-        if single_cell
-            mkpath("Fasta output") # Create folder
+        if single_cell == 1
+            mkpath(path_save_file*"\\Fasta output") # Create folder
+            path_for_fasta = path_save_file*"\\Fasta output"
             for i in 1:length(leafs)
 
                 ## Windows-ism!!!!
 
-                w = FASTA.Writer(open("Fasta output\\sample"
+                w = FASTA.Writer(open(path_for_fasta
+                                      * "\\sample"
                                       * string(leafs[i])
                                       * ".fasta",
                                       "w"))
@@ -465,6 +479,7 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, path::String,
         f = get_prop(Tree, l, :Fasta)
         push!(fasta_samples, f)
     end
+
 
     return get_prop(Tree_SC, 1, :Fasta), fasta_samples, Tree_SC
 end
