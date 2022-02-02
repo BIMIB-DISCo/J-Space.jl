@@ -14,7 +14,7 @@ using CairoMakie                # Library for heatmap
 #using WGLMakie                  # Library for 2D/3D plot on web page
 using GLMakie                   # Library for 2D/3D plot
 using DataFrames                # Library for the main struct
-using Makie
+#using Makie
 using Makie.MakieLayout
 using Random
 using UUIDs                     # Library for unique id
@@ -30,9 +30,9 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    Molecular_evolution, experiment_bulk, singlecell_NoISA, save_FastaQ
+    Molecular_evolution, experiment_bulk, singlecell_NoISA, save_Fasta, Q,
     ## ART
-    call_ART,
+    call_ART, Start,
     ## non utili, servono per i plot
     plot_lattice, plot_tree, plot_lattice_3D_web, animation_2D, create_heatmap
 
@@ -161,15 +161,15 @@ end
 """
 Plots tree.
 """
-function plot_tree(Tree::MetaGraph, path::String, who::String)
+function plot_tree(Tree::AbstractMetaGraph, path::String, who::String)
       GLMakie.activate!()
-      color = [:black for i in 1:nv(tree)]
+      color = [:black for i in 1:nv(Tree)]
       color[1] = :red
       f, ax, p =
       graphplot(Tree,
                 layout = Buchheim(),
                 node_color = color,
-                nlabels = [string(v) for v in vertices(tree)])
+                nlabels = [string(v) for v in vertices(Tree)])
       hidedecorations!(ax)
       hidespines!(ax)
       save(path*who*".png", f)
@@ -788,7 +788,8 @@ include("SingleCellExperiment.jl")
 include("Bulk_Experiment.jl")
 include("CallART.jl")
 include("DataFrameGraphBridge.jl")
-
+include("Models.jl")
+include("Start.jl")
 end # module
 
 

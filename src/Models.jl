@@ -1,9 +1,9 @@
-using DataFrames
+#using DataFrames
 
 
 # π are basefrequencies and they do not need to  sum to 1
 #example
-π=[3.,4.,5.,6.]
+#π=[3.,4.,5.,6.]
 
 # α is the transitional substitutions rate or
 # the transitional over transversal rate ratio
@@ -23,7 +23,7 @@ using DataFrames
 #βᶜʳ cytosine from/to purine
 
 #example
-par=IdDict( :α => 0.5, :β => 0.3)
+#par=IdDict( :α => 0.5, :β => 0.3)
 
 
 
@@ -245,7 +245,7 @@ function Q(model::String, par::IdDict)
 
     return Q;
 end
-
+#=
 #Q("abc")
 par=IdDict()
 println(Q("JC69", par))
@@ -268,3 +268,4 @@ println(Q("K81", par))
 
 par=IdDict( :α => 0.3, :α2 => 0.3)
 println(Q("TrN93ef", par))
+=#

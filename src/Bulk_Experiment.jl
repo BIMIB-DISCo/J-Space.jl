@@ -89,6 +89,7 @@ end
 function experiment_bulk(reference::LongDNASeq,
                          fasta_samples::Vector{Any},
                          position_used::Vector{Any},
+                         path::String,
                          seed::MersenneTwister;
                          Noise::Int = 0,
                          coverage::AbstractFloat = 0,
@@ -96,7 +97,7 @@ function experiment_bulk(reference::LongDNASeq,
                          FN::AbstractFloat = 0)
     # calculate bulk experiment if bulk is true
     VAF_GT = create_bulk_groundtruth(reference, fasta_samples, position_used)
-    CSV.write("VAF_GT.vcf", VAF_GT, delim = ",")
+    CSV.write(path*"\\VAF_GT.vcf", VAF_GT, delim = ",")
     if Noise == 1
         if coverage == 0 && FP == 0 && FN == 0
             return "Error: insert covarege, FP and FN"
@@ -107,7 +108,7 @@ function experiment_bulk(reference::LongDNASeq,
                                        n_sample,
                                        FP,
                                        FN, position_used, seed)
-        CSV.write("VAF_GT_Noise.vcf", VAF_GT_Noise, delim = ",")
+        CSV.write(path*"\\VAF_GT_Noise.vcf", VAF_GT_Noise, delim = ",")
     end
     return VAF_GT, VAF_GT_Noise #, g_seq
 end

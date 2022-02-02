@@ -7,8 +7,8 @@ using FASTX
 """
 Save fasta.
 """
-function save_FastaQ(Ref::LongDNASeq, fasta_samples::Vector{Any},
-                     tree::MetaGraphs, path_save_file::String)
+function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
+                     tree::AbstractMetaGraph, path_save_file::String)
       ## write fasta on files if single_cell is true
       leafs = get_leafs(tree)
       mkpath(path_save_file*"\\Fasta output") # Create folder
@@ -199,11 +199,14 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
                              seed::MersenneTwister,
                              path::String)
     ## load reference genome
+    g_seq = LongDNASeq()
     open(FASTA.Reader, path) do reader
         for record in reader
             g_seq = FASTX.sequence(record)
+            #println("g_seq: ", g_seq)
         end
     end
+    #println("g_seq: ", g_seq)
     len_ROI = length(g_seq)
 
     ## Compute mutations ∀ node
@@ -218,7 +221,6 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
             break
         end
     end
-        ## IMHO manca una 'end' qui!!!!
 
         possible_position = Set(1:len_ROI)
         # g_seq_e = copy(g_seq) #reference g_seq not change
@@ -254,26 +256,6 @@ function Molecular_evolution(Tree::AbstractMetaGraph,
             push!(fasta_samples, f)
         end
 
-        ## write fasta on files if single_cell is true
-        if single_cell == 1
-            mkpath(path_save_file*"\\Fasta output") # Create folder
-            path_for_fasta = path_save_file*"\\Fasta output"
-            for i in 1:length(leafs)
-
-                ## Windows-ism!!!!
-
-                w = FASTA.Writer(open(path_for_fasta
-                                      * "\\sample"
-                                      * string(leafs[i])
-                                      * ".fasta",
-                                      "w"))
-                rec = FASTA.Record("Sample"
-                                   * string(leafs[i]),
-                                   fasta_samples[i])
-                write(w, rec)
-                close(w)
-            end
-        end
         return g_seq, fasta_samples, position_used
 end
 
@@ -422,14 +404,16 @@ end
 """
     Molecular evolution with several substitution models (With ref)
 """
-function singlecell_NoISA(Tree::AbstractMetaGraph, path::String,
+function singlecell_NoISA(Tree::AbstractMetaGraph,
+                          path::String,
                           Selector::String,
+                          params::IdDict,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
                           branch_length::AbstractFloat,
                           seed::MersenneTwister)
     Tree_SC = copy(Tree)
-
+    Ref = LongDNASeq()
     ## load reference genome
     open(FASTA.Reader, path) do reader
         for record in reader
@@ -438,11 +422,7 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, path::String,
     end
 
     #Model_Selector
-    Model_Selector_matrix =
-        DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
-                  C = [0.33333333, 0.0, 0.33333333, 0.33333333],
-                  G = [0.33333333, 0.33333333, 0.0, 0.33333333],
-                  T = [0.33333333, 0.33333333, 0.33333333, 0.0])
+    Model_Selector_matrix = Q(Selector, params)
 
     prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
     prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
@@ -487,8 +467,10 @@ end
 """
     Molecular evolution with several substitution models (Without ref)
 """
-function singlecell_NoISA(Tree::AbstractMetaGraph, Len::Int,
+function singlecell_NoISA(Tree::AbstractMetaGraph,
+                          Len::Int,
                           Selector::String,
+                          params::IdDict,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
                           branch_length::AbstractFloat,
@@ -503,11 +485,7 @@ function singlecell_NoISA(Tree::AbstractMetaGraph, Len::Int,
     close(w)
 
     #Model_Selector
-    Model_Selector_matrix =
-        DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
-                  C = [0.33333333, 0.0, 0.33333333, 0.33333333],
-                  G = [0.33333333, 0.33333333, 0.0, 0.33333333],
-                  T = [0.33333333, 0.33333333, 0.33333333, 0.0])
+    Model_Selector_matrix = Q(Selector, params)
 
     prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
     prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
