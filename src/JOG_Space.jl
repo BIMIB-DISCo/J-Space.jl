@@ -22,7 +22,7 @@ using UUIDs                     # Library for unique id
                      # the function
 using Distributions  # Library for calculate normal distributions
 using CSV, Tables
-#using TOML
+using TOML
 ### File da esportare
 export
     ## Simulation
@@ -115,6 +115,8 @@ function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
                          layout = mylayout,
                          node_size = [10 for i in 1:nv(G)],
                          node_color = colors)
+    hidedecorations!(ax)
+    hidespines!(ax)
     return f, ax, p, colors
 end
 
@@ -660,7 +662,10 @@ function simulate_evolution(G::AbstractGraph,
                             driv_std_advantage::AbstractFloat,
                             model::String,
                             seed::MersenneTwister;
-                            n_save_graph::Int = 1)
+                            Time_of_sampling = [])
+    Time_index = 1
+    Gs_plot = []
+    CA_Alive_TOT = []
     set_mut_pop = unique(get_drivermut(G)) # Insieme delle mutazioni
     df = Graph_to_Dataframe(G)             # Creo il dataframe
     t_curr = 0.0                           # Tempo iniziale
@@ -698,7 +703,14 @@ function simulate_evolution(G::AbstractGraph,
         Aₙ = α_subpop ./ λ
         Bₙ = death / λ
         Mₙ = M / λ
-
+        #plot
+        if Time_of_sampling != [] &&
+           t_curr > Time_of_sampling[Time_index] &&
+           Time_index < length(Time_of_sampling)
+            push!(Gs_plot, G)
+            push!(CA_Alive_TOT, cs_alive)
+            Time_index += 1
+        end
         ## Probability vector
         prob_vet = vcat(Aₙ, Bₙ, Mₙ)
         prob_cum = cumsum(prob_vet)
@@ -777,7 +789,7 @@ function simulate_evolution(G::AbstractGraph,
             end
         end
     end
-    return df, G, list_len_node_occ, set_mut_pop
+    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT
 end
 
 ### Include?  Non è una cosa che si fa a livello di progetto?

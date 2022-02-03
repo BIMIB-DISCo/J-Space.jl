@@ -45,7 +45,8 @@ function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
     control = true
     if paired_end == mate_pair
         control = false
-    elseif mean_fragsize == 0 || std_fragsize == 0
+    end
+    if (mean_fragsize == 0 || std_fragsize == 0) && paired_end == 1
         control = false
     end
 
@@ -58,31 +59,19 @@ function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
 end
 
 function call_ART(profile::String,
-                  path_ref::String,
+                  path_fileout::String,
                   len_read::Int,
                   tot_num_reads::Int,
                   outfile_prefix::String,
                   paired_end::Bool,
                   seed::MersenneTwister;
+                  sam::Bool = false,
                   ef::Bool = true,
                   mate_pair::Bool = false,
                   mean_fragsize::Int = 0,
                   std_fragsize::Int = 0,
                   no_ALN::Bool = 0)
-
-    #=cd("Fasta output\\")        # Cambio directory.
-    for file in readdir()       # Scorro tutti i file
-        f = hcat(split.(file, ".")...)[1, :]
-        if length(f) > 1 && f[2] == "fasta"
-            mkpath(f[1])
-            cd(f[1])
-            command = `art_illumina -sam -i $file -l $len_read -ss HS25
-                                                                -f 10 -o $mode`
-            #run(command)
-            cd("..\\")
-        end
-    end
-    cd("..\\")=#
+    #/!!!\ i file fasta vengono sovrascritti e/o presi tutti
     if paired_end == true || mate_pair == true
         control = check_input(paired_end,
                               mate_pair,
@@ -95,40 +84,59 @@ function call_ART(profile::String,
 
     #create command
     mean_std = false
-    command = `sudo art_illumina `
-    command = "sudo art_illumina "
+    #command = `sudo art_illumina `
+    ss = ["-ss", profile]
+    l = ["-l", len_read]
+    c = ["-c", tot_num_reads]
+    o = ["-o", outfile_prefix]
+    ef_c = sam_c = p = mp = na = m_s = []
     if ef
-        command = command * "-ef"#`
+        #push!(command,"--errfree")
+        #command = command * "-ef"#`--errfree
         ef_c = ["-ef"]
+    elseif sam
+        #push!(command,"--samout")
+        sam_c = ["-sam"]
     end
     if paired_end
-        command = command * "-p "
+        p = ["-p"]
+        #command = command * "-p "#--paired
         mean_std = true
     end
     if mate_pair
-        command = command * "-mp "
+        mp = ["-mp"]
+        #command = command * "-mp "#--matepair
         mean_std = true
     end
     if no_ALN
-        command = command * "-na "
+        na = ["-na"]
+        #command = command * "-na "#--noALN
     end
     if mean_std
-        command = command * "-ss $profile -i $file -l $len_read
-                             -c $tot_num_reads -m  $mean_fragsize
-                             -s $std_fragsize -o $outfile_prefix"
-    else
-        command = command * "-ss $profile -i $file -l $len_read
-                             -c $tot_num_reads -o $outfile_prefix"
+        m_s = ["-m", mean_std, "-s", std_fragsize]
     end
-    #Cmd(`sudo art_illumina $ef`) #cosi va
-    #non funziona, devo trovare il modo
-    #cmd = @cmd(command)
-    #cmd = @cmd("art_illumina -sam -i file -l len_read -ss HS25 -f 10 -o mode")
+
+    cd(path_fileout*"\\Fasta output\\")        # Cambio directory.
+    for file in readdir()       # Scorro tutti i file
+        f = hcat(split.(file, ".")...)[1, :]
+        if length(f) > 1 && f[2] == "fasta"
+            mkpath(f[1])
+            cd(f[1])
+            path_fasta = "..\\"*file
+            i = ["-i", path_fasta]
+            command = `sudo art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
+            println("command: ", command)
+            #run(command)
+            cd("..\\")
+        end
+    end
+    cd("..\\")
 end
 
-function call_ART(command::Cmd#= più dove salvare le cose=#)
+function call_ART(command::String, path_fileout::String)
     #caso in cui ho tanti fasta -> da vedere
-    #cd("Fasta output\\")        # Cambio directory in cui voglio salvare.
+
+    cd(path_fileout*"\\Fasta output\\")        # Cambio directory in cui voglio salvare.
     for file in readdir()       # Scorro tutti i file
         f = hcat(split.(file, ".")...)[1, :]
         if length(f) > 1 && f[2] == "fasta"
@@ -139,6 +147,6 @@ function call_ART(command::Cmd#= più dove salvare le cose=#)
         end
     end
     cd("..\\")
-
+    cd("..\\")
 end
 ### end of file -- CallART.jl

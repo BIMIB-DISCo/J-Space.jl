@@ -23,7 +23,7 @@
 #βᶜʳ cytosine from/to purine
 
 #example
-#par=IdDict( :α => 0.5, :β => 0.3)
+#par=IdDict( "alpha" => 0.5, "beta" => 0.3)
 
 
 
@@ -54,67 +54,67 @@ function Q(model::String, par::IdDict)
 
 	#check π
 	if ( model == "F81" || model == "HKY" || model == "TrN" || model == "K81uf")
-		if :π ∉ keys(par)
+		if "pi" ∉ keys(par)
 			println("Warning -> Stationary frequencies not provided will all be set to 1/4 ")
 			π=setequalfreqs()
 		else
-			π=par[:π]
+			π=par["pi"]
 		end
     else
         π=setequalfreqs()
 	end
-
+	println("par: ",par)
 	#check α
 	if ( model == "K80" || model == "HKY" || model == "TrN93ef" || model == "TrN" )
-		if :α ∉ keys(par)
+		if "alpha" ∉ keys(par)
 			println("Error -> Parameter α for the model not provided")
 			return "Error"
 		else
-			α=par[:α]
+			α=par["alpha"]
 		end
 	elseif ( model == "JC69" || model == "F81" || model == "K81" || model == "K81uf" )
-		if :α ∉ keys(par)
+		if "alpha" ∉ keys(par)
 			println("Warning -> Parameter α for the model not provided wil be set to 1")
 			α=1.0
 		else
-			α=par[:α]
+			α=par["alpha"]
 		end
 	end
 
 	#check α2
 	if (model == "TrN93ef" || model == "TrN" )
-		if :α2 ∉ keys(par)
+		if "alpha2" ∉ keys(par)
 			println("Error -> Parameter α2 for the model not provided")
 			return "Error"
 		else
-			α2=par[:α2]
+			α2=par["alpha2"]
 		end
 	end
 
 	#check β
 	if ( model == "K81" || model == "K81uf" )
-		if :β ∉ keys(par)
+		if "beta" ∉ keys(par)
 			println("Error -> Parameter β for the model not provided")
 			return "Error"
 		else
-			β=par[:β]
+			β=par["beta"]
 		end
 	elseif ( model == "K80" || model == "HKY" || model == "TrN93ef" || model == "TrN" )
-		if :β ∉ keys(par)
+		if "beta" ∉ keys(par)
 			println("Warning -> Parameter β for the model set to 1")
 			β=1.0
 		else
-			β=par[:β]
+			β=par["beta"]
 		end
 	end
 
 	#check β2
 	if (model == "K81" || model == "K81uf")
-		if :β2 ∉ keys(par)
+		if "beta2" ∉ keys(par)
 			println("Error -> Parameter β2 for the model not provided")
 			return "Error"
 		else
-			β2=par[:β2]
+			β2=par["beta2"]
         end
 	end
 	# end checking
@@ -137,7 +137,7 @@ function Q(model::String, par::IdDict)
 
 		a=f=α;
 		b=c=d=e=β
-        #(:β ∈ keys(par)) ? b=c=d=e=par[:β] : b=c=d=e=1;  #check and delete
+        #("beta" ∈ keys(par)) ? b=c=d=e=par["beta"] : b=c=d=e=1;  #check and delete
 
     elseif ( model == "TrN93ef" || model == "TrN" )
         #Tn93: Tamura, K. and Nei, M. (1993) Estimation of the number of nucleotide substitutions in the control region of mitochondrial DNA in humans and chimpanzees. Mol. Bio. Evol. 10:512-526.
@@ -150,7 +150,7 @@ function Q(model::String, par::IdDict)
 
 		a=αʸ;
 		b=c=d=e=β;
-        #(:β ∈ keys(par)) ? b=c=d=e=par[:β] : b=c=d=e=1;  #check and delete
+        #("beta" ∈ keys(par)) ? b=c=d=e=par["beta"] : b=c=d=e=1;  #check and delete
         f=αʳ;
 
 	elseif ( model == "K81" || model == "K81uf" )
@@ -159,11 +159,11 @@ function Q(model::String, par::IdDict)
             π=setequalfreqs()
         end
 
-		βᶜᵍ⁻ᵃᵗ = par[:β]
-		βᵃᶜ⁻ᵍᵗ = par[:β2]
+		βᶜᵍ⁻ᵃᵗ = par["beta"]
+		βᵃᶜ⁻ᵍᵗ = par["beta2"]
 
 		a=f=α
-		#(:α ∈ keys(par)) ? a=f=par[:α] : a=f=1;  #check and delete
+		#("alpha" ∈ keys(par)) ? a=f=par["alpha"] : a=f=1;  #check and delete
         b=e=βᶜᵍ⁻ᵃᵗ;
         c=d=βᵃᶜ⁻ᵍᵗ;
     else
@@ -251,21 +251,21 @@ par=IdDict()
 println(Q("JC69", par))
 println(Q("K80", par))
 
-par=IdDict( :α => 0.5)
+par=IdDict( "alpha" => 0.5)
 println(Q("JC69", par))
 println(Q("K80", par))
 println(Q("K81", par))
 
-par=IdDict( :α => 0.5, :β => 0.3)
+par=IdDict( "alpha" => 0.5, "beta" => 0.3)
 println(Q("JC69", par))
 println(Q("K80", par))
 println(Q("K81", par))
 
-par=IdDict( :β => 0.3, :β2 => 0.3)
+par=IdDict( "beta" => 0.3, "beta2" => 0.3)
 println(Q("JC69", par))
 println(Q("K80", par))
 println(Q("K81", par))
 
-par=IdDict( :α => 0.3, :α2 => 0.3)
+par=IdDict( "alpha" => 0.3, "alpha2" => 0.3)
 println(Q("TrN93ef", par))
 =#

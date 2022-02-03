@@ -41,22 +41,15 @@ Computes number of mutations for all edges.
 function evolution_seq(Tree::AbstractMetaGraph,
                        Neutral_mut_rate::AbstractFloat, # AbstractFloat?
                        length_ROI::Int, seed::MersenneTwister)
+
     mutations = []
-    ## println("evolution_seq funzione")
+    λ = Neutral_mut_rate * length_ROI
 
     for e in edges(Tree)
         Tfinal = get_prop(Tree, dst(e), :Time) # Prima era len = ...
-        ## println("len: ",len)
-
-        λ = Neutral_mut_rate * length_ROI # Cambiato
-
-        ## println("valore λ: ", λ)
-        ## n_mut = rand(Poisson(λ), 1)[1]
-        ## println("num mut dalla distribuzione di poisson: ", n_mut)
-
-        ## Modifica!!!
         t_curr = 0
         n_mut = 0
+
         while t_curr <= Tfinal
             t_curr = t_curr + rand(seed, Exponential(1 / λ), 1)[1]
             n_mut += 1
@@ -423,7 +416,9 @@ function singlecell_NoISA(Tree::AbstractMetaGraph,
 
     #Model_Selector
     Model_Selector_matrix = Q(Selector, params)
-
+    if typeof(Model_Selector_matrix) == String
+        return Ref, [], Tree_SC
+    end
     prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
     prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
     prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
@@ -439,16 +434,16 @@ function singlecell_NoISA(Tree::AbstractMetaGraph,
             g_seq_e = copy(Ref)
         end
         sequence = genomic_evolution(g_seq_e,
-                                     "isa",
-                                      rate_Indel,
-                                      size_indel,
-                                      branch_length,
-                                      Model_Selector_matrix,
-                                      prob_A,
-                                      prob_C,
-                                      prob_G,
-                                      prob_T,
-                                      seed)
+                                     Selector,
+                                     rate_Indel,
+                                     size_indel,
+                                     branch_length,
+                                     Model_Selector_matrix,
+                                     prob_A,
+                                     prob_C,
+                                     prob_G,
+                                     prob_T,
+                                     seed)
         set_prop!(Tree_SC, dst(e), :Fasta, sequence)
     end
 
@@ -456,12 +451,12 @@ function singlecell_NoISA(Tree::AbstractMetaGraph,
     leafs = get_leafs(Tree_SC)
     fasta_samples = []
     for l in leafs
-        f = get_prop(Tree, l, :Fasta)
+        f = get_prop(Tree_SC, l, :Fasta)
         push!(fasta_samples, f)
     end
 
 
-    return get_prop(Tree_SC, 1, :Fasta), fasta_samples, Tree_SC
+    return Ref, fasta_samples, Tree_SC
 end
 
 """
@@ -502,16 +497,16 @@ function singlecell_NoISA(Tree::AbstractMetaGraph,
             g_seq_e = copy(Ref)
         end
         sequence = genomic_evolution(g_seq_e,
-                                     "isa",
-                                      rate_Indel,
-                                      size_indel,
-                                      branch_length,
-                                      Model_Selector_matrix,
-                                      prob_A,
-                                      prob_C,
-                                      prob_G,
-                                      prob_T,
-                                      seed)
+                                     Selector,
+                                     rate_Indel,
+                                     size_indel,
+                                     branch_length,
+                                     Model_Selector_matrix,
+                                     prob_A,
+                                     prob_C,
+                                     prob_G,
+                                     prob_T,
+                                     seed)
         set_prop!(Tree_SC, dst(e), :Fasta, sequence)
     end
 
@@ -519,11 +514,11 @@ function singlecell_NoISA(Tree::AbstractMetaGraph,
     leafs = get_leafs(Tree_SC)
     fasta_samples = []
     for l in leafs
-        f = get_prop(Tree, l, :Fasta)
+        f = get_prop(Tree_SC, l, :Fasta)
         push!(fasta_samples, f)
     end
 
-    return get_prop(Tree_SC, 1, :Fasta), fasta_samples, Tree_SC
+    return Ref, fasta_samples, Tree_SC
 end
 
     ### end of file -- SingleCellExperiment.jl

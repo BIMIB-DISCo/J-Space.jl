@@ -37,6 +37,14 @@ function Start(paramaters::String, config::String)
 
       ###DYNAMIC
       println("RUN DYNAMIC....")
+      Dyn_Clon_genotype = Conf_dict["FileOutputPlot"][1]["Dynamic_Clonal_genotype"]
+      Graph_configuration = Conf_dict["FileOutputPlot"][1]["Graph_configuration"]
+      if Dyn_Clon_genotype == 1 || Graph_configuration == 1
+            Time_of_sampling =  Conf_dict["FileOutputPlot"][1]["Time_of_sampling"]
+      else
+            Time_of_sampling = []
+      end
+
       Dynamic_dict = Par_dict["Dynamic"][1]
       Model = Dynamic_dict["Model"]
       Time = Dynamic_dict["Max_time"]
@@ -47,7 +55,8 @@ function Start(paramaters::String, config::String)
       avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
       std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
       #run simulation
-      df, G, n_cell_alive, set_mut = simulate_evolution(g_meta,
+      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop = simulate_evolution(
+                                                        g_meta,
                                                         Time,
                                                         rate_birth,
                                                         rate_death,
@@ -56,7 +65,17 @@ function Start(paramaters::String, config::String)
                                                         avg_driv_mut_rate,
                                                         std_driv_mut_rate,
                                                         Model,
-                                                        seed)
+                                                        seed,
+                                                        Time_of_sampling =
+                                                               Time_of_sampling)
+      #save configuration of time at specific time
+      if Graph_configuration == 1
+            for i in 1:length(Gs_conf)
+                  f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
+                  save(path_save_plot*"\\Conf_t_"*string(Time_of_sampling[i])*
+                                                                     ".png", f)
+            end
+      end
       #save final configuration
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
@@ -129,21 +148,26 @@ function Start(paramaters::String, config::String)
             indel_size = MolEvo_dict["indel_size"]
             indel_rate = MolEvo_dict["indel_rate"]
             branch_length = MolEvo_dict["branch_length"]
-            params = IdDict(MolEvo_dict["params"])
-            println("params: ",params)
-            println("type: ",typeof(params))
+            #println("params: ",MolEvo_dict["params"])
+            #println("type: ",typeof(MolEvo_dict["params"]))
+            params = IdDict(MolEvo_dict["params"][1])
+            #println("params: ",params)
+            #println("type: ",typeof(params))
             g_seq, fastaX, Tree_SC = singlecell_NoISA(tree_red,
                                                       ref,
                                                       submodel,
                                                       params,
                                                       indel_rate,
+                                                      indel_size,
                                                       branch_length,
                                                       seed)
       end
-
+      if fastaX == []
+            return "Correct error input"
+      end
       #save fasta
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
-            save_fasta(g_seq, fastaX, tree_red, path_save_file)
+            save_Fasta(g_seq, fastaX, tree_red, path_save_file)
       end
 
       ##BulkExperiment
@@ -178,52 +202,65 @@ function Start(paramaters::String, config::String)
       end
 
       ##ART
-      println("CALL ART....")
-      ART_dict = Par_dict["ART"][1]
-      if ART_dict["command"] != ``
-            call_Art(ART_dict["command"])
-      else
-            profile = ART_dict["profile"]
-            len_read = ART_dict["len_read"]
-            tot_num_reads = ART_dict["tot_num_reads"]
-            outfile_prefix = ART_dict["outfile_prefix"]
-            if ART_dict["ef"] == 1
-                  ef = true
-            else
-                  ef = false
+      SC_noise = Conf_dict["FileOutputExperiments"][1]["Single_cell_noise"]
+      if SC_noise != 0
+            println("CALL ART....")
+            if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 0
+                  println("WARNING -> ART must need file Fasta...")
+                  println("I am save the files")
+                  save_Fasta(g_seq, fastaX, tree_red, path_save_file)
             end
-            if ART_dict["no_ALN"] == 1
-                  no_ALN = true
+            ART_dict = Par_dict["ART"][1]
+            if ART_dict["command"] != ""
+                  call_ART(ART_dict["command"], path_save_file)
             else
-                  no_ALN = false
+                  profile = ART_dict["profile"]
+                  len_read = ART_dict["len_read"]
+                  tot_num_reads = ART_dict["tot_num_reads"]
+                  outfile_prefix = ART_dict["outfile_prefix"]
+                  if SC_noise == 1
+                        ef = false
+                        sam = true
+                  else
+                        ef = true
+                        sam = false
+                  end
+                  if Conf_dict["FileOutputExperiments"][1]["Alignment"] == 0
+                        no_ALN = true
+                  else
+                        no_ALN = false
+                  end
+                  if ART_dict["paired_end"] == 1
+                        paired_end = true
+                        mate_pair = false
+                  elseif ART_dict["mate_pair"] == 1
+                        mate_pair = true
+                        paired_end = false
+                  else
+                        mate_pair = false
+                        paired_end = false
+                  end
+                  mean_fragsize = ART_dict["mean_fragsize"]
+                  std_fragsize = ART_dict["std_fragsize"]
             end
-            if ART_dict["paired_end"] == 1
-                  paired_end = true
-                  mate_pair = false
-            elseif ART_dict["mate_pair"] == 1
-                  mate_pair = true
-                  paired_end = false
-            else
-                  mate_pair = false
-                  paired_end = false
-            end
-            mean_fragsize = ART_dict["mean_fragsize"]
-            std_fragsize = ART_dict["std_fragsize"]
+
+            #controllare il path_ref
+            call_ART(profile,
+                     path_save_file,
+                     len_read,
+                     tot_num_reads,
+                     outfile_prefix,
+                     paired_end,
+                     seed,
+                     sam = sam,
+                     ef = ef,
+                     mate_pair = mate_pair,
+                     mean_fragsize = mean_fragsize,
+                     std_fragsize = std_fragsize,
+                     no_ALN = no_ALN)
       end
-      #controllare il path_ref
-      call_ART(profile, path_ref, #cambiare se ho già la ref o no
-                        len_read,
-                        tot_num_reads,
-                        outfile_prefix,
-                        paired_end,
-                        seed,
-                        ef = ef,
-                        mate_pair = mate_pair,
-                        mean_fragsize = mean_fragsize,
-                        std_fragsize = std_fragsize,
-                        no_ALN = no_ALN)
 end
-#=Start("Parameters.toml", "Config.toml")
+#=
 ################### START, single function
 seed = MersenneTwister(1234)
 g_meta = spatial_graph(21, 21, seed, dim = 1, n_cell=1)#creo il grafico

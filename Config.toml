@@ -19,15 +19,15 @@ Driver_list = 1 #list of all driver mutation => FATTO
 Driver_Tree = 1 #tree of driver mutation => FATTO
 
 [[FileOutputExperiments]]
-Single_cell_genotype = "./Experiments/" #
-Single_cell_fasta = 0 #1 if you want save fasta of cells => FATTO se ho capito giusto
-Single_cell_noise = 1
+#Single_cell_genotype = "./Experiments/" #Fasta cell GT
+Single_cell_fasta = 1 #1 if you want save the fasta of the GT sequences of cells => FATTO
+Single_cell_noise = 1 # if 0 nothing | if 1 SAM file | if 2 ef(SAM GT e Noise) =>FATTO
 VAF_GT = 1 #if model substitution is ISA => FATTO
 Bulk_noise = 1 #if model substitution is ISA => FATTO
-reads = "" #??
+Alignment = 1 #do output ALN alignment file => FATTO
 
 [[FileOutputPlot]]
-Time_of_sampling = 1
-Dynamic_genotype = 1
-Division_time = [10, 20, 50, 70, 100] #last element < t_max simulation
-Graph_configuration = 1
+Time_of_sampling = [10, 20, 50, 70, 100] #last element < t_max simulation => FATTO
+Dynamic_Clonal_genotype = 1 #grafico in cui ho la crescita del num di cell per ogni sottopopolazione(fino al tempo finale)
+#Division_time =1 or 0 #
+Graph_configuration = 1 #se vuole il plot del grafico => FATTO
