@@ -169,7 +169,7 @@ function create_tree(matrix::DataFrame, newick::Bool; path::String = "")
     # !!!!!!!!!!!!||!!! DEVE ESSERE UN GRAFO DIRETTO, altrimenti non
     # funziona il plot
     tree = MetaDiGraph(matrix, :Father, :Child)
-    if path != ""
+    #=if path != ""
         GLMakie.activate!()
         color = [:blue for i in 1:nv(tree)]
         color[1] = :black
@@ -182,7 +182,7 @@ function create_tree(matrix::DataFrame, newick::Bool; path::String = "")
         hidespines!(ax)
         save(path, f)
         display(f)
-    end
+    end=#
 
     tree_reduce = reduce_tree(tree)
     ## color = [:blue for i in 1:nv(tree_reduce)]

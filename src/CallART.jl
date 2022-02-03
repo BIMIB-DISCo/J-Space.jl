@@ -134,15 +134,26 @@ function call_ART(profile::String,
 end
 
 function call_ART(command::String, path_fileout::String)
-    #caso in cui ho tanti fasta -> da vedere
-
-    cd(path_fileout*"\\Fasta output\\")        # Cambio directory in cui voglio salvare.
+    com = split(command)
+    ind_ss = findall(x -> x == "-ss", com)
+    next = 0
+    if typeof(ind_ss) != Int
+        ind_ss = 0
+    end
+    cd(path_fileout*"\\Fasta output\\")
     for file in readdir()       # Scorro tutti i file
         f = hcat(split.(file, ".")...)[1, :]
         if length(f) > 1 && f[2] == "fasta"
             mkpath(f[1])
             cd(f[1])
-            run(command)
+            path_fasta = "..\\"*file
+            i = ["-i", path_fasta]
+            new_com = com[1:ind_ss+1]
+            append!(new_com, path_fasta)
+            append!(new_com, com[ind_ss+2:end])
+            com_run = `sudo $new_com`
+            println("command: ", com_run)
+            #run(com_run)
             cd("..\\")
         end
     end
