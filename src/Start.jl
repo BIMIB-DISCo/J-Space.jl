@@ -139,7 +139,7 @@ function Start(paramaters::String, config::String)
       end
       if is_ISA == 1
             neu_mut_rate = MolEvo_dict["neut_mut_rate"]
-            g_seq, fastaX, position_used = Molecular_evolution(tree_red,
+            g_seq, fastaX, position_used = Molecular_evolution_ISA(tree_red,
                                                                neu_mut_rate,
                                                                seed,
                                                                ref)
@@ -153,14 +153,14 @@ function Start(paramaters::String, config::String)
             params = IdDict(MolEvo_dict["params"][1])
             #println("params: ",params)
             #println("type: ",typeof(params))
-            g_seq, fastaX, Tree_SC = singlecell_NoISA(tree_red,
-                                                      ref,
-                                                      submodel,
-                                                      params,
-                                                      indel_rate,
-                                                      indel_size,
-                                                      branch_length,
-                                                      seed)
+            g_seq, fastaX, Tree_SC = Molecular_evolution_NoISA(tree_red,
+                                                               ref,
+                                                               submodel,
+                                                               params,
+                                                               indel_rate,
+                                                               indel_size,
+                                                               branch_length,
+                                                               seed)
       end
       if fastaX == []
             return "Correct error input"
@@ -171,7 +171,7 @@ function Start(paramaters::String, config::String)
       end
 
       ##BulkExperiment
-      if Conf_dict["FileOutputExperiments"][1]["VAF_GT"] == 1
+      if Conf_dict["FileOutputExperiments"][1]["VAF_GT"] == 1 && is_ISA == 1
             println("BULK EXPERIMENT....")
             BulkExp_dict = Par_dict["BulkExperiment"][1]
             if Conf_dict["FileOutputExperiments"][1]["Bulk_noise"] == 1

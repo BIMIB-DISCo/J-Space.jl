@@ -30,7 +30,8 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    Molecular_evolution, experiment_bulk, singlecell_NoISA, save_Fasta, Q,
+    Molecular_evolution_ISA, experiment_bulk, Molecular_evolution_NoISA,
+    save_Fasta, Q,
     ## ART
     call_ART, Start,
     ## non utili, servono per i plot

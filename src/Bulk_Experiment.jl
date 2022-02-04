@@ -5,9 +5,9 @@
 ########################## Experiments
 #function calculate bulk experiment
 
-"Function create_bulk_groundtruth
-
-"
+"""
+Function create_bulk_groundtruth
+"""
 function create_bulk_groundtruth(G_seq::LongDNASeq,
                                  Fasta_sample::Vector{Any},
                                  Position::Vector{Any})
@@ -61,9 +61,9 @@ function create_bulk_groundtruth(G_seq::LongDNASeq,
 end
 
 
-"Function bulk_with_noise
-
-"
+"""
+Function bulk_with_noise
+"""
 function bulk_with_noise(Coverage, VAF, n_sample, FP, FN, Positions, seed)
     df_noise = DataFrame(MUT = Any[], VAF = AbstractFloat[])
     for i in 1:length(Positions)
@@ -83,9 +83,9 @@ function bulk_with_noise(Coverage, VAF, n_sample, FP, FN, Positions, seed)
 end
 
 
-"Function experiment_bulk
-
-"
+"""
+Function experiment_bulk
+"""
 function experiment_bulk(reference::LongDNASeq,
                          fasta_samples::Vector{Any},
                          position_used::Vector{Any},

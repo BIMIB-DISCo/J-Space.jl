@@ -31,7 +31,7 @@ radius_sampling = 10 #size radius of the sampling
 
 [[MolecularEvolution]]
 length_genome = 6000 #length of genome reference, if ref not given, else = 0
-type_isa = 1 #type of model evolution, if value 0 specificate submodel
+type_isa = 0 #type of model evolution, if value 0 specificate submodel
 #diploide = 0 #if we choose a evolution with constrain
 #*** if type_isa = 1 ***#
 neut_mut_rate = 0.000025 #rate of neutral mutation
@@ -48,7 +48,7 @@ FP = 0.0000005 #rate false positive
 FN = 0.0000002 #rate false negative
 
 [[ART]]
-command = "`prova`" #if user want write your call
+command = "" #if user want write your call
 #*** Otherwise write paramaters ***#
 profile = "HS25" #The name of Illumina sequencing system of the built-in profile used for simulation
 len_read = 150 #the length of reads to be simulated

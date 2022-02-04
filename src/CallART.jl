@@ -130,7 +130,7 @@ function call_ART(profile::String,
             cd("..\\")
         end
     end
-    cd("..\\")
+    cd("..\\..\\")
 end
 
 function call_ART(command::String, path_fileout::String)
@@ -157,7 +157,7 @@ function call_ART(command::String, path_fileout::String)
             cd("..\\")
         end
     end
-    cd("..\\")
-    cd("..\\")
+    cd("..\\..\\")
+    #cd("..\\")
 end
 ### end of file -- CallART.jl

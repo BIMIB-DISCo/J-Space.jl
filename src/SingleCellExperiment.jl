@@ -122,7 +122,7 @@ end
 """
 Creates a input for tool ART -> FASTA file (WITHOUT FASTA).
 """
-function Molecular_evolution(Tree::AbstractMetaGraph,
+function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
                              seed::MersenneTwister,
                              len_ROI::Int)
@@ -187,7 +187,7 @@ end
 """
 Creates a input for tool ART -> FASTA file (WITH REF FASTA).
 """
-function Molecular_evolution(Tree::AbstractMetaGraph,
+function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
                              seed::MersenneTwister,
                              path::String)
@@ -397,7 +397,7 @@ end
 """
     Molecular evolution with several substitution models (With ref)
 """
-function singlecell_NoISA(Tree::AbstractMetaGraph,
+function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                           path::String,
                           Selector::String,
                           params::IdDict,
@@ -462,7 +462,7 @@ end
 """
     Molecular evolution with several substitution models (Without ref)
 """
-function singlecell_NoISA(Tree::AbstractMetaGraph,
+function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                           Len::Int,
                           Selector::String,
                           params::IdDict,
