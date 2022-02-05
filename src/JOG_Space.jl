@@ -9,7 +9,7 @@ using Graphs                    # Create graph
 using Plots                     # Library as support
 using NetworkLayout             # Layout for lattice
 using GraphMakie                # Plot graph
-using CairoMakie                # Library for heatmap
+#using CairoMakie                # Library for heatmap
 #using JSServe                   # Create page for plot
 #using WGLMakie                  # Library for 2D/3D plot on web page
 using GLMakie                   # Library for 2D/3D plot
@@ -110,7 +110,7 @@ Plots a graph in 2D.
 """
 function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
     driver_mut, labels, colors = get_drivermut_name_colors(G, Set_mut)
-    GLMakie.activate!()
+    #GLMakie.activate!()
     mylayout = NetworkLayout.SquareGrid(cols=:auto)
     f, ax, p = graphplot(G,
                          layout = mylayout,
@@ -165,7 +165,7 @@ end
 Plots tree.
 """
 function plot_tree(Tree::AbstractMetaGraph, path::String, who::String)
-      GLMakie.activate!()
+      #GLMakie.activate!()
       color = [:black for i in 1:nv(Tree)]
       color[1] = :red
       f, ax, p =
@@ -184,7 +184,7 @@ Plots graph in 3D.
 function plot_lattice_3D_web(G::MetaGraph, set_mut::Vector{Any})
     driver_mut, labels, colors = get_drivermut_name_colors(G, set_mut)
     Page(exportable = true, offline = true) # use JSServe
-    WGLMakie.activate!()
+    #WGLMakie.activate!()
     set_theme!(resolution=(800, 600)) # use WGLMakie
     f, ax, p = graphplot(G,
                          layout = Spring(dim = 3),
@@ -407,8 +407,7 @@ function migration_cell(G::AbstractGraph,
                                                                :Fit => fitness))
     push!(df, ["Migration", time, id, undef])
 end
-
-
+#=
 """
 Return animation for simulation.
 """
@@ -431,7 +430,7 @@ function animation_2D(row::Int,
         c[] = i
     end
 end
-
+=#
 
 """
 Returns the average on axis y.
@@ -706,9 +705,9 @@ function simulate_evolution(G::AbstractGraph,
         Mₙ = M / λ
         #plot
         if Time_of_sampling != [] &&
-           t_curr > Time_of_sampling[Time_index] &&
-           Time_index < length(Time_of_sampling)
-            push!(Gs_plot, G)
+           Time_index <= length(Time_of_sampling) &&
+           t_curr > Time_of_sampling[Time_index]
+            push!(Gs_plot, copy(G))
             push!(CA_Alive_TOT, cs_alive)
             Time_index += 1
         end

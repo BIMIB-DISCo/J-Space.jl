@@ -4,12 +4,12 @@
 seed = 1234 #choose yout seed => FATTO
 generate_reference = 0 # 0 if user have his ref, 1 if not have reference => FATTO
 #*** if generate_reference == 1 ***#
-path_reference = "./reference.fasta" #path where reference is saved => FATTO
-path_to_save_files = "./fileoutput" #where you want save outputfile => FATTO
-path_to_save_plot = "./plot" #where you want save your plot => FATTO
+path_reference = ".\\reference.fasta" #path where reference is saved => FATTO
+path_to_save_files = ".\\fileoutput" #where you want save outputfile => FATTO
+path_to_save_plot = ".\\plot" #where you want save your plot => FATTO
 
 Generate_graph = 1 #1 if graph is not already avaliable => FATTO
-Path_to_Graph = "./graph_AM.csv" #example path where read graph => FATTO
+Path_to_Graph = "\\graph_AM.csv" #example path where read graph => FATTO
 
 
 [[OutputGT]]

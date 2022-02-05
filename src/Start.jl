@@ -84,7 +84,7 @@ function Start(paramaters::String, config::String)
 
       #save driver list
       if Conf_dict["OutputGT"][1]["Driver_list"] == 1
-            CSV.write(path_save_file*"/DriverList.csv",
+            CSV.write(path_save_file*"\\DriverList.csv",
                       Tables.table(set_mut),
                       header=false)
       end
