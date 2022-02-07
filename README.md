@@ -13,13 +13,13 @@ For any of the theoretical details please see xxx
 
 ## RUN SPACE-SIM
 
-The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.toml and Config.toml that are detailed below.
+The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
 
 ## OUTPUTS OF SPACE-SIM
 
 
 ## THE CONFIGURATION FILE OF SPACE-SIM
-In the file Config.toml the user can manage the configuration of SPACE-SIM. This file is useful to choose the path where save the files, the desired plot and outputfile.
+In the file Config.tml the user can manage the configuration of SPACE-SIM. This file is useful to choose the path where save the files, the desired plot and outputfile.
 
 The following are the paramenters of such file
 
@@ -45,7 +45,7 @@ The following are the paramenters of such file
 #SONO QUI (FABRIZIO)
 
 ## THE PARAMETERS FILE OF SPACE-SIM
-In the file Parameters.toml the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
+In the file Parameters.tml the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
 
 
 
