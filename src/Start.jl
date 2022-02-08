@@ -55,7 +55,7 @@ function Start(paramaters::String, config::String)
       avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
       std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
       #run simulation
-      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop = simulate_evolution(
+      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop = simulate_evolution(
                                                         g_meta,
                                                         Time,
                                                         rate_birth,
@@ -72,21 +72,36 @@ function Start(paramaters::String, config::String)
       if Graph_configuration == 1
             for i in 1:length(Gs_conf)
                   f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
-                  save(path_save_plot*"\\Conf_t_"*string(Time_of_sampling[i])*
+                  if Sys.iswindows()
+                        save(path_save_plot*"\\Conf_t_"*string(Time_of_sampling[i])*
                                                                      ".png", f)
+                  elseif Sys.islinux()
+                        save(path_save_plot*"/Conf_t_"*string(Time_of_sampling[i])*
+                                                                     ".png", f)
+                  end
             end
       end
       #save final configuration
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
-            save(path_save_plot*"\\Final_conf.png", f)
+            if Sys.iswindows()
+                  save(path_save_plot*"\\Final_conf.png", f)
+            elseif Sys.islinux()
+                  save(path_save_plot*"/Final_conf.png", f)
+            end
       end
 
       #save driver list
       if Conf_dict["OutputGT"][1]["Driver_list"] == 1
-            CSV.write(path_save_file*"\\DriverList.csv",
-                      Tables.table(set_mut),
-                      header=false)
+            if Sys.iswindows()
+                  CSV.write(path_save_file*"\\DriverList.csv",
+                            Tables.table(set_mut), Tables.table(α_subpop),
+                            header=false)
+            elseif Sys.islinux()
+                  CSV.write(path_save_file*"/DriverList.csv",
+                            Tables.table(set_mut), Tables.table(α_subpop),
+                            header=false)
+            end
       end
 
       ##SAMPLING
@@ -117,14 +132,24 @@ function Start(paramaters::String, config::String)
       end
       if driver_tree == 1
             tree_mut = tree_mut[1]
-            plot_tree(tree_mut, path_save_plot, "\\driver_tree")
+            f, ax, p = plot_tree(tree_mut)
+            if Sys.iswindows()
+                  save(path_save_plot*"\\driver_tree.png", f)
+            elseif Sys.islinux()
+                  save(path_save_plot*"/driver_tree.png", f)
+            end
       end
       if Conf_dict["OutputGT"][1]["Tree_Newick"] == 1
             tree_red, net = create_tree(matrix_R, true)
-            path_complete = path_save_file*"\\formatNewick"#inserire un formato?
-            writeTopology(net, path_complete)
+            if Sys.iswindows()
+                  path_complete = path_save_file*"\\formatNewick"#inserire un formato?
+                  writeTopology(net, path_complete)
+            elseif Sys.islinux()
+                  path_complete = path_save_file*"/formatNewick"#inserire un formato?
+                  writeTopology(net, path_complete)
+            end
       else
-            tree_red, net = create_tree(matrix_R, false)
+            tree_red = create_tree(matrix_R, false)
       end
 
       ##MolecularEvolution
@@ -153,21 +178,27 @@ function Start(paramaters::String, config::String)
             params = IdDict(MolEvo_dict["params"][1])
             #println("params: ",params)
             #println("type: ",typeof(params))
-            g_seq, fastaX, Tree_SC = Molecular_evolution_NoISA(tree_red,
+            g_seq, fastaX, Tree_SC, mutation_driver = Molecular_evolution_NoISA(tree_red,
                                                                ref,
                                                                submodel,
                                                                params,
                                                                indel_rate,
                                                                indel_size,
                                                                branch_length,
-                                                               seed)
+                                                               seed,
+                                                               set_mut)
       end
       if fastaX == []
             return "Correct error input"
       end
       #save fasta
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
-            save_Fasta(g_seq, fastaX, tree_red, path_save_file)
+            if Sys.iswindows()
+                  SO = "windows"
+            elseif Sys.islinux()
+                  SO = "linux"
+            end
+            save_Fasta(g_seq, fastaX, tree_red, path_save_file, SO)
       end
 
       ##BulkExperiment

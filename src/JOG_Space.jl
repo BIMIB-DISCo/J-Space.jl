@@ -18,6 +18,7 @@ using DataFrames                # Library for the main struct
 using Makie.MakieLayout
 using Random
 using UUIDs                     # Library for unique id
+using StatsBase                 # Sample
 #using BenchmarkTools # Library for checking time and allocations of
                      # the function
 using Distributions  # Library for calculate normal distributions
@@ -114,7 +115,9 @@ function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
     mylayout = NetworkLayout.SquareGrid(cols=:auto)
     f, ax, p = graphplot(G,
                          layout = mylayout,
-                         node_size = [10 for i in 1:nv(G)],
+                         node_size = repeat([5], nv(G)),#[7 for i in 1:nv(G)],
+                         edge_width = repeat([1], ne(G)),
+                         edge_color = repeat([:white], ne(G)),
                          node_color = colors)
     hidedecorations!(ax)
     hidespines!(ax)
@@ -164,7 +167,7 @@ end
 """
 Plots tree.
 """
-function plot_tree(Tree::AbstractMetaGraph, path::String, who::String)
+function plot_tree(Tree::AbstractMetaGraph)
       #GLMakie.activate!()
       color = [:black for i in 1:nv(Tree)]
       color[1] = :red
@@ -175,7 +178,7 @@ function plot_tree(Tree::AbstractMetaGraph, path::String, who::String)
                 nlabels = [string(v) for v in vertices(Tree)])
       hidedecorations!(ax)
       hidespines!(ax)
-      save(path*who*".png", f)
+      return f, ax, p
 end
 
 """
@@ -789,7 +792,7 @@ function simulate_evolution(G::AbstractGraph,
             end
         end
     end
-    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT
+    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α_subpop
 end
 
 ### Include?  Non è una cosa che si fa a livello di progetto?

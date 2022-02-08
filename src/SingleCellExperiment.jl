@@ -8,7 +8,7 @@ using FASTX
 Save fasta.
 """
 function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
-                     tree::AbstractMetaGraph, path_save_file::String)
+                     tree::AbstractMetaGraph, path_save_file::String, OS="windows")
       ## write fasta on files if single_cell is true
       leafs = get_leafs(tree)
       mkpath(path_save_file*"\\Fasta output") # Create folder
@@ -28,6 +28,37 @@ function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
       end
       w = FASTA.Writer(open(path_for_fasta
                             * "\\reference"
+                            * ".fasta",
+                            "w"))
+      rec = FASTA.Record("Reference", Ref)
+      write(w, rec)
+      close(w)
+end
+
+"""
+Save fasta.
+"""
+function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
+                     tree::AbstractMetaGraph, path_save_file::String, OS="linux")
+      ## write fasta on files if single_cell is true
+      leafs = get_leafs(tree)
+      mkpath(path_save_file*"/Fasta output") # Create folder
+      path_for_fasta = path_save_file*"/Fasta output"
+      for i in 1:length(leafs)
+          ## Windows-ism!!!!
+          w = FASTA.Writer(open(path_for_fasta
+                                * "/sample"
+                                * string(leafs[i])
+                                * ".fasta",
+                                "w"))
+          rec = FASTA.Record("Sample"
+                             * string(leafs[i]),
+                             fasta_samples[i])
+          write(w, rec)
+          close(w)
+      end
+      w = FASTA.Writer(open(path_for_fasta
+                            * "/reference"
                             * ".fasta",
                             "w"))
       rec = FASTA.Record("Reference", Ref)
@@ -65,12 +96,13 @@ end
 Change genome in position pos.
 """
 function transform_genome(genome::LongDNASeq, pos::Vector{Any},
-                                                        seed::MersenneTwister)
+                                                        seed::MersenneTwister; funct::Int = 0, mutation_driver::Dict = Dict{}())
     transition_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],
                   C = [0.33333333, 0.0, 0.33333333, 0.33333333],
                   G = [0.33333333, 0.33333333, 0.0, 0.33333333],
                   T = [0.33333333, 0.33333333, 0.33333333, 0.0])
+    substitution = []
     for p in pos
         ## println("pos: ",p)
         nucleotide = genome[p]
@@ -90,8 +122,17 @@ function transform_genome(genome::LongDNASeq, pos::Vector{Any},
         new_nucleotide = collect(names(transition_matrix)[min])[1] # type char
         ## println("new_nucleotide: ",new_nucleotide)
         genome[p] = DNA(new_nucleotide)
+        if funct == 1
+            sub = string(p)*"_"*string(nucleotide)*">"*string(new_nucleotide)
+            mutation_driver[p] = sub
+            push!(substitution, sub)
+        end
     end
-    return genome
+    if funct == 1
+        return genome, substitution
+    else
+        return genome
+    end
 end
 
 
@@ -163,6 +204,9 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
             end
             n_mut = get_prop(Tree, e, :N_Mutations)
             pos_edge = []
+            #pos_edge = sample(seed, possible_position, n_mut, replace = false)
+            #filter!(p -> p ∉ pos_edge, possible_position)
+            #push!(position_used, pos_edge)
             for i = 1:n_mut
                 pos = rand(seed, possible_position)
                 delete!(possible_position, pos)
@@ -231,6 +275,9 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
             end
             n_mut = get_prop(Tree, e, :N_Mutations)
             pos_edge = []
+            #pos_edge = sample(seed, possible_position, n_mut, replace = false)
+            #filter!(p -> p ∉ pos_edge, possible_position)
+            #push!(position_used, pos_edge)
             for i = 1:n_mut
                 pos = rand(seed, possible_position)
                 delete!(possible_position, pos)
@@ -265,12 +312,15 @@ function genomic_evolution(Seq_f::LongDNASeq,
                            prob_C::Vector{Float64},
                            prob_G::Vector{Float64},
                            prob_T::Vector{Float64},
-                           seed::MersenneTwister)
+                           seed::MersenneTwister;
+                           num_mut_driver::Int = -1,
+                           muts::Vector{Int} = [0],
+                           mutation_driver::Dict = Dict{}())
 
-
+    #println("sono dentro")
     sequence_father = copy(Seq_f)
     len_father = length(sequence_father)
-
+    len_num_mut_driver = num_mut_driver
     As = findall(x -> x == 'A', string(sequence_father))
     n_A = length(As)
     Cs = findall(x -> x == 'C', string(sequence_father))
@@ -298,7 +348,18 @@ function genomic_evolution(Seq_f::LongDNASeq,
 
         mutation = collect(k .<= prob_cum)
         min_mutation = findfirst(mutation)
-
+        if num_mut_driver >= 0
+            if num_mut_driver == 0
+                num_mut_driver = -1
+            else
+                #println("num_mut_driver: ",num_mut_driver)
+                #println("muts: ",muts)
+                mut_sub = muts[len_num_mut_driver - num_mut_driver + 1]#da controllare
+                #println("mut_sub: ",mut_sub)
+                num_mut_driver -= 1
+                #println("num_mut_driver: ",num_mut_driver)
+            end
+        end
         if min_mutation == 5 #indel
             e = rand(seed, ["insertion", "deletion"])
             #choose initial position
@@ -319,11 +380,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
                  append!(new_sequence, sequence_father[init_pos_ins + 1 : end])
                  sequence_father = new_sequence
                  len_father = len_father + length_ins
-                 #update
-                 #n_A += count("A" , string(insertion_sequence))
-                 #n_C += count("C" , string(insertion_sequence))
-                 #n_G += count("G" , string(insertion_sequence))
-                 #n_T += count("T" , string(insertion_sequence))
+                 if num_mut_driver >= 0
+                     mutation_driver[mut_sub] = "ins $init_pos_ins-"*string(init_pos_ins + length_ins)
+                 end
              else #deletion
                  length_del = rand(seed, Poisson(size_indel), 1)[1] + 1
                  init_pos_del = rand(seed, 1:length(sequence_father))
@@ -337,11 +396,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
                  deletion_sequence = sequence_father[init_pos_del:end_pos_del]
                  sequence_father = new_sequence
                  len_father = len_father - length_del
-                 #update
-                 #n_A -= count("A" , string(deletion_sequence))
-                 #n_C -= count("C" , string(deletion_sequence))
-                 #n_G -= count("G" , string(deletion_sequence))
-                 #n_T -= count("T" , string(deletion_sequence))
+                 if num_mut_driver >= 0
+                     mutation_driver[mut_sub] = "del $init_pos_del- $end_pos_del"
+                 end
             end
 
         elseif min_mutation == 4 #T
@@ -353,7 +410,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             ## println("new_nucleotide: ",new_nucleotide)
             sequence_father[pos_mutation] = DNA(new_nucleotide)
-
+            if num_mut_driver >= 0
+                mutation_driver[mut_sub] = string(pos_mutation)*"_T>"*string(new_nucleotide)
+            end
         elseif min_mutation == 3 #G
             pos_mutation = rand(seed, Gs)
             prob_cum_G = cumsum(prob_G)
@@ -362,7 +421,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
-
+            if num_mut_driver >= 0
+                mutation_driver[mut_sub] = string(pos_mutation)*"_G>"*string(new_nucleotide)
+            end
         elseif min_mutation == 2 #C
             pos_mutation = rand(seed, Cs)
             prob_cum_C = cumsum(prob_C)
@@ -371,7 +432,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
-
+            if num_mut_driver >= 0
+                mutation_driver[mut_sub] = string(pos_mutation)*"_C>"*string(new_nucleotide)
+            end
         elseif min_mutation == 1 #A
             pos_mutation = rand(seed, As)
             prob_cum_A = cumsum(prob_A)
@@ -380,6 +443,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             ff = findfirst(mutation)
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
+            if num_mut_driver >= 0
+                mutation_driver[mut_sub] = string(pos_mutation)*"_A>"*string(new_nucleotide)
+            end
         end
         #update values
         As = findall(x -> x == 'A', string(sequence_father))
@@ -391,7 +457,11 @@ function genomic_evolution(Seq_f::LongDNASeq,
         Ts = findall(x -> x == 'T', string(sequence_father))
         n_T = length(Ts)
     end
-    return sequence_father
+    if len_num_mut_driver != -1
+         return sequence_father, num_mut_driver
+     else
+         return sequence_father
+     end
 end
 
 """
@@ -404,15 +474,121 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
                           branch_length::AbstractFloat,
-                          seed::MersenneTwister)
+                          seed::MersenneTwister,
+                          set_mut::Vector{Any})
     Tree_SC = copy(Tree)
+    set_prop!(Tree_SC, 1, :Subpop_Child, 1)
     Ref = LongDNASeq()
+    mutation_driver = Dict()
     ## load reference genome
     open(FASTA.Reader, path) do reader
         for record in reader
             Ref = FASTX.sequence(record)
         end
     end
+
+    #Model_Selector
+    Model_Selector_matrix = Q(Selector, params)
+    if typeof(Model_Selector_matrix) == String
+        return Ref, [], Tree_SC
+    end
+    prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
+    prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
+    prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
+    prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
+    ##### fino a qui
+    #println("set_mut: ",set_mut)
+    for e in edges(Tree_SC)
+        g_seq_e = LongDNASeq()
+        println(e)
+        if has_prop(Tree_SC, src(e), :Fasta)
+            # println("il source ha un file Fasta")
+            g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
+        else
+            g_seq_e = copy(Ref)
+        end
+        subpop_father = get_prop(Tree_SC, src(e), :Subpop_Child)
+        subpop_child = get_prop(Tree_SC, dst(e), :Subpop_Child)
+        mut_f = set_mut[subpop_father]
+        mut_child = set_mut[subpop_child]
+        #println("ecco le muts: ",mut_f, "\t", mut_child)
+        if length(mut_f) == length(mut_child)
+            sequence = genomic_evolution(g_seq_e,
+                                     Selector,
+                                     rate_Indel,
+                                     size_indel,
+                                     branch_length,
+                                     Model_Selector_matrix,
+                                     prob_A,
+                                     prob_C,
+                                     prob_G,
+                                     prob_T,
+                                     seed)
+        else
+            num_mut_driver = length(mut_child) - length(mut_f)
+            new_muts = copy(mut_child)
+            filter!(m -> m ∉ mut_f, new_muts)
+            sequence, num_mut_driver = genomic_evolution(g_seq_e,
+                                     Selector,
+                                     rate_Indel,
+                                     size_indel,
+                                     branch_length,
+                                     Model_Selector_matrix,
+                                     prob_A,
+                                     prob_C,
+                                     prob_G,
+                                     prob_T,
+                                     seed,
+                                     num_mut_driver=num_mut_driver,
+                                     muts=new_muts,
+                                     mutation_driver=mutation_driver)
+            if num_mut_driver > 0
+                pos_rand = sample(seed, 1:length(sequence), num_mut_driver, replace = false)
+                sequence, substitution = transform_genome(sequence, pos_rand, seed, funct = 1, mutation_driver=mutation_driver)
+                println("WARNING -> the mutational rates are low")
+                println("Low mutational rate or very short branch length.
+                Few mutations were generated in this branch, and driver
+                mutations were added by force.")
+                for sub in substitution
+                    println(sub)
+                end
+            end
+        end
+        set_prop!(Tree_SC, dst(e), :Fasta, sequence)
+    end
+
+    # Return fasta of leaf nodes
+    leafs = get_leafs(Tree_SC)
+    fasta_samples = []
+    for l in leafs
+        f = get_prop(Tree_SC, l, :Fasta)
+        push!(fasta_samples, f)
+    end
+
+    println("mutation_driver: ",mutation_driver)
+    return Ref, fasta_samples, Tree_SC, mutation_driver
+end
+
+"""
+    Molecular evolution with several substitution models (Without ref)
+"""
+function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
+                          Len::Int,
+                          Selector::String,
+                          params::IdDict,
+                          rate_Indel::AbstractFloat,
+                          size_indel::Int,
+                          branch_length::AbstractFloat,
+                          seed::MersenneTwister,
+                          set_mut::Vector{Any})
+    Tree_SC = copy(Tree)
+    set_prop!(Tree_SC, 1, :Subpop_Child, 1)
+    ## Create reference genome
+    Ref = randdnaseq(seed, Len)
+    rec = FASTA.Record("Reference", Ref)
+    w = FASTA.Writer(open("Reference.fasta", "w"))
+    write(w, rec)
+    close(w)
 
     #Model_Selector
     Model_Selector_matrix = Q(Selector, params)
@@ -433,70 +609,29 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
         else
             g_seq_e = copy(Ref)
         end
-        sequence = genomic_evolution(g_seq_e,
-                                     Selector,
-                                     rate_Indel,
-                                     size_indel,
-                                     branch_length,
-                                     Model_Selector_matrix,
-                                     prob_A,
-                                     prob_C,
-                                     prob_G,
-                                     prob_T,
-                                     seed)
-        set_prop!(Tree_SC, dst(e), :Fasta, sequence)
-    end
-
-    # Return fasta of leaf nodes
-    leafs = get_leafs(Tree_SC)
-    fasta_samples = []
-    for l in leafs
-        f = get_prop(Tree_SC, l, :Fasta)
-        push!(fasta_samples, f)
-    end
-
-
-    return Ref, fasta_samples, Tree_SC
-end
-
-"""
-    Molecular evolution with several substitution models (Without ref)
-"""
-function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
-                          Len::Int,
-                          Selector::String,
-                          params::IdDict,
-                          rate_Indel::AbstractFloat,
-                          size_indel::Int,
-                          branch_length::AbstractFloat,
-                          seed::MersenneTwister)
-    Tree_SC = copy(Tree)
-
-    ## Create reference genome
-    Ref = randdnaseq(seed, Len)
-    rec = FASTA.Record("Reference", Ref)
-    w = FASTA.Writer(open("Reference.fasta", "w"))
-    write(w, rec)
-    close(w)
-
-    #Model_Selector
-    Model_Selector_matrix = Q(Selector, params)
-
-    prob_A = Model_Selector_matrix[:,1] ./ sum(Model_Selector_matrix[:,1])
-    prob_C = Model_Selector_matrix[:,2] ./ sum(Model_Selector_matrix[:,2])
-    prob_G = Model_Selector_matrix[:,3] ./ sum(Model_Selector_matrix[:,3])
-    prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
-    ##### fino a qui
-    for e in edges(Tree_SC)
-        g_seq_e = LongDNASeq()
-        println(e)
-        if has_prop(Tree_SC, src(e), :Fasta)
-            # println("il source ha un file Fasta")
-            g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
+        subpop_father = get_prop(Tree_SC, src(e), :Subpop_Child)
+        #id_f = findall(x -> x == subpop_father, set_mut)[1]
+        subpop_child = get_prop(Tree_SC, dst(e), :Subpop_Child)
+        #id_c = findall(x -> x == subpop_child, set_mut)[1]
+        mut_f = set_mut[subpop_father]
+        mut_child = set_mut[subpop_child]
+        if length(mut_f) == length(mut_child)
+            sequence = genomic_evolution(g_seq_e,
+                                         Selector,
+                                         rate_Indel,
+                                         size_indel,
+                                         branch_length,
+                                         Model_Selector_matrix,
+                                         prob_A,
+                                         prob_C,
+                                         prob_G,
+                                         prob_T,
+                                         seed)
         else
-            g_seq_e = copy(Ref)
-        end
-        sequence = genomic_evolution(g_seq_e,
+            num_mut_driver = length(mut_child) - length(mut_f)
+            new_muts = copy(mut_child)
+            filter!(m -> m ∉ mut_f, new_muts)
+            sequence, num_mut_driver = genomic_evolution(g_seq_e,
                                      Selector,
                                      rate_Indel,
                                      size_indel,
@@ -506,7 +641,22 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                                      prob_C,
                                      prob_G,
                                      prob_T,
-                                     seed)
+                                     seed,
+                                     num_mut_driver=num_mut_driver,
+                                     muts=new_muts,
+                                     mutation_driver=mutation_driver)
+            if num_mut_driver > 0
+                    pos_rand = sample(seed, 1:length(sequence), num_mut_driver, replace = false)
+                    sequence, substitution = transform_genome(sequence, pos_rand, seed, funct = 1)
+                    println("WARNING -> the mutational rates are low")
+                    println("Low mutational rate or very short branch length.
+                    Few mutations were generated in this branch, and driver
+                    mutations were added by force.")
+                    for sub in substitution
+                        println(sub)
+                    end
+            end
+        end
         set_prop!(Tree_SC, dst(e), :Fasta, sequence)
     end
 
@@ -518,7 +668,6 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
         push!(fasta_samples, f)
     end
 
-    return Ref, fasta_samples, Tree_SC
+    return Ref, fasta_samples, Tree_SC, mutation_driver
 end
-
     ### end of file -- SingleCellExperiment.jl

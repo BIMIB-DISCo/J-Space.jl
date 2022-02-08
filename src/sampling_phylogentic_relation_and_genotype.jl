@@ -157,7 +157,7 @@ function sampling_phylogentic_relation(G::AbstractGraph,
         tree_mut = create_tree_mutation_driver(set_mut, event_df)
         return matrix_R, tree_mut
     else
-        return matrix_R
+        return matrix_R, []
     end
 end
 
@@ -165,10 +165,16 @@ end
 """
 Create and plot tree
 """
-function create_tree(matrix::DataFrame, newick::Bool; path::String = "")
+function create_tree(matrix::DataFrame, newick::Bool)
     # !!!!!!!!!!!!||!!! DEVE ESSERE UN GRAFO DIRETTO, altrimenti non
     # funziona il plot
     tree = MetaDiGraph(matrix, :Father, :Child)
+    #println("props: ", props(tree, 1))
+    if get_prop(tree, 1, :Time) === missing
+        set_prop!(tree, 1, :Time, 0)
+        set_prop!(tree, 1, :Subpop_Child, 1)
+    end
+    #println("props: ", props(tree, 1))
     #=if path != ""
         GLMakie.activate!()
         color = [:blue for i in 1:nv(tree)]
@@ -183,13 +189,12 @@ function create_tree(matrix::DataFrame, newick::Bool; path::String = "")
         save(path, f)
         display(f)
     end=#
-
     tree_reduce = reduce_tree(tree)
     ## color = [:blue for i in 1:nv(tree_reduce)]
     ## color[1] = :black
     # f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
 
-    nlabels = [string(v) for v in vertices(tree_reduce)]
+    #nlabels = [string(v) for v in vertices(tree_reduce)]
 
     ## save(path, f)
 

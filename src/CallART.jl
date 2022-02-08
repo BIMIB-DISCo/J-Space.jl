@@ -70,7 +70,7 @@ function call_ART(profile::String,
                   mate_pair::Bool = false,
                   mean_fragsize::Int = 0,
                   std_fragsize::Int = 0,
-                  no_ALN::Bool = 0)
+                  no_ALN::Bool = false)
     #/!!!\ i file fasta vengono sovrascritti e/o presi tutti
     if paired_end == true || mate_pair == true
         control = check_input(paired_end,
@@ -116,21 +116,21 @@ function call_ART(profile::String,
         m_s = ["-m", mean_std, "-s", std_fragsize]
     end
 
-    cd(path_fileout*"\\Fasta output\\")        # Cambio directory.
+    cd(path_fileout*"./Fasta output/")        # Cambio directory.
     for file in readdir()       # Scorro tutti i file
         f = hcat(split.(file, ".")...)[1, :]
         if length(f) > 1 && f[2] == "fasta"
             mkpath(f[1])
             cd(f[1])
-            path_fasta = "..\\"*file
+            path_fasta = "../"*file
             i = ["-i", path_fasta]
-            command = `sudo art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
+            command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
             println("command: ", command)
-            #run(command)
-            cd("..\\")
+            run(command)
+            cd("../")
         end
     end
-    cd("..\\..\\")
+    cd("../../")
 end
 
 function call_ART(command::String, path_fileout::String)
@@ -140,24 +140,24 @@ function call_ART(command::String, path_fileout::String)
     if typeof(ind_ss) != Int
         ind_ss = 0
     end
-    cd(path_fileout*"\\Fasta output\\")
+    cd(path_fileout*"/Fasta output/")
     for file in readdir()       # Scorro tutti i file
         f = hcat(split.(file, ".")...)[1, :]
         if length(f) > 1 && f[2] == "fasta"
             mkpath(f[1])
             cd(f[1])
-            path_fasta = "..\\"*file
+            path_fasta = "../"*file
             i = ["-i", path_fasta]
             new_com = com[1:ind_ss+1]
             append!(new_com, path_fasta)
             append!(new_com, com[ind_ss+2:end])
-            com_run = `sudo $new_com`
+            com_run = `$new_com`
             println("command: ", com_run)
-            #run(com_run)
-            cd("..\\")
+            run(com_run)
+            cd("../")
         end
     end
-    cd("..\\..\\")
+    cd("../../")
     #cd("..\\")
 end
 ### end of file -- CallART.jl

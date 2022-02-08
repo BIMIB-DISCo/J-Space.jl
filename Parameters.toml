@@ -1,8 +1,8 @@
 #This is an example of parameters files of dynamic
 
 [[Graph]]
-row = 21 #num row of lattice
-col = 21 #num col of lattice
+row = 100 #num row of lattice
+col = 100 #num col of lattice
 dim = 1 #deep of lattice
 N_starting_cells = 1 #start cell at the simualtion
 # ***
@@ -12,11 +12,11 @@ N_starting_cells = 1 #start cell at the simualtion
 
 [[Dynamic]]
 Model = "contact" #Model of interaction ["contact", "voter", "hvoter"]
-Max_time = 200.0 #Time of the simulation
+Max_time = 350.0 #Time of the simulation
 rate_birth = 0.2 #Rate of birth
 rate_death = 0.01 #Rate of Death
 rate_migration = 0.01 #Rate of migration
-drive_mut_rate = 0.01 #Rate of mew drive mutation
+drive_mut_rate = 0.001 #Rate of new drive mutation
 average_driver_mut_rate = 0.4 #Rate of average of the new driver mutation during proliferation
 std_driver_mut_rate = 0.1 #Rate of the standard deviation of average_driver_mut_rate
 
@@ -31,7 +31,7 @@ radius_sampling = 10 #size radius of the sampling
 
 [[MolecularEvolution]]
 length_genome = 6000 #length of genome reference, if ref not given, else = 0
-type_isa = 0 #type of model evolution, if value 0 specificate submodel
+type_isa = 1 #type of model evolution, if value 0 specificate submodel
 #diploide = 0 #if we choose a evolution with constrain
 #*** if type_isa = 1 ***#
 neut_mut_rate = 0.000025 #rate of neutral mutation
@@ -44,8 +44,8 @@ params = [{"alpha" = 0.5, "beta" = 0.3}]
 [[BulkExperiment]]
 coverage = 10.0
 #read_lenght = ??
-FP = 0.0000005 #rate false positive
-FN = 0.0000002 #rate false negative
+FP = 0.000005 #rate false positive
+FN = 0.000002 #rate false negative
 
 [[ART]]
 command = "" #if user want write your call

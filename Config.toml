@@ -5,8 +5,8 @@ seed = 1234 #choose yout seed => FATTO
 generate_reference = 0 # 0 if user have his ref, 1 if not have reference => FATTO
 #*** if generate_reference == 1 ***#
 path_reference = ".\\reference.fasta" #path where reference is saved => FATTO
-path_to_save_files = ".\\fileoutput" #where you want save outputfile => FATTO
-path_to_save_plot = ".\\plot" #where you want save your plot => FATTO
+path_to_save_files = ".\\Fileoutput" #where you want save outputfile => FATTO
+path_to_save_plot = ".\\Plot" #where you want save your plot => FATTO
 
 Generate_graph = 1 #1 if graph is not already avaliable => FATTO
 Path_to_Graph = "\\graph_AM.csv" #example path where read graph => FATTO
@@ -27,7 +27,7 @@ Bulk_noise = 1 #if model substitution is ISA => FATTO
 Alignment = 1 #do output ALN alignment file => FATTO
 
 [[FileOutputPlot]]
-Time_of_sampling = [10, 20, 50, 70, 100] #last element < t_max simulation => FATTO
+Time_of_sampling = [10, 20, 50, 70, 100, 150, 200, 250] #last element < t_max simulation => FATTO
 Dynamic_Clonal_genotype = 1 #grafico in cui ho la crescita del num di cell per ogni sottopopolazione(fino al tempo finale)
 #Division_time =1 or 0 #
 Graph_configuration = 1 #se vuole il plot del grafico => FATTO

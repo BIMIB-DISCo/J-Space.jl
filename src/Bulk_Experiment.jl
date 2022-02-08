@@ -70,8 +70,11 @@ function bulk_with_noise(Coverage, VAF, n_sample, FP, FN, Positions, seed)
         n_reads = rand(seed, Poisson(Coverage), 1)[1]
         # println("n_reads: ", n_reads)
         n_read_muts = rand(seed, Binomial(n_reads, VAF[i, :VAF]), 1)[1]
-        # println("n_read_muts: ", n_read_muts)
-        n_FP = rand(seed, Binomial(n_sample-n_read_muts, FP), 1)[1]
+        if n_sample-n_read_muts < 0
+            n_FP = 0
+        else
+            n_FP = rand(seed, Binomial(n_sample-n_read_muts, FP), 1)[1]
+        end
         # println("n_FP: ",n_FP)
         n_FN = rand(seed, Binomial(n_read_muts, FN), 1)[1]
         # println("n_FN: ",n_FN)
