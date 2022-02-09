@@ -12,8 +12,12 @@ For any of the theoretical details please see xxx
 ## INSTALLATION OF SPACE-SIM
 
 ## RUN SPACE-SIM
-
+### RUN A SINGLE SIMULATION
 The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
+### RUN A SINGLE FUNCTION
+
+
+### RUN THE EXAMPLES
 
 ## OUTPUTS OF SPACE-SIM
 
@@ -42,7 +46,6 @@ The following are the paramenters of such file
 - Dynamic_Clonal_genotype, if 1 plots the dynamics of the clonal genotypes.
 - Graph_configuration, if 1  returns the plot of the state of the lattice.
 
-#SONO QUI (FABRIZIO)
 
 ## THE PARAMETERS FILE OF SPACE-SIM
 In the file Parameters.tml the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
@@ -51,66 +54,71 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 
 ### Paramenters of the generation of the lattice
 
-- row = 21 num row of lattice
-- col = 21 num col of lattice
-- dim = 1 deep of lattice
+- row, integer number of the rows of the regular lattice, not used if a graph is imported
+- col, integer number of the columns of the regular lattice, not used if a graph is imported
+- dim, integer number of the rows of the regular lattice, not used if a graph is imported. If =1 the simulation is 2D
 - N_starting_cells, integer  the number of starting cells.
 
-- matrix_adjacency = "path/matrix/adjacency" #or 1, if already exist
+- matrix_adjacency,  path to the adjacency matrix ("path/matrix/adjacency") of the graph that should be imported.
 
 ### Paramenters of the clonal spatial dynamics
 
-- Model, choose the different  Model of interaction ["contact", "voter", "hvoter"]
-- Max_time = 200.0 Time of the simulation
-- rate_birth = 0.2 Rate of birth
-- rate_death = 0.01 Rate of Death
-- rate_migration = 0.01 Rate of migration
-- drive_mut_rate = 0.01 Rate of mew drive mutation
-- average_driver_mut_rate = 0.4 Rate of average of the new driver mutation during proliferation
-- std_driver_mut_rate = 0.1 Rate of the standard deviation of average_driver_mut_rate
+- Model,  for selecting the different  Models of interaction, possible values ["contact", "voter", "hvoter"]
+- Max_time, real number it is the maximum time of the simulation 
+- rate_birth, real number.  Birth rate per cell per unit of times
+- rate_death,  real number . Death rate per cell per unit of times
+- rate_migration, real number.  Migration rate per cell per unit of times
+- drive_mut_rate, probability of generate a new driver (i.e., subclones) after a division event.
+- average_driver_mut_rate,  average birth rate advantage a driver mutation 
+- std_driver_mut_rate, standard deviation of the birth rate advantage of a driver mutation 
 
 ### Paramenters of the sampling
-- Random_sampling = 1 hoose mode sampling: 1 -> Random, 0 -> Neighbourhood
-- num_cell = 10 Num of cells of the sampling
+- Random_sampling. if 1  Random sampling, if 0 cirular/spherical sampling 
+- num_cell. Number of sampled cells
 
 # If Random_sampling = 0
 
- -  pos_center = 0 center of neighborshood, if = 0 -> position random
-- radius_sampling = 10 size radius of the sampling
+ -  pos_center. Integer number, it is the center of the sampling
+- radius_sampling. Integer number, it is size radius of the sampling
 
 ### Paramenters of the molecular evolution
-- length_genome = 6000 length of genome reference, if ref not given, else = 0
-- type_isa = 0 type of model evolution, if value 0 specificate submodel
+- length_genome.  Length of the ancestral genome. Used  if ancestral genome is not given. If ancestral genome is given equal to 0.
+- type_isa. Integer number, if 1 SPACE-SIM use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
 *** if type_isa = 1 ***
-- neut_mut_rate = 0.000025 rate of neutral mutation
+- neut_mut_rate. Rate of mutation per site and per unit of time
 *** if type_isa = 0 ***
-- sub_model = "K80" decide substitution matrix for mutation, possible value ->[]
-- indel_size = 300
-- indel_rate = 0.0005
-- branch_length = 10.0
-- params = [{"alpha" = 0.5, "beta" = 0.3}]
+- sub_model. A string, variable that select the subistituion model, possible value ->[ "JC69","F81","K80", "HKY85","TN93","K81"]
+- indel_size. Real number maximum size of indel 
+- Lavelette_param. Real number the parameter of  the Lavelette distribution for the size of indels
+- indel_rate. Rate of indel per site and per unit of time
+- params. Rates of the substitution models
+ if sub_model= "JC69" params=
+ if sub_model= "F81" params=
+ if sub_models= "K80" params=
+ if sub_models= "HKY85" params=
+ if sub_models = "TN93" params =
+ if sub_models = "K81" params =
 
 ### Paramenters of the bulk experiment (working only if ISA approximation is used)
-- coverage = 10.0
- - FP = 0.0000005 rate false positive
-- FN = 0.0000002 rate false negative
+- coverage. Real number, average coverage 
+ - FP. Real number,  false positive rate
+- FN. Real number, false negative rate
 
 ### Paramenters of the sequencing experiment (ART)
-- command = ""  user want write your call
+- command = "". A string, if the user want to do custom calls of ART I 
 *** Otherwise write param aters ***
-- profile = "HS25" he name of Illumina sequencing system of the built-in profile used for simulation
-- len_read = 150 the length of reads to be simulated
-- tot_num_reads = 10 number of reads/read pairs to be generated per sequence
- - outfile_prefix = "example" the prefix of output filename
-
-- paired_end = 0  indicate a paired-end read simulation or to generate reads from both ends of amplicons
-	                    NOTE: art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000
+- profile. The name of Illumina sequencing system of the built-in profile used for simulation, e.g., "HS25"
+- len_read. The length of reads to be simulated
+- tot_num_reads.  Number of reads/read pairs to be generated per sequence
+ - outfile_prefix.  The prefix of output filename
+- paired_end. Integer number,  0  indicate a paired-end read simulation or to generate reads from both ends of amplicons, if 1 a paried_end simulation is performed
+	                 
+			    
 *** if paired_end == 1, they are require **
-- mean_fragsize = 200 the mean size of DNA/RNA fragments for paired-end simulations
-- std_fragsize = 10 the standard deviation of DNA/RNA fragment size for paired-end simulations
-
-- mate_pair = 0 indicate a mate-pair read simulation
-
+- mean_fragsize. The mean size of DNA/RNA fragments for paired-end simulations
+- std_fragsize. The standard deviation of DNA/RNA fragment size for paired-end simulations
+- mate_pair. If  0  mate-pair read simulation (controlla!!!)
+   NOTE: art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000
 
 
 
