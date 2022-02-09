@@ -76,17 +76,16 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - Random_sampling. if 1  Random sampling, if 0 cirular/spherical sampling 
 - num_cell. Number of sampled cells
 
-# If Random_sampling = 0
-
+***If Random_sampling = 0***
  -  pos_center. Integer number, it is the center of the sampling
 - radius_sampling. Integer number, it is size radius of the sampling
 
 ### Paramenters of the molecular evolution
 - length_genome.  Length of the ancestral genome. Used  if ancestral genome is not given. If ancestral genome is given equal to 0.
 - type_isa. Integer number, if 1 SPACE-SIM use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
-*** if type_isa = 1 ***
+***if type_isa = 1***
 - neut_mut_rate. Rate of mutation per site and per unit of time
-*** if type_isa = 0 ***
+***if type_isa = 0***
 - sub_model. A string, variable that select the subistituion model, possible value ->[ "JC69","F81","K80", "HKY85","TN93","K81"]
 - indel_size. Real number maximum size of indel 
 - Lavelette_param. Real number the parameter of  the Lavelette distribution for the size of indels
@@ -106,7 +105,7 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 
 ### Paramenters of the sequencing experiment (ART)
 - command = "". A string, if the user want to do custom calls of ART I 
-*** Otherwise write param aters ***
+***Otherwise for Illumina  sequencing system is possible to compile the following parmenters***
 - profile. The name of Illumina sequencing system of the built-in profile used for simulation, e.g., "HS25"
 - len_read. The length of reads to be simulated
 - tot_num_reads.  Number of reads/read pairs to be generated per sequence
@@ -114,13 +113,13 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - paired_end. Integer number,  0  indicate a paired-end read simulation or to generate reads from both ends of amplicons, if 1 a paried_end simulation is performed
 	                 
 			    
-*** if paired_end == 1, they are require **
+***if paired_end == 1,  are required the following **
 - mean_fragsize. The mean size of DNA/RNA fragments for paired-end simulations
 - std_fragsize. The standard deviation of DNA/RNA fragment size for paired-end simulations
 - mate_pair. If  0  mate-pair read simulation (controlla!!!)
    NOTE: art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000
 
-
+For all paramenters of ART  please see: 
 
 ## EXAMPLES
 
