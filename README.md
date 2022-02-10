@@ -1,27 +1,27 @@
-# SPACE-SIM
+# J-SPACE 
 ## INTRODUCTION 
-SPACE-SIM is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and sequencing the genome of the sampled cells.
+J-SPACE is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and sequencing the genome of the sampled cells.
 .
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
 After mimicking a spatial sampling of the tumour cells,
-SPACE-SIM  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, SPACE-SIM generates the  synthetic single-end, paired-end/mate-pair reads of the next-generation sequencing platforms.
+J-SPACE  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, J-SPACE generates the  synthetic single-end, paired-end/mate-pair reads of the next-generation sequencing platforms.
 
 
  ### Spatial clonal dynamics
- In SPACE-SIM the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
-arbitrary graph. SPACE-SIM could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path/). 
+ In J-SPACE the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
+arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path/). 
 In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells, the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
-Note that every rate inserted in SPACE-SIM must have the same unit of time both for the spatial dynamics and the molecular evolution.  
+Note that every rate inserted in J-SPACE must have the same unit of time both for the spatial dynamics and the molecular evolution.  
 
  ### Molecular evolution
  
  
- SPACE-SIM simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the SPACE-SIM evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file. 
+J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file. 
 
 The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algorithm.
 The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time), and the total simulated time is long.
 
-In the case of finite-site models, SPACE-SIM takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
+In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
  Note that using finite-site for long genomes come at the cost of computational performance.
  After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder xxxx.
@@ -30,7 +30,7 @@ We suppose that the indels have a size distributed as  a Lavalette distribution.
 
  ### Sequencing experiment
 
-To simulate the reads of a sequencing experiment SPACE-SIM calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration file to specify the error model (for Illumina platforms), the number of reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
+To simulate the reads of a sequencing experiment J-SPACE calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration file to specify the error model (for Illumina platforms), the number of reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
 In addition, in the configuration file, there is the option to insert custom "calls" for ART  with the possibility to use it in any possible configuration.
 If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
 If the infinite-site model is used,  it is possible to obtain the VCF file directly without simulating the reads with ART.
@@ -38,9 +38,9 @@ If the infinite-site model is used,  it is possible to obtain the VCF file direc
 
 
 
-## INSTALLATION OF SPACE-SIM
+## INSTALLATION OF J-SPACE
 
-## RUN SPACE-SIM
+## RUN J-SPACE
 ### RUN A SINGLE SIMULATION
 The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
 ### RUN A SINGLE FUNCTION
@@ -48,8 +48,8 @@ The paramenters and the cofinguration of the simulation are managment by the use
 
 ### RUN THE EXAMPLES
 
-## OUTPUTS OF SPACE-SIM
- SPACE-SIM provides the following outputs. 
+## OUTPUTS OF J-SPACE
+ J-SPACE provides the following outputs. 
 
    -  The state of the lattice at any time of the simulation (as plot and metagraph).
     - The plot of clonal dynamics.
@@ -63,17 +63,17 @@ The paramenters and the cofinguration of the simulation are managment by the use
 
 
 
-## THE CONFIGURATION FILE OF SPACE-SIM
-In the file Config.tml the user can manage the configuration of SPACE-SIM. This file is useful to choose the path where save the files, the desired plot and outputfile.
+## THE CONFIGURATION FILE OF J-SPACE
+In the file Config.tml the user can manage the configuration of J-SPACE. This file is useful to choose the path where save the files, the desired plot and outputfile.
 
 The following are the paramenters of such file
 
 - seed. The seed of the simulations.
-- generate_reference.  I 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 SPACE-SIM generate a random sequence.
+- generate_reference.  I 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 J-SPACE generate a random sequence.
 - path_reference.The path of the reference given by user.
 - path_to_save_files, path of the folder where the output files should be saved
 - path_to_save_plot,  path of the folder where the output plots should be saved
-- Generate_graph, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 SPACE-SIM generate regular lattice, the paramenters of such lattice are specified in the fiele Paramenters.toml.
+- Generate_graph, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate regular lattice, the paramenters of such lattice are specified in the fiele Paramenters.toml.
 - Tree_Newick, if 1  the phylogenentic tree of the cells is saved as newick file.
 - Final_configuration, if 1 return the metagraph (in format) of the final configuration of the lattice.
 - Driver_list, if 1 returns the list of the driver mutations
@@ -83,12 +83,12 @@ The following are the paramenters of such file
 - Alignment, if 1 it returns the GT aligment file in ALN format.
  - VAF_GT, if 1 it returns the VAF of the sampled cells  (working only if isa is used).
 - Bulk_noise , if 1 it returns an approximate bulk experiment not using ART (working only if isa is used).
-- Time_of_sampling, insert an array of times. SPACE-SIM perform the plot of the state of the lattice in that times.
+- Time_of_sampling, insert an array of times. J-SPACE perform the plot of the state of the lattice in that times.
 - Dynamic_Clonal_genotype, if 1 plots the dynamics of the clonal genotypes.
 - Graph_configuration, if 1  returns the plot of the state of the lattice.
 
 
-## THE PARAMETERS FILE OF SPACE-SIM
+## THE PARAMETERS FILE OF J-SPACE
 In the file Parameters.tml the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
 
 
@@ -123,7 +123,7 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 
 ### Paramenters of the molecular evolution
 - length_genome.  Length of the ancestral genome. Used  if ancestral genome is not given. If ancestral genome is given equal to 0.
-- type_isa. Integer number, if 1 SPACE-SIM use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
+- type_isa. Integer number, if 1 J-SPACE use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
 #### if type_isa = 1
 - neut_mut_rate. Rate of mutation per site and per unit of time
 #### if type_isa = 0
