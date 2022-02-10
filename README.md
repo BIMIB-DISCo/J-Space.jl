@@ -37,21 +37,22 @@ If the infinite-site model is used,  it is possible to obtain the VCF file direc
 - ART, install it from https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
 ## INSTALLATION OF J-SPACE
+
 The J-SPACE can be downloaded from Github. To do so, we need to install the Julia from https://julialang.org/.   
 Fist the user need to copy the project folder in the chosen working directory. To install J-SPACE follow the steps:
-Using REPL or the COMMAND LINE move to the working directory.  
-1. If you use the COMMAND LINE, to start a Julia session run the command:
+1.Using REPL or the COMMAND LINE move to the working directory.  
+2. If you use the COMMAND LINE, to start a Julia session run the command:
 
 >Julia
 
-2. To enter in the Pkg REPL  type 
+3. To enter in the Pkg REPL  type 
 
 >]  
 
-3. Type the command 
+4. Type the command 
 > activate .
 
-4. To activate the J-SPACE project, type
+5. To activate the J-SPACE project, type
 > instantiate
 	
 
