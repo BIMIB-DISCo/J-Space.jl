@@ -161,7 +161,7 @@ In the file ""Parameters.tml" the user will find all the paramenters of the dyna
 - `indel_size`. Integer number, maximum size of indel .
 - `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
 - `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulatio put this parameter to 0.0 .
-- `params`. Rates of the substitution models  
+- `params`. Rates of the substitution models  in units of time of the simulation.  
  if `sub_model= "JC69" `-> params = [{"alpha" = 0.5}]  
  if `sub_model= "F81" ` -> params = [{"alpha" = 0.5}]  
  if `sub_models= "K80"  `-> params = [{"alpha" = 0.5, "beta" = 0.3}]  
