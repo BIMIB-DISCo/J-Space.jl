@@ -41,6 +41,7 @@ If the infinite-site model is used,  it is possible to obtain the VCF file direc
 ## INSTALLATION OF J-SPACE
 
 ## RUN J-SPACE
+
 ### RUN A SINGLE SIMULATION
 The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
 ### RUN A SINGLE FUNCTION
@@ -51,15 +52,15 @@ The paramenters and the cofinguration of the simulation are managment by the use
 ## OUTPUTS OF J-SPACE
  J-SPACE provides the following outputs. 
 
-   -  The state of the lattice at any time of the simulation (as plot and metagraph).
-    - The plot of clonal dynamics.
-   -  The Ground Truth (GT) genotype of the sampled cells as FASTA files.
-   - The GT phylogenetic  tree  of the sampled cells in Newick format.
+  -  The state of the lattice at any time of the simulation (as plot and metagraph).
+  - The plot of clonal dynamics.
+  -  The Ground Truth (GT) genotype of the sampled cells as FASTA files.
+  - The GT phylogenetic  tree  of the sampled cells in Newick format.
   -   The mutational tree of the driver mutations (if present).
   -   The list of the driver mutation with their birth rate advantage (if present).
   -   The simulated next-generation sequencing reads as FASTQ files.
   -  The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
-  -   The alignment file, whithout noise in format SAM .
+  -   The alignment file, whithout noise in format SAM.
 
 
 
@@ -81,7 +82,7 @@ The following are the paramenters of such file
 - Single_cell_fasta, if 1 save the fasta of the GT sequences of the sampled cells 
 - Single_cell_noise, if 0  the sequencing experiment is not performed, if 1 it returns the FASTQ  files of the reads and SAM files with noise  , if 2 it returns the FASTQ  files of the reads, the SAM files with noise and without noise.
 - Alignment, if 1 it returns the GT aligment file in ALN format.
- - VAF_GT, if 1 it returns the VAF of the sampled cells  (working only if isa is used).
+- VAF_GT, if 1 it returns the VAF of the sampled cells  (working only if isa is used).
 - Bulk_noise , if 1 it returns an approximate bulk experiment not using ART (working only if isa is used).
 - Time_of_sampling, insert an array of times. J-SPACE perform the plot of the state of the lattice in that times.
 - Dynamic_Clonal_genotype, if 1 plots the dynamics of the clonal genotypes.
@@ -118,7 +119,7 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - num_cell. Integer, number of sampled cells
 
 #### If Random_sampling = 0
- -  pos_center. Integer number, it is the center of the sampling
+-  pos_center. Integer number, it is the center of the sampling
 - radius_sampling. Integer number, it is size radius of the sampling
 
 ### Paramenters of the molecular evolution
@@ -132,9 +133,9 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - Lavelette_param. Real number the parameter of  the Lavelette distribution for the size of indels
 - indel_rate. Rate of indel per site and per unit of time. To esclude indel put this parameter to 0.
 - params. Rates of the substitution models
- if sub_model= "JC69" params=
- if sub_model= "F81" params=
- if sub_models= "K80" params=
+ if sub_model= "JC69" params =
+ if sub_model= "F81" params =
+ if sub_models= "K80" params =
  if sub_models= "HKY85" params=
  if sub_models = "TN93" params =
  if sub_models = "K81" params =
