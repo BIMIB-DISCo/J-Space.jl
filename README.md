@@ -64,14 +64,19 @@ The parameters and the configuration of the simulation are managment by the user
 To run a simulation of J-SPACE using the ".toml" file for the paramet follow the following step:
 
 1. Load the J-SPACE package using:
-> using J_Space
+> using J_Space  
+
 2. Start the simulation
-> Start_J_Space("Parameters.toml","Config.toml")
+> Start_J_Space("Parameters.toml","Config.toml")  
+
+
 NOTE: the simulation does not start if in the working folder are absent the two .toml files. 
 
 ### RUN THE EXAMPLES
 To run the examples, in the main folder of J-SPACE, from command line digit 
-> julia --project=.  ./path/myscript.jl
+> julia --project=.  ./path/myscript.jl  
+
+
 
 ## OUTPUTS OF J-SPACE
  J-SPACE provides the following outputs. 
@@ -100,15 +105,15 @@ The following are the paramenters of such file:
 - `path_to_save_plot`. A string,  path of the folder where the output plots should be saved
 - `Generate_graph`. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Paramenters.toml".
 - `Tree_Newick`. Integer, if 1  the phylogenentic tree of the cells is saved as newick file.
-- `Final_configuration.` if 1 return the plot of the final configuration of the lattice.
-- `Driver_list`. if 1 returns the list of the driver mutations
-- `Driver_Tree`. if 1 returns the tree of the driver mutations
-- `Single_cell_fasta`. if 1 save the fasta of the GT sequences of the sampled cells 
-- `Single_cell_noise`. if 0  the sequencing experiment is not performed, if 1 it returns the FASTQ  files of the reads and SAM files with noise  , if 2 it returns the FASTQ  files of the reads, the SAM files with noise and without noise.
-- `Alignment`. if 1 it returns the GT aligment file in ALN format.
-- `VAF_GT`. if 1 it returns the VAF of the sampled cells  (working only if isa is used).
-- `Bulk_noise`. if 1 it returns an approximate bulk experiment not using ART (working only if isa is used).
-- `Time_of_sampling` insert an array of times. J-SPACE perform the plot of the state of the lattice in that times.
+- `Final_configuration`. Integer,  if 1 return the plot of the final configuration of the lattice.
+- `Driver_list`. Integer,  if 1 returns the list of the driver mutations
+- `Driver_Tree`. Integer, if 1 returns the tree of the driver mutations
+- `Single_cell_fasta`. Integer, if 1 save the fasta of the GT sequences of the sampled cells 
+- `Single_cell_noise`. Integer, if 0  the sequencing experiment is not performed, if 1 it returns the FASTQ  files of the reads and SAM files with noise  , if 2 it returns the FASTQ  files of the reads, the SAM files with noise and without noise.
+- `Alignment`. Integer, if 1 it returns the GT aligment file in ALN format.
+- `VAF_GT`. Integer, if 1 it returns the VAF of the sampled cells  (working only if isa is used).
+- `Bulk_noise`. Integer, if 1 it returns an approximate bulk experiment not using ART (working only if isa is used).
+- `Time_of_sampling`. Integer,  insert an array of real value that are the times. J-SPACE perform the plot of the state of the lattice in that times.
 - `Dynamic_Clonal_genotype`. if 1 plots the dynamics of the clonal genotypes.
 - `Graph_configuration`. if 1  returns the plot of the state of the lattice.
 
