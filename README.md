@@ -1,10 +1,8 @@
 # J-SPACE 
 ## INTRODUCTION 
-J-SPACE is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and sequencing the genome of the sampled cells.
-.
+J-SPACE is a Julia package to simulate the spatial growth and the genomic evolution  of a cell population and the experiment of sequencing the genome of the sampled cells.
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
-After mimicking a spatial sampling of the tumour cells,
-J-SPACE  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, J-SPACE generates the  synthetic single-end, paired-end/mate-pair reads of the next-generation sequencing platforms.
+After mimicking a spatial sampling of the tumour cells, J-SPACE  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, J-SPACE generates the  synthetic single-end, paired-/mate-pair end reads of the next-generation sequencing platforms.
 
 
  ### Spatial clonal dynamics
@@ -70,7 +68,7 @@ In the file Config.tml the user can manage the configuration of J-SPACE. This fi
 The following are the paramenters of such file
 
 - seed. The seed of the simulations.
-- generate_reference.  I 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 J-SPACE generate a random sequence.
+- generate_reference.  If 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 J-SPACE generate a random sequence.
 - path_reference.The path of the reference given by user.
 - path_to_save_files, path of the folder where the output files should be saved
 - path_to_save_plot,  path of the folder where the output plots should be saved
@@ -133,7 +131,7 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - Lavelette_param. Real number the parameter of  the Lavelette distribution for the size of indels
 - indel_rate. Rate of indel per site and per unit of time. To esclude indel put this parameter to 0.
 - params. Rates of the substitution models
- if sub_model= "JC69" params =
+ if sub_model= "JC69" params = 
  if sub_model= "F81" params =
  if sub_models= "K80" params =
  if sub_models= "HKY85" params=
