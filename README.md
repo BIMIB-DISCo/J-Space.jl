@@ -43,7 +43,7 @@ Fist the user need to copy the project folder in the chosen working directory. T
 1. Using REPL or the COMMAND LINE move to the working directory.  
 2. If you use the COMMAND LINE, to start a Julia session run the command:
 
->Julia
+> julia
 
 3. To enter in the Pkg REPL  type 
 
@@ -104,35 +104,35 @@ The following are the paramenters of such file:
 - `path_to_save_files`.  A string, path of the folder where the output files should be saved
 - `path_to_save_plot`. A string,  path of the folder where the output plots should be saved
 - `Generate_graph`. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Paramenters.toml".
+- `Path_to_Graph`.  Path to the adjacency matrix of the graph if imported.
 - `Tree_Newick`. Integer, if 1  the phylogenentic tree of the cells is saved as newick file.
 - `Final_configuration`. Integer,  if 1 return the plot of the final configuration of the lattice.
-- `Driver_list`. Integer,  if 1 returns the list of the driver mutations
-- `Driver_Tree`. Integer, if 1 returns the tree of the driver mutations
-- `Single_cell_fasta`. Integer, if 1 save the fasta of the GT sequences of the sampled cells 
+- `Driver_list`. Integer,  if 1 returns the list of the driver mutations.
+- `Driver_Tree`. Integer, if 1 returns the plot tree of the driver mutations.
+- `Single_cell_fasta`. Integer, if 1 save the fasta of the GT sequences of the sampled cells.
 - `Single_cell_noise`. Integer, if 0  the sequencing experiment is not performed, if 1 it returns the FASTQ  files of the reads and SAM files with noise  , if 2 it returns the FASTQ  files of the reads, the SAM files with noise and without noise.
 - `Alignment`. Integer, if 1 it returns the GT aligment file in ALN format.
-- `VAF_GT`. Integer, if 1 it returns the VAF of the sampled cells  (working only if isa is used).
-- `Bulk_noise`. Integer, if 1 it returns an approximate bulk experiment not using ART (working only if isa is used).
-- `Time_of_sampling`. Integer,  insert an array of real value that are the times. J-SPACE perform the plot of the state of the lattice in that times.
-- `Dynamic_Clonal_genotype`. if 1 plots the dynamics of the clonal genotypes.
-- `Graph_configuration`. if 1  returns the plot of the state of the lattice.
+- `VAF_GT`. Integer, if 1 it returns the VAF of the sampled cells  (working only if `type_isa = 1`).
+- `Bulk_noise`. Integer, if 1 it returns an approximate bulk experiment not using ART (working only if `type_isa = 1`).
+- `Time_of_sampling`. Array of times in an incresing order (e.g., [10.0 , 20.3 , 50.2]). J-SPACE perform the plot of the state of the lattice in that times.
+- `Graph_configuration`. Integer,  if 1  returns the plot of the state of the lattice.
 
 
 ## THE PARAMETERS FILE OF J-SPACE
-In the file Parameters.tml the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
+In the file ""Parameters.tml" the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
 
 
 
-### Paramenters of the generation of the lattice
+### Parameters of the generation of the lattice
 
 - `row`. Integer number of the rows of the regular lattice, not used if a graph is imported
 - `col`. Integer number of the columns of the regular lattice, not used if a graph is imported
-- `dim`. Integer number of the rows of the regular lattice, not used if a graph is imported. If =1 the simulation is 2D
+- `dim`. Integer number of the height of the regular lattice, not used if a graph is imported. If = 2 the simulation is 2D. If = 3 the simulation is 3D.
 - `N_starting_cells`. Integer  the number of starting cells.
 
-- matrix_adjacency.  Path to the adjacency matrix ("path/matrix/adjacency") of the graph that should be imported.
 
-### Paramenters of the clonal spatial dynamics
+
+### Parameters of the clonal spatial dynamics
 
 - `Model`. String, the possible values are ["contact", "voter", "hvoter"] they are the possible different  Models of interaction.
 - `Max_time`. Real number, it is the maximum time of the simulation 
@@ -143,62 +143,66 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - `average_driver_mut_rate`. Real number,  average birth rate advantage a driver mutation 
 - `std_driver_mut_rate`. Real number, standard deviation of the birth rate advantage of a driver mutation 
 
-### Paramenters of the sampling
+### Parameters of the sampling
 - `Random_sampling`. Integer, if 1  Random sampling, if 0 cirular/spherical sampling 
-- `num_cell. Integer`. number of sampled cells
+- `num_cell`. Integer, number of sampled cells
 
 #### If Random_sampling = 0
 -  `pos_center`. Integer number, it is the center of the sampling
 - `radius_sampling`. Integer number, it is size radius of the sampling
 
-### Paramenters of the molecular evolution
-- `length_genome`.  Length of the ancestral genome. Used  if ancestral genome is not given. If ancestral genome is given equal to 0.
+### Parameters of the molecular evolution
+- `length_genome`.  Length of the ancestral genome. Used  if ancestral genome is not given. If the ancestral genome is given as fasta file this line is ignored.
 - `type_isa`. Integer number, if 1 J-SPACE use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
-#### if type_isa = 1
+#### if `type_isa = 1`
 - `neut_mut_rate`. Rate of mutation per site and per unit of time
-#### if type_isa = 0
-- `sub_model`. A string, variable that select the subistituion model, possible value ->[ "JC69","F81","K80", "HKY85","TN93","K81"]
-- `indel_size`. Real number maximum size of indel 
-- `Lavelette_param`. Real number the parameter of  the Lavelette distribution for the size of indels
-- `indel_rate`. Rate of indel per site and per unit of time. To esclude indel put this parameter to 0.
+#### if `type_isa = 0`
+- `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY85","TN93","K81"].
+- `indel_size`. Integer number, maximum size of indel .
+- `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
+- `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulatio put this parameter to 0.0 .
 - `params`. Rates of the substitution models
- if `sub_model`= "JC69" params = 
- if `sub_model`= "F81" params =
- if `sub_models`= "K80" params =
- if `sub_models`= "HKY85" params=
- if `sub_models` = "TN93" params =
- if `sub_models` = "K81" params =
+ if `sub_model= "JC69" `-> params = [{"alpha" = 0.5}]
+ if `sub_model= "F81" ` -> params = [{"alpha" = 0.5}]
+ if `sub_models= "K80"  `-> params = [{"alpha" = 0.5, "beta" = 0.3}]
+ if `sub_models= "HKY" ` -> params = [{"alpha" = 0.5, "beta" = 0.3}]
+ if `sub_models = "TrN93ef"`  -> params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]
+ if `sub_models = "TrN" `-> params = params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]
+ if `sub_models = "K81" ` -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]
+  if `sub_models = "K81uf"`  -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]
 
-### Paramenters of the bulk experiment (working only if ISA approximation is used)
-- `coverage`. Real number, average coverage 
- - `FP`. Real number,  false positive rate
-- `FN`. Real number, false negative rate
 
-### Paramenters of the sequencing experiment (ART)
-- `command` = "". A string, if the user want to do custom calls of ART I 
-#### Otherwise for Illumina  sequencing system is possible to compile the following parmenters
-- `profile`. The name of Illumina sequencing system of the built-in profile used for simulation, e.g., "HS25"
-- `len_read`. The length of reads to be simulated
-- `tot_num_reads`.  Number of reads/read pairs to be generated per sequence
- - `outfile_prefix`.  The prefix of output filename
-- `paired_end`. Integer number,  0  indicate a paired-end read simulation or to generate reads from both ends of amplicons, if 1 a paried_end simulation is performed
-	                 
-			    
-#### if paired_end == 1,  are required the following 
-- `mean_fragsize`. The mean size of DNA/RNA fragments for paired-end simulations
-- `std_fragsize`. The standard deviation of DNA/RNA fragment size for paired-end simulations
-- `mate_pair`. If  0  mate-pair read simulation (controlla!!!)
-   NOTE: art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000
+### Parameters of the bulk experiment (working only if `type_isa = 1`)
+- `coverage`. Real number, average coverage of the simulate bulk experiment.
+ - `FP`. Real number,  false positive rate.
+- `FN`. Real number, false negative rate.
+
+### Parameters of the sequencing experiment (ART)
+- `command`. A string, if the user want to do custom calls of ART, e.g., `command = "art_illumina -ss HS25 -sam -i reference.fa -l 150 -f 10 -o single_dat"`.
+#### If `command = ""`  for Illumina sequencing system is possible to compile the following parameters
+- `profile`. String, the name of Illumina sequencing system of the built-in profile used for simulation, e.g.,`profile = "HS25"`.
+- `len_read`. Integer, the length of reads to be simulated.
+- `tot_num_reads`. Integer, number of reads/read pairs to be generated per sequence.
+- `outfile_prefix`. String, the prefix of output filename.
+- `paired_end`. Integer number,  0  indicate a paired-end read simulation, if 1 a paried_end simulation is performed. If `paired_end = 1`, it is necessary to set  `mate_pair = 0`.
+   NOTE: if paired end is equal to 1 you will find 2 FASTQ files for sample. 
+	                 		    
+- `mate_pair`. Integer, if  1 mate-pair read simulation. If `mate_pair = 1`, it is necessary to set  `paired_end = 0`.
+   Art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000.
+#### if `paired_end == 1`,  are required the following 
+- `mean_fragsize`. Integer, the mean size of DNA/RNA fragments for paired-end simulations.
+- `std_fragsize`. Integer, the standard deviation of DNA/RNA fragment size for paired-end simulations.
+
 
 For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
 ## EXAMPLES
 
-## POSSIBLE ISSUES
+## POSSIBLE PROBLEM
  - la glmak usa gpu problema con macchine virtuali, per 
 
 
 
 See the file `COPYING` for license information.
 ## CONTACTS
-Please feel free to contact us if you have problems running our tool at .
+Please feel free to contact us if you have problems running our tool at fabrizio.angaroni@unimib.it and a.guidi@campus.unimib.it .
