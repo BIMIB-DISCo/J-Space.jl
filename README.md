@@ -140,7 +140,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `Random_sampling`. Integer, if 1  Random sampling, if 0 cirular/spherical sampling 
 - `num_cell`. Integer, number of sampled cells
 
-#### If Random_sampling = 0
+#### If `Random_sampling = 0`
 -  `pos_center`. Integer number, it is the center of the sampling
 - `radius_sampling`. Integer number, it is size radius of the sampling
 
