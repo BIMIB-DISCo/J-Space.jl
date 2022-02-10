@@ -34,10 +34,9 @@ If the infinite-site model is used,  it is possible to obtain the VCF file direc
 ## REQUIRED  SOFTWARE AND PACKAGE
 - Operating system: Linux 
 - Julia (https://julialang.org/) Version 1.6.3 or higher
-- ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm)
+- ART, install it from https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
 ## INSTALLATION OF J-SPACE
-### Installation of the J-SPACE module
 The J-SPACE can be downloaded from Github. To do so, we need to install the Julia from https://julialang.org/.   
 Fist the user need to copy the project folder in the chosen working directory. To install J-SPACE follow the steps:
 Using REPL or the COMMAND LINE move to the working directory.  
@@ -56,45 +55,51 @@ Using REPL or the COMMAND LINE move to the working directory.
 > instantiate
 	
 
-### Installation of ART
 
 ## RUN J-SPACE
-using JOG_Space
-### RUN A SINGLE SIMULATION
-The paramenters and the configuration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
-### RUN A SINGLE FUNCTION
 
+### RUN A SINGLE SIMULATION
+The paramenters and the configuration of the simulation are managment by the user by modifing the files "Parameters.toml" and "Config.toml" (the name of the file is not mandatory),  that are detailed in the next sections.  
+To run a simulation of J-SPACE using the ".toml" file for the paramet follow the following step:
+
+1. Load the J-SPACE package using:
+> using J_Space
+2. Start the simulation
+> Start_J_Space("Parameters.toml","Config.toml")
+NOTE: the simulation does not start if in the working folder are absent the two .toml files. 
 
 ### RUN THE EXAMPLES
+To run the examples, in the main folder of J-SPACE, from command line digit 
+> julia --project=.  ./path/myscript.jl
 
 ## OUTPUTS OF J-SPACE
  J-SPACE provides the following outputs. 
 
-  -  The state of the lattice at any time of the simulation (as plot and metagraph).
-  - The plot of clonal dynamics.
+  -  The state of the lattice at any time of the simulation (as plot).
   -  The Ground Truth (GT) genotype of the sampled cells as FASTA files.
   - The GT phylogenetic  tree  of the sampled cells in Newick format.
-  -   The mutational tree of the driver mutations (if present).
-  -   The list of the driver mutation with their birth rate advantage (if present).
-  -   The simulated next-generation sequencing reads as FASTQ files.
+  -   The plot of the mutational tree of the driver mutations (if present).
+  -   The list of the driver mutation with their birth rate advantage as .csv (if present).
+  -   The simulated next-generation sequencing reads as FASTQ files in the folder "/"path_to_save_files"/Fasta output/sample_#", where sample_# is the #-th sample.
   -  The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
   -   The alignment file, whithout noise in format SAM.
 
 
 
 ## THE CONFIGURATION FILE OF J-SPACE
-In the file Config.tml the user can manage the configuration of J-SPACE. This file is useful to choose the path where save the files, the desired plot and outputfile.
+In the file "Config.toml" the user can manage the configuration of J-SPACE. This file is useful to choose the path where save the files, the desired plots and output files.
+We provide an example in the main folder of J-SPACE.
 
-The following are the paramenters of such file
+The following are the paramenters of such file:
 
-- seed. The seed of the simulations.
-- generate_reference.  If 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 J-SPACE generate a random sequence.
-- path_reference.The path of the reference given by user.
-- path_to_save_files, path of the folder where the output files should be saved
-- path_to_save_plot,  path of the folder where the output plots should be saved
-- Generate_graph, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate regular lattice, the paramenters of such lattice are specified in the fiele Paramenters.toml.
-- Tree_Newick, if 1  the phylogenentic tree of the cells is saved as newick file.
-- Final_configuration, if 1 return the metagraph (in format) of the final configuration of the lattice.
+- seed. Integer, the seed of the simulation.
+- generate_reference. Integer, If 0 the user should inser the ancestral genome in fasta format in the folder "path_reference". If 1 J-SPACE generate a random sequence.
+- path_reference. A string,  the path of the reference given by user.
+- path_to_save_files.  A string, path of the folder where the output files should be saved
+- path_to_save_plot. A string,  path of the folder where the output plots should be saved
+- Generate_graph. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Paramenters.toml".
+- Tree_Newick. Integer,if 1  the phylogenentic tree of the cells is saved as newick file.
+- Final_configuration, if 1 return the plot of the final configuration of the lattice.
 - Driver_list, if 1 returns the list of the driver mutations
 - Driver_Tree, if 1 returns the tree of the driver mutations
 - Single_cell_fasta, if 1 save the fasta of the GT sequences of the sampled cells 
