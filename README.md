@@ -1,42 +1,39 @@
 # SPACE-SIM
 ## INTRODUCTION 
-SPACE-SIM is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and the procedure of sequencing the genome of the sampled cells.
+SPACE-SIM is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and sequencing the genome of the sampled cells.
 .
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
 After mimicking a spatial sampling of the tumour cells,
-SPACE-SIM  returns the phylogenetic tree of the sample and simulate molecular evolution of the genome under the a infinite-site models or a set of different substitution models  with the possibility to include structural variants as the indels. Finally, employing ART, SPACE-SIM   generate the  synthetic  single-end, paired-end/mate-pair reads of three  next-generation sequencing platforms.
+SPACE-SIM  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, SPACE-SIM generates the  synthetic single-end, paired-end/mate-pair reads of the next-generation sequencing platforms.
 
 
  ### Spatial clonal dynamics
- In SPACE-SIM he dynamics of the spatio-temporal
-evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
-arbitrary graph. SPACE-SIM could generate by itself a 2D or 3D regular lattice, in
-addition, it is possible to give as input any arbitrary graph as an adjacency matrix ( an example of the format needed for  this matrix is given in path/). 
-In this part the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells,the probabilty to develop a driver mutation per division, and the adverage birth rate advantage of a driver mutation.
-Note that every rate inserted in SPACE-SIM must the same unit of time both for the spatial dynamics and the molecular evolution.  
-
+ In SPACE-SIM the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
+arbitrary graph. SPACE-SIM could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path/). 
+In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells, the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
+Note that every rate inserted in SPACE-SIM must have the same unit of time both for the spatial dynamics and the molecular evolution.  
 
  ### Molecular evolution
  
  
- SPACE-SIM simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it and the SPACE-SIM evaluate the phylogenetic tree of the samples, this GT tree is returned as a newick file. 
+ SPACE-SIM simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the SPACE-SIM evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file. 
 
-The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algortihm.
-The user can use a infinite-site model, to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time) and the total simulated time is long.
+The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algorithm.
+The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time), and the total simulated time is long.
 
-In the case of finite-site models, SPACE-SIM takes as input the  matrix of instantaneous rates for different substitution models : JC69, F81, K80, HKY85, TN93, and K81.
-For the indels we suppose that they have a size distributed as  a Lavalette distribution.
- Note that using finite-site for  long genomes come at the cost of computational performance.
- After this computation the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned ad fasta file in the folder xxxx.
+In the case of finite-site models, SPACE-SIM takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
+We suppose that the indels have a size distributed as  a Lavalette distribution.
+ Note that using finite-site for long genomes come at the cost of computational performance.
+ After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder xxxx.
  
  
+
  ### Sequencing experiment
- 
-To simulate the reads of a sequencing experiment SPACE-SIM calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration files to specify the error model (for Illumina platforms), the number of  reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
-In addition, in the configuration file there is the option to insert custom "calls" for ART  with the possibility to use it in any possible configuration.
-If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
-If the infinite-site model is used,  it is possible to obtain directly the VCF fileto simulate a bulk experiment without simulating the reads with ART.
 
+To simulate the reads of a sequencing experiment SPACE-SIM calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration file to specify the error model (for Illumina platforms), the number of reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
+In addition, in the configuration file, there is the option to insert custom "calls" for ART  with the possibility to use it in any possible configuration.
+If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
+If the infinite-site model is used,  it is possible to obtain the VCF file directly without simulating the reads with ART.
 ## REQUIRED  SOFTWARE AND PACKAGE
 
 
