@@ -13,7 +13,7 @@ Note that every rate inserted in J-SPACE must have the same unit of time both fo
 
  ### Molecular evolution
  
-J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file in the folder >"path_to_save_files" .  
+J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file in the folder specified by the variable "/path_to_save_files/" .  
 
 The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algorithm.
 The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time), and the total simulated time is long.
@@ -21,7 +21,7 @@ The user can use an infinite-site model to have fast simulations of situations w
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
  Note that using finite-site for long genomes come at the cost of computational performance.
- After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  _path_to_save_files"/Fasta output/_
+ After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  /"path_to_save_files"/Fasta output/
  
  
 
@@ -32,15 +32,36 @@ In addition, in the configuration file, there is the option to insert custom "ca
 If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
 If the infinite-site model is used,  it is possible to obtain the VCF file directly without simulating the reads with ART.
 ## REQUIRED  SOFTWARE AND PACKAGE
-
-
+- Operating system: Linux 
+- Julia (https://julialang.org/) Version 1.6.3 or higher
+- ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm)
 
 ## INSTALLATION OF J-SPACE
+### Installation of the J-SPACE module
+The J-SPACE can be downloaded from Github. To do so, we need to install the Julia from https://julialang.org/.   
+Fist the user need to copy the project folder in the chosen working directory. To install J-SPACE follow the steps:
+Using REPL or the COMMAND LINE move to the working directory.  
+1. If you use the COMMAND LINE, to start a Julia session run the command:
+
+>Julia
+
+2. To enter in the Pkg REPL  type 
+
+>]  
+
+3. Type the command 
+> activate .
+
+4. To activate the J-SPACE project, type
+> instantiate
+	
+
+### Installation of ART
 
 ## RUN J-SPACE
-
+using JOG_Space
 ### RUN A SINGLE SIMULATION
-The paramenters and the cofinguration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
+The paramenters and the configuration of the simulation are managment by the user by modifing the files Parameters.tml and Config.tml that are detailed below.
 ### RUN A SINGLE FUNCTION
 
 
