@@ -32,9 +32,9 @@ In addition, in the configuration file, there is the option to insert custom "ca
 If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
 If the infinite-site model is used,  it is possible to obtain the VCF file directly without simulating the reads with ART.
 ## REQUIRED  SOFTWARE AND PACKAGE
-- Operating system: Linux 
-- Julia (https://julialang.org/) Version 1.6.3 or higher
-- ART, install it from https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
+- Operating system: Linux, Windows.
+- Julia (https://julialang.org/) Version 1.6.3 or higher.
+- ART, install it from https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm.
 
 ## INSTALLATION OF J-SPACE
 
