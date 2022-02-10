@@ -2,19 +2,18 @@
 ## INTRODUCTION 
 J-SPACE is a Julia package to simulate the spatial growth and the genomic evolution  of a cell population and the experiment of sequencing the genome of the sampled cells.
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
-After mimicking a spatial sampling of the tumour cells, J-SPACE  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models with the possibility of including structural variants as the indels. Finally, employing ART, J-SPACE generates the  synthetic single-end, paired-/mate-pair end reads of the next-generation sequencing platforms.
+After mimicking a spatial sampling of the tumour cells, J-SPACE  returns the phylogenetic tree of the sample and simulates molecular evolution of the genome under the infinite-site models or a set of different substitution models. Ther is also  the possibility of include indels. Finally, employing ART, J-SPACE generates the  synthetic single-end, paired-/mate-pair end reads of the next-generation sequencing platforms.
 
 
  ### Spatial clonal dynamics
  In J-SPACE the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
-arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path/). 
+arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path "xxxxxx", descrizione breve formato). 
 In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells, the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
 Note that every rate inserted in J-SPACE must have the same unit of time both for the spatial dynamics and the molecular evolution.  
 
  ### Molecular evolution
  
- 
-J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file. 
+J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file in the folder "path_to_save_files".  
 
 The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algorithm.
 The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time), and the total simulated time is long.
@@ -22,7 +21,7 @@ The user can use an infinite-site model to have fast simulations of situations w
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
  Note that using finite-site for long genomes come at the cost of computational performance.
- After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder xxxx.
+ After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  code(path_to_save_files/Fasta output/).
  
  
 
