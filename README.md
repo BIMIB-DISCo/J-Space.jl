@@ -21,7 +21,7 @@ The user can use an infinite-site model to have fast simulations of situations w
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
  Note that using finite-site for long genomes come at the cost of computational performance.
- After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  code(path_to_save_files/Fasta output/).
+ After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  _path_to_save_files"/Fasta output/_
  
  
 
