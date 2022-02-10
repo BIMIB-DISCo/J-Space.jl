@@ -81,14 +81,14 @@ To run the examples, in the main folder of J-SPACE, from command line digit
 ## OUTPUTS OF J-SPACE
  J-SPACE provides the following outputs. 
 
-  -  The state of the lattice at any time of the simulation (as plot).
-  -  The Ground Truth (GT) genotype of the sampled cells as FASTA files.
+  - The state of the lattice at any time of the simulation (as plot).
+  - The Ground Truth (GT) genotype of the sampled cells as FASTA files.
   - The GT phylogenetic  tree  of the sampled cells in Newick format.
-  -   The plot of the mutational tree of the driver mutations (if present).
-  -   The list of the driver mutation with their birth rate advantage as .csv (if present).
-  -   The simulated next-generation sequencing reads as FASTQ files in the folder "/"path_to_save_files"/Fasta output/sample_#", where sample_# is the #-th sample.
-  -  The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
-  -   The alignment file, whithout noise in format SAM.
+  - The plot of the mutational tree of the driver mutations (if present).
+  - The list of the driver mutation with their birth rate advantage as .csv (if present).
+  - The simulated next-generation sequencing reads as FASTQ files in the folder "/"path_to_save_files"/Fasta output/sample_#", where sample_# is the #-th sample.
+  - The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
+  - The alignment file, whithout noise in format SAM.
 
 
 
@@ -117,23 +117,16 @@ The following are the paramenters of such file:
 - `Time_of_sampling`. Array of times in an incresing order (e.g., [10.0 , 20.3 , 50.2]). J-SPACE perform the plot of the state of the lattice in that times.
 - `Graph_configuration`. Integer,  if 1  returns the plot of the state of the lattice.
 
-
 ## THE PARAMETERS FILE OF J-SPACE
-In the file ""Parameters.tml" the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
-
-
+In the file "Parameters.toml" the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
 
 ### Parameters of the generation of the lattice
-
 - `row`. Integer number of the rows of the regular lattice, not used if a graph is imported
 - `col`. Integer number of the columns of the regular lattice, not used if a graph is imported
 - `dim`. Integer number of the height of the regular lattice, not used if a graph is imported. If = 2 the simulation is 2D. If = 3 the simulation is 3D.
 - `N_starting_cells`. Integer  the number of starting cells.
 
-
-
 ### Parameters of the clonal spatial dynamics
-
 - `Model`. String, the possible values are ["contact", "voter", "hvoter"] they are the possible different  Models of interaction.
 - `Max_time`. Real number, it is the maximum time of the simulation 
 - `rate_birth`. Real number,  Birth rate per cell per unit of times
@@ -162,14 +155,14 @@ In the file ""Parameters.tml" the user will find all the paramenters of the dyna
 - `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
 - `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulatio put this parameter to 0.0 .
 - `params`. Rates of the substitution models  in units of time of the simulation.  
- if `sub_model= "JC69" `-> params = [{"alpha" = 0.5}]  
- if `sub_model= "F81" ` -> params = [{"alpha" = 0.5}]  
- if `sub_models= "K80"  `-> params = [{"alpha" = 0.5, "beta" = 0.3}]  
- if `sub_models= "HKY" ` -> params = [{"alpha" = 0.5, "beta" = 0.3}]  
- if `sub_models = "TrN93ef"`  -> params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]  
- if `sub_models = "TrN" `-> params = params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]  
- if `sub_models = "K81" ` -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]  
-  if `sub_models = "K81uf"`  -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]  
+ if `sub_model= "JC69" `-> params = [{"alpha" = 0.5}]. 
+ if `sub_model= "F81" ` -> params = [{"alpha" = 0.5}].  
+ if `sub_models= "K80"  `-> params = [{"alpha" = 0.5, "beta" = 0.3}].  
+ if `sub_models= "HKY" ` -> params = [{"alpha" = 0.5, "beta" = 0.3}].  
+ if `sub_models = "TrN93ef"`  -> params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}].   
+ if `sub_models = "TrN" `-> params = params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}].  
+ if `sub_models = "K81" ` -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}].  
+ if `sub_models = "K81uf"`  -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}].  
 
 
 ### Parameters of the bulk experiment (working only if `type_isa = 1`)
@@ -185,11 +178,11 @@ In the file ""Parameters.tml" the user will find all the paramenters of the dyna
 - `tot_num_reads`. Integer, number of reads/read pairs to be generated per sequence.
 - `outfile_prefix`. String, the prefix of output filename.
 - `paired_end`. Integer number,  0  indicate a paired-end read simulation, if 1 a paried_end simulation is performed. If `paired_end = 1`, it is necessary to set  `mate_pair = 0`.
-   NOTE: if paired end is equal to 1 you will find 2 FASTQ files for sample. 
-	                 		    
+   NOTE: if paired end is equal to 1 you will find 2 FASTQ files for sample.             		    
 - `mate_pair`. Integer, if  1 mate-pair read simulation. If `mate_pair = 1`, it is necessary to set  `paired_end = 0`.
    Art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000.
-#### if `paired_end == 1`,  are required the following 
+   
+#### if `paired_end = 1`,  are required the following 
 - `mean_fragsize`. Integer, the mean size of DNA/RNA fragments for paired-end simulations.
 - `std_fragsize`. Integer, the standard deviation of DNA/RNA fragment size for paired-end simulations.
 
