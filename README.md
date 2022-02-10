@@ -60,7 +60,7 @@ Fist the user need to copy the project folder in the chosen working directory. T
 ## RUN J-SPACE
 
 ### RUN A SINGLE SIMULATION
-The paramenters and the configuration of the simulation are managment by the user by modifing the files "Parameters.toml" and "Config.toml" (the name of the file is not mandatory),  that are detailed in the next sections.  
+The parameters and the configuration of the simulation are managment by the user by modifing the files "Parameters.toml" and "Config.toml" (the name of the file is not mandatory),  that are detailed in the next sections.  
 To run a simulation of J-SPACE using the ".toml" file for the paramet follow the following step:
 
 1. Load the J-SPACE package using:
