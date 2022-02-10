@@ -1,10 +1,42 @@
 # SPACE-SIM
 ## INTRODUCTION 
-SPACE-SIM is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and the procedure of sequencing the genome of the sampled cells. SPACE-SIM operate under a broad set of different conditions, phenomenological rules and experimental setting.
+SPACE-SIM is a Julia package to simulate the genomic evolution and the spatial growth of a cell population and the procedure of sequencing the genome of the sampled cells.
+.
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
-Finally, after mimicking a spatial sampling of the tumour cells, SPACE-SIM  returns the phylogenetic tree of the sample and simulate molecular evolution of the genome under the a infinite-site models or a set of different substitution models  with the possibility to include structural variants as the indels. Finally, employing ART, SPACE-SIM   generate the  synthetic  single-end, paired-end/mate-pair reads of three  next-generation sequencing platforms.
-For any of the theoretical details please see xxx
+After mimicking a spatial sampling of the tumour cells,
+SPACE-SIM  returns the phylogenetic tree of the sample and simulate molecular evolution of the genome under the a infinite-site models or a set of different substitution models  with the possibility to include structural variants as the indels. Finally, employing ART, SPACE-SIM   generate the  synthetic  single-end, paired-end/mate-pair reads of three  next-generation sequencing platforms.
+
+
+ ### Spatial clonal dynamics
+ In SPACE-SIM he dynamics of the spatio-temporal
+evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
+arbitrary graph. SPACE-SIM could generate by itself a 2D or 3D regular lattice, in
+addition, it is possible to give as input any arbitrary graph as an adjacency matrix ( an example of the format needed for  this matrix is given in path/). 
+In this part the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells,the probabilty to develop a driver mutation per division, and the adverage birth rate advantage of a driver mutation.
+Note that every rate inserted in SPACE-SIM must the same unit of time both for the spatial dynamics and the molecular evolution.  
+
+
+ ### Molecular evolution
  
+ 
+ SPACE-SIM simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it and the SPACE-SIM evaluate the phylogenetic tree of the samples, this GT tree is returned as a newick file. 
+
+The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algortihm.
+The user can use a infinite-site model, to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time) and the total simulated time is long.
+
+In the case of finite-site models, SPACE-SIM takes as input the  matrix of instantaneous rates for different substitution models : JC69, F81, K80, HKY85, TN93, and K81.
+For the indels we suppose that they have a size distributed as  a Lavalette distribution.
+ Note that using finite-site for  long genomes come at the cost of computational performance.
+ After this computation the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned ad fasta file in the folder xxxx.
+ 
+ 
+ ### Sequencing experiment
+ 
+To simulate the reads of a sequencing experiment SPACE-SIM calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration files to specify the error model (for Illumina platforms), the number of  reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
+In addition, in the configuration file there is the option to insert custom "calls" for ART  with the possibility to use it in any possible configuration.
+If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
+If the infinite-site model is used,  it is possible to obtain directly the VCF fileto simulate a bulk experiment without simulating the reads with ART.
+
 ## REQUIRED  SOFTWARE AND PACKAGE
 
 
@@ -20,6 +52,18 @@ The paramenters and the cofinguration of the simulation are managment by the use
 ### RUN THE EXAMPLES
 
 ## OUTPUTS OF SPACE-SIM
+ SPACE-SIM provides the following outputs. 
+
+   -  The state of the lattice at any time of the simulation (as plot and metagraph).
+    - The plot of clonal dynamics.
+   -  The Ground Truth (GT) genotype of the sampled cells as FASTA files.
+   - The GT phylogenetic  tree  of the sampled cells in Newick format.
+  -   The mutational tree of the driver mutations (if present).
+  -   The list of the driver mutation with their birth rate advantage (if present).
+  -   The simulated next-generation sequencing reads as FASTQ files.
+  -  The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
+  -   The alignment file, whithout noise in format SAM .
+
 
 
 ## THE CONFIGURATION FILE OF SPACE-SIM
@@ -27,9 +71,9 @@ In the file Config.tml the user can manage the configuration of SPACE-SIM. This 
 
 The following are the paramenters of such file
 
-- seed, the seed of the simulations.
-- generate_reference,  if 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 SPACE-SIM generate a random sequence.
-- path_reference, the path of the reference given by user.
+- seed. The seed of the simulations.
+- generate_reference.  I 0 the user should inser the reference genome in fasta format in the folder path_reference. If 1 SPACE-SIM generate a random sequence.
+- path_reference.The path of the reference given by user.
 - path_to_save_files, path of the folder where the output files should be saved
 - path_to_save_plot,  path of the folder where the output plots should be saved
 - Generate_graph, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 SPACE-SIM generate regular lattice, the paramenters of such lattice are specified in the fiele Paramenters.toml.
@@ -54,27 +98,27 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 
 ### Paramenters of the generation of the lattice
 
-- row, integer number of the rows of the regular lattice, not used if a graph is imported
-- col, integer number of the columns of the regular lattice, not used if a graph is imported
-- dim, integer number of the rows of the regular lattice, not used if a graph is imported. If =1 the simulation is 2D
-- N_starting_cells, integer  the number of starting cells.
+- row. Integer number of the rows of the regular lattice, not used if a graph is imported
+- col. Integer number of the columns of the regular lattice, not used if a graph is imported
+- dim. Integer number of the rows of the regular lattice, not used if a graph is imported. If =1 the simulation is 2D
+- N_starting_cells. Integer  the number of starting cells.
 
-- matrix_adjacency,  path to the adjacency matrix ("path/matrix/adjacency") of the graph that should be imported.
+- matrix_adjacency.  Path to the adjacency matrix ("path/matrix/adjacency") of the graph that should be imported.
 
 ### Paramenters of the clonal spatial dynamics
 
-- Model,  for selecting the different  Models of interaction, possible values ["contact", "voter", "hvoter"]
-- Max_time, real number it is the maximum time of the simulation 
-- rate_birth, real number.  Birth rate per cell per unit of times
-- rate_death,  real number . Death rate per cell per unit of times
-- rate_migration, real number.  Migration rate per cell per unit of times
-- drive_mut_rate, probability of generate a new driver (i.e., subclones) after a division event.
-- average_driver_mut_rate,  average birth rate advantage a driver mutation 
-- std_driver_mut_rate, standard deviation of the birth rate advantage of a driver mutation 
+- Model. String, the possible values are ["contact", "voter", "hvoter"] they are the possible different  Models of interaction.
+- Max_time. Real number, it is the maximum time of the simulation 
+- rate_birth. Real number,  Birth rate per cell per unit of times
+- rate_death. Real number,  Death rate per cell per unit of times
+- rate_migration. Real number,  Migration rate per cell per unit of times
+- drive_mut_rate. Real number, probability of generate a new driver (i.e., subclones) after a division event.
+- average_driver_mut_rate. Real number,  average birth rate advantage a driver mutation 
+- std_driver_mut_rate. Real number, standard deviation of the birth rate advantage of a driver mutation 
 
 ### Paramenters of the sampling
-- Random_sampling. if 1  Random sampling, if 0 cirular/spherical sampling 
-- num_cell. Number of sampled cells
+- Random_sampling. Integer, if 1  Random sampling, if 0 cirular/spherical sampling 
+- num_cell. Integer, number of sampled cells
 
 #### If Random_sampling = 0
  -  pos_center. Integer number, it is the center of the sampling
@@ -89,7 +133,7 @@ In the file Parameters.tml the user will find all the paramenters of the dynamic
 - sub_model. A string, variable that select the subistituion model, possible value ->[ "JC69","F81","K80", "HKY85","TN93","K81"]
 - indel_size. Real number maximum size of indel 
 - Lavelette_param. Real number the parameter of  the Lavelette distribution for the size of indels
-- indel_rate. Rate of indel per site and per unit of time
+- indel_rate. Rate of indel per site and per unit of time. To esclude indel put this parameter to 0.
 - params. Rates of the substitution models
  if sub_model= "JC69" params=
  if sub_model= "F81" params=
@@ -129,4 +173,5 @@ For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resou
 
 
 See the file `COPYING` for license information.
-
+## CONTACTS
+Please feel free to contact us if you have problems running our tool at .
