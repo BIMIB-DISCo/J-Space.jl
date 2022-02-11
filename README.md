@@ -29,7 +29,7 @@ We suppose that the indels have a size distributed as  a Lavalette distribution.
 
 To simulate the reads of a sequencing experiment J-SPACE calls ART (https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm). The user can use a configuration file to specify the error model (for Illumina platforms), the number of reads, the length of the reads, and if the experiment uses single-end paired-end/mate-pair reads.
 In addition, in the configuration file, there is the option to insert custom "calls" for ART  with the possibility to use it in any possible configuration.
-If the user simulate the experiment, \alg{} returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
+If the user simulate the experiment, J-SPACE returns for each cell, the simulated reads as FASTQ file, the alignment map of the reads over the genome of the sampled cells in SAM and/or ALN format. 
 If the infinite-site model is used,  it is possible to obtain the VCF file directly without simulating the reads with ART.
 ## REQUIRED  SOFTWARE AND PACKAGE
 - Operating system: Linux, Windows.
