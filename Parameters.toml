@@ -3,7 +3,7 @@
 [[Graph]]
 row = 100 #num row of lattice
 col = 100 #num col of lattice
-dim = 1 #deep of lattice
+dim = 2 #deep of lattice
 N_starting_cells = 1 #start cell at the simualtion
 # ***
 # Otherwise matrix adjacency
@@ -12,7 +12,7 @@ N_starting_cells = 1 #start cell at the simualtion
 
 [[Dynamic]]
 Model = "contact" #Model of interaction ["contact", "voter", "hvoter"]
-Max_time = 350.0 #Time of the simulation
+Max_time = 200.0 #Time of the simulation
 rate_birth = 0.2 #Rate of birth
 rate_death = 0.01 #Rate of Death
 rate_migration = 0.01 #Rate of migration
@@ -22,7 +22,7 @@ std_driver_mut_rate = 0.1 #Rate of the standard deviation of average_driver_mut_
 
 [[Sampling]]
 Random_sampling = 1 #Choose mode sampling: 1 -> Random, 0 -> Neighbourhood
-num_cell = 10 #Num of cells of the sampling
+num_cell = 100 #Num of cells of the sampling
 #***
 # If Random_sampling = 0
 # ***#
@@ -31,15 +31,16 @@ radius_sampling = 10 #size radius of the sampling
 
 [[MolecularEvolution]]
 length_genome = 6000 #length of genome reference, if ref not given, else = 0
-type_isa = 1 #type of model evolution, if value 0 specificate submodel
+type_isa = 0 #type of model evolution, if value 0 specificate submodel
+approx_snv_indel = 1 #0 or 1
 #diploide = 0 #if we choose a evolution with constrain
 #*** if type_isa = 1 ***#
 neut_mut_rate = 0.000025 #rate of neutral mutation
 #*** if type_isa = 0 ***#
 sub_model = "K80" #decide substitution matrix for mutation, possible value ->[]
-indel_size = 300
+indel_size = 300 #MAX indel size
+lavalette_par = 0.5 #shape parameter of lavalette distribution for indel size
 indel_rate = 0.0005
-branch_length = 10.0
 params = [{"alpha" = 0.5, "beta" = 0.3}]
 [[BulkExperiment]]
 coverage = 10.0

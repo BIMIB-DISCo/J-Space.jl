@@ -169,12 +169,14 @@ function Start(paramaters::String, config::String)
             g_seq, fastaX, position_used = Molecular_evolution_ISA(tree_red,
                                                                neu_mut_rate,
                                                                seed,
-                                                               ref)
+                                                               ref,
+                                                               set_mut)
       else
             submodel = MolEvo_dict["sub_model"]
             indel_size = MolEvo_dict["indel_size"]
             lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
+            approx_snv_indel = MolEvo["approx_snv_indel"]
             #println("params: ",MolEvo_dict["params"])
             #println("type: ",typeof(MolEvo_dict["params"]))
             params = IdDict(MolEvo_dict["params"][1])
@@ -188,7 +190,8 @@ function Start(paramaters::String, config::String)
                                                                indel_size,
                                                                seed,
                                                                set_mut,
-                                                               lavalette)
+                                                               lavalette,
+                                                               approx_snv_indel)
       end
       if fastaX == []
             return "Correct error input"
