@@ -7,8 +7,8 @@ using FASTX
 """
 Save fasta.
 """
-function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
-                     tree::AbstractMetaGraph, path_save_file::String, OS="windows")
+function save_Fasta_W(Ref::LongDNASeq, fasta_samples::Vector{Any},
+                     tree::AbstractMetaGraph, path_save_file::String)
       ## write fasta on files if single_cell is true
       leafs = get_leafs(tree)
       mkpath(path_save_file*"\\Fasta output") # Create folder
@@ -38,8 +38,8 @@ end
 """
 Save fasta.
 """
-function save_Fasta(Ref::LongDNASeq, fasta_samples::Vector{Any},
-                     tree::AbstractMetaGraph, path_save_file::String, OS="linux")
+function save_Fasta_L(Ref::LongDNASeq, fasta_samples::Vector{Any},
+                     tree::AbstractMetaGraph, path_save_file::String)
       ## write fasta on files if single_cell is true
       leafs = get_leafs(tree)
       mkpath(path_save_file*"/Fasta output") # Create folder
@@ -305,7 +305,7 @@ end
 function genomic_evolution(Seq_f::LongDNASeq,
                            Model_Selector::String, #Ploidity::Int,
                            rate_Indel::AbstractFloat,
-                           size_indel::Int,
+                           size_indel_arr::Vector{AbstractFloat},#da controllare
                            branch_length::AbstractFloat,
                            Model_Selector_matrix::DataFrame,
                            prob_A::Vector{Float64},
@@ -365,8 +365,10 @@ function genomic_evolution(Seq_f::LongDNASeq,
             #choose initial position
             init_pos = rand(seed, 1:length(sequence_father))
             if e == "insertion"
-                length_ins = rand(seed, Poisson(size_indel), 1)[1] + 1
-
+                prob_cum_size = cumsum(size_indel_arr)
+                k = rand(seed)
+                id_size_indel = collect(k .<= prob_cum_size)
+                length_ins = findfirst(id_size_indel)
                 if len_father - init_pos < length_ins
                      length_ins = len_father - init_pos
                  end
@@ -384,7 +386,10 @@ function genomic_evolution(Seq_f::LongDNASeq,
                      mutation_driver[mut_sub] = "ins $init_pos_ins-"*string(init_pos_ins + length_ins)
                  end
              else #deletion
-                 length_del = rand(seed, Poisson(size_indel), 1)[1] + 1
+                 prob_cum_size = cumsum(size_indel_arr)
+                 k = rand(seed)
+                 id_size_indel = collect(k .<= prob_cum_size)
+                 length_del = findfirst(id_size_indel)
                  init_pos_del = rand(seed, 1:length(sequence_father))
                  end_pos_del = min(len_father, init_pos_del + length_del)
                  new_sequence = sequence_father[1:init_pos_del]
@@ -464,6 +469,15 @@ function genomic_evolution(Seq_f::LongDNASeq,
      end
 end
 
+function size_indel_dist(len_g::Int, size_indel::AbstractFloat, lavalette_par::AbstractFloat)
+    if size_indel > len_g
+        size_indel = len_g - 1
+    end
+    size_indel_arr = [((u*size_indel)/(size_indel-u +1))^(-lavalette_par) for u in 1:size_indel]
+    size_indel_arr = size_indel_arr ./ sum(size_indel_arr)
+    return size_indel_arr
+end
+
 """
     Molecular evolution with several substitution models (With ref)
 """
@@ -473,9 +487,9 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                           params::IdDict,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
-                          branch_length::AbstractFloat,
                           seed::MersenneTwister,
-                          set_mut::Vector{Any})
+                          set_mut::Vector{Any},
+                          lavalette_par::AbstractFloat)
     Tree_SC = copy(Tree)
     set_prop!(Tree_SC, 1, :Subpop_Child, 1)
     Ref = LongDNASeq()
@@ -486,7 +500,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
             Ref = FASTX.sequence(record)
         end
     end
-
+    size_indel_arr = size_indel_dist(length(Ref), size_indel, lavalette_par)
     #Model_Selector
     Model_Selector_matrix = Q(Selector, params)
     if typeof(Model_Selector_matrix) == String
@@ -507,6 +521,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
         else
             g_seq_e = copy(Ref)
         end
+        branch_length =get_prop(Tree_SC, dst(e), :Time) - get_prop(Tree_SC, src(e), :Time)
         subpop_father = get_prop(Tree_SC, src(e), :Subpop_Child)
         subpop_child = get_prop(Tree_SC, dst(e), :Subpop_Child)
         mut_f = set_mut[subpop_father]
@@ -516,7 +531,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
             sequence = genomic_evolution(g_seq_e,
                                      Selector,
                                      rate_Indel,
-                                     size_indel,
+                                     size_indel_arr,
                                      branch_length,
                                      Model_Selector_matrix,
                                      prob_A,
@@ -531,7 +546,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
             sequence, num_mut_driver = genomic_evolution(g_seq_e,
                                      Selector,
                                      rate_Indel,
-                                     size_indel,
+                                     size_indel_arr,
                                      branch_length,
                                      Model_Selector_matrix,
                                      prob_A,
@@ -578,9 +593,9 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
                           params::IdDict,
                           rate_Indel::AbstractFloat,
                           size_indel::Int,
-                          branch_length::AbstractFloat,
                           seed::MersenneTwister,
-                          set_mut::Vector{Any})
+                          set_mut::Vector{Any},
+                          lavalette_par::AbstractFloat)
     Tree_SC = copy(Tree)
     set_prop!(Tree_SC, 1, :Subpop_Child, 1)
     ## Create reference genome
@@ -589,7 +604,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     w = FASTA.Writer(open("Reference.fasta", "w"))
     write(w, rec)
     close(w)
-
+    size_indel_arr = size_indel_dist(Len, size_indel, lavalette_par)
     #Model_Selector
     Model_Selector_matrix = Q(Selector, params)
     if typeof(Model_Selector_matrix) == String
@@ -609,6 +624,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
         else
             g_seq_e = copy(Ref)
         end
+        branch_length = get_prop(Tree_SC, dst(e), :Time) - get_prop(Tree_SC, src(s), :Time)
         subpop_father = get_prop(Tree_SC, src(e), :Subpop_Child)
         #id_f = findall(x -> x == subpop_father, set_mut)[1]
         subpop_child = get_prop(Tree_SC, dst(e), :Subpop_Child)
@@ -619,7 +635,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
             sequence = genomic_evolution(g_seq_e,
                                          Selector,
                                          rate_Indel,
-                                         size_indel,
+                                         size_indel_arr,
                                          branch_length,
                                          Model_Selector_matrix,
                                          prob_A,
@@ -634,7 +650,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
             sequence, num_mut_driver = genomic_evolution(g_seq_e,
                                      Selector,
                                      rate_Indel,
-                                     size_indel,
+                                     size_indel_arr,
                                      branch_length,
                                      Model_Selector_matrix,
                                      prob_A,

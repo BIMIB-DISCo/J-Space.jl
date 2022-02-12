@@ -68,6 +68,7 @@ function Start(paramaters::String, config::String)
                                                         seed,
                                                         Time_of_sampling =
                                                                Time_of_sampling)
+      println("save plot...")
       #save configuration of time at specific time
       if Graph_configuration == 1
             for i in 1:length(Gs_conf)
@@ -81,7 +82,7 @@ function Start(paramaters::String, config::String)
                   end
             end
       end
-      #save final configuration
+
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
@@ -90,16 +91,17 @@ function Start(paramaters::String, config::String)
                   save(path_save_plot*"/Final_conf.png", f)
             end
       end
-
       #save driver list
       if Conf_dict["OutputGT"][1]["Driver_list"] == 1
+            List_driver = DataFrame(Driver = set_mut, Fitness = α_subpop)
             if Sys.iswindows()
                   CSV.write(path_save_file*"\\DriverList.csv",
-                            Tables.table(set_mut), Tables.table(α_subpop),
+                            List_driver,
                             header=false)
+
             elseif Sys.islinux()
                   CSV.write(path_save_file*"/DriverList.csv",
-                            Tables.table(set_mut), Tables.table(α_subpop),
+                            List_driver,
                             header=false)
             end
       end
@@ -171,8 +173,8 @@ function Start(paramaters::String, config::String)
       else
             submodel = MolEvo_dict["sub_model"]
             indel_size = MolEvo_dict["indel_size"]
+            lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
-            branch_length = MolEvo_dict["branch_length"]
             #println("params: ",MolEvo_dict["params"])
             #println("type: ",typeof(MolEvo_dict["params"]))
             params = IdDict(MolEvo_dict["params"][1])
@@ -184,9 +186,9 @@ function Start(paramaters::String, config::String)
                                                                params,
                                                                indel_rate,
                                                                indel_size,
-                                                               branch_length,
                                                                seed,
-                                                               set_mut)
+                                                               set_mut,
+                                                               lavalette)
       end
       if fastaX == []
             return "Correct error input"
@@ -194,11 +196,11 @@ function Start(paramaters::String, config::String)
       #save fasta
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
             if Sys.iswindows()
-                  SO = "windows"
+                  save_Fasta_W(g_seq, fastaX, tree_red, path_save_file)
             elseif Sys.islinux()
-                  SO = "linux"
+                  save_Fasta_L(g_seq, fastaX, tree_red, path_save_file)
             end
-            save_Fasta(g_seq, fastaX, tree_red, path_save_file, SO)
+
       end
 
       ##BulkExperiment

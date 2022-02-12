@@ -53,8 +53,17 @@ calls function for initialize lattice with p as probability that
 there are a cell have a driver mutation
 """
 function spatial_graph(row::Int, col::Int, seed::MersenneTwister;
-                                                dim::Int = 1, n_cell::Int = 1)
-    G = Graphs.grid((row, col, dim))
+                                                dim::Int = 2, n_cell::Int = 1)
+    if dim == 3
+        d = convert(Int, trunc((row*col)^(1/3)))+1
+        G = Graphs.grid((d, d, d))
+    elseif dim == 2
+        G = Graphs.grid((row, col, 1))
+    else
+        println("WARNING -> dim not corret, it set 3")
+        d = convert(Int, trunc((row*col)^(1/3)))+1
+        G = Graphs.grid((d, d, d))
+    end
     G_meta = initialize_graph(G, row, col, n_cell, seed)
     return G_meta
 end
@@ -101,6 +110,9 @@ function initialize_graph(G::AbstractGraph, row::Int, col::Int, n_cell::Int,
             delete!(positions, pos)
             set_props!(G_meta, pos, Dict(:mutation => (1), :id => id))
         end
+        for i in 1:nv(G_meta.graph)
+             set_props!(G_meta, i, Dict(:name=> "node$i"))
+        end
     end
     return G_meta
 end
@@ -116,8 +128,8 @@ function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
     f, ax, p = graphplot(G,
                          layout = mylayout,
                          node_size = repeat([5], nv(G)),#[7 for i in 1:nv(G)],
-                         edge_width = repeat([1], ne(G)),
-                         edge_color = repeat([:white], ne(G)),
+                         #edge_width = repeat([1], ne(G)),
+                         #edge_color = repeat([:white], ne(G)),
                          node_color = colors)
     hidedecorations!(ax)
     hidespines!(ax)
@@ -130,8 +142,12 @@ Creates a palette based on the number of driver mutations present.
 """
 function color_index(driver_mut::Vector{Any}, Set_mut::Vector{Any})
     colors = []
+    n_color = 20
+    if length(Set_mut) > 20
+        n_color = length(Set_mut)
+    end
     nodecolor_range =
-        distinguishable_colors(20,
+        distinguishable_colors(n_color,
                                [RGB(1, 1, 1), RGB(0, 0, 0)],
                                dropseed = true)
     for i in 1:length(driver_mut)
@@ -287,6 +303,15 @@ function cell_birth(G::AbstractGraph,
                     ca_subpop::Vector{Any},
                     idx::Int,
                     seed::MersenneTwister)
+    #println(props(G, cell))
+    #println(props(G, pos))
+    if #=(length(props(G, cell)) != length(props(G, pos))) || =#has_prop(G, cell, :id) == false
+        println("########################################## ERRORE ##################################")
+        println(props(G, cell))
+    end
+    if has_prop(G, pos, :id) #elimino la vecchia cellula
+        filter!(e -> e != pos, ca_subpop[get_prop(G, pos, :Subpop)])
+    end
     id = uuid1(seed)
     id2 = uuid1(seed)
     parent = get_prop(G, cell, :id)     # Trovo il vecchio id
@@ -337,6 +362,8 @@ function cell_birth(G::AbstractGraph,
             push!(ca_subpop, [cell])
         end
     end
+    #println(props(G, cell))
+    #println(props(G, pos))
     return length(set_mut)
 end
 
@@ -387,6 +414,8 @@ function cell_death(G::AbstractGraph,
     ## Aggiorno il grafo
     rem_prop!(G, cell, :id)
     rem_prop!(G, cell, :mutation)
+    rem_prop!(G, cell, :Subpop)
+    rem_prop!(G, cell, :Fit)
 end
 
 
@@ -692,17 +721,20 @@ function simulate_evolution(G::AbstractGraph,
     ## Ritorna la lista dei vicini di ogni nodo(sia vuoto che pieno)
     cs_neighbors = cells_neighbors(G)
     ca_subpop = cells_alive_subpop(G, set_mut_pop) # Num di cell ∀ subpop
-    while t_curr < Tf && n_cs_alive > 0
+    α_subpop_f = []
+    while (t_curr < Tf && n_cs_alive > 0) || (rate_death == 0 && n_cs_alive == nv(G))
         α_subpop = []           # alpha for each subpop
         for i in 1:length(α)
             push!(α_subpop, α[i] * length(ca_subpop[i]))
         end
+        α_subpop_f = α_subpop
         birth = sum(α_subpop)           # Tot prob nascita
         death = rate_death * n_cs_alive # Tot prob di morte
         M = rate_migration * n_cs_alive # Tot prob di migrazione
         λ = birth + death + M
         t_event = rand(seed, Exponential(1 / λ), 1)[1]
         t_curr += t_event
+        #println("t_curr: ",t_curr)
         Aₙ = α_subpop ./ λ
         Bₙ = death / λ
         Mₙ = M / λ
@@ -711,7 +743,7 @@ function simulate_evolution(G::AbstractGraph,
            Time_index <= length(Time_of_sampling) &&
            t_curr > Time_of_sampling[Time_index]
             push!(Gs_plot, copy(G))
-            push!(CA_Alive_TOT, cs_alive)
+            push!(CA_Alive_TOT, ca_subpop)
             Time_index += 1
         end
         ## Probability vector
@@ -724,6 +756,7 @@ function simulate_evolution(G::AbstractGraph,
         min = findfirst(target_subpop)
 
         if min == num_pop + 2              # Evento migrazione
+            #println("migrazione")
             x = rand(seed, (1:n_cs_alive))       # Scelgo una cellula a caso
             cell = cs_alive[x]             # Prendo la cellula
             pos = rand(seed, cs_neighbors[cell]) # Scelgo una posizione a caso
@@ -738,16 +771,29 @@ function simulate_evolution(G::AbstractGraph,
                 push!(list_len_node_occ, n_cs_alive)
             end
         elseif min == num_pop + 1    # Evento morte
+            #println("morte")
+            #println("len: ",length(cs_alive))
+            #println("n_cs_alive: ", n_cs_alive)
             x = rand(seed, (1:n_cs_alive)) # Scelgo una cellula a caso
+            #println("X: ",x)
+            #println(cs_alive)
             cell = cs_alive[x]       # Prendo la cellula
+            #println("cell: ",cell)
             mut = get_prop(G, cell, :mutation) # Recupero mutazione
+            #println("mut: ",mut)
             idx = findall(x -> x == mut, set_mut_pop)[1]
+            #println("idx: ",idx)
             cell_death(G, cell, df, t_curr) # Funzione morte cellula
+            #println(cs_alive, "\n", "len: ", length(cs_alive))
             filter!(e -> e != cell, cs_alive) # Tolgo la vecchia cell occupata
+            #println(cs_alive, "\n", "len: ", length(cs_alive))
             filter!(e -> e != cell, ca_subpop[idx]) # Update list of subpop
             n_cs_alive -= 1
             push!(list_len_node_occ, n_cs_alive)
+            #println("len: ",length(cs_alive))
+            #println("n_cs_alive: ", n_cs_alive)
         else                                   # Evento nascita
+            #println("nascita")
             x = rand(seed, 1:length(ca_subpop[min])) # Scelgo cell a caso
             cell = ca_subpop[min][x]           # Prendo la cell a caso
             pos = rand(seed, cs_neighbors[cell]) # Scelgo una posizione a caso
@@ -758,20 +804,28 @@ function simulate_evolution(G::AbstractGraph,
                     rule = false
                 end
             elseif  model == "voter"
+                #println("sono dentro a voter")
                 if pos ∈ cs_alive
+                    if has_prop(G, cell, :Subpop) == false || has_prop(G, pos, :Subpop) == false
+                        println(props(G, cell))
+                        println(props(G, pos))
+                    end
                     if get_prop(G, cell, :Subpop) == get_prop(G, pos, :Subpop)
-                         rule = false
-                     end
-                 end
+                        #println("evento phandom")
+                        rule = false
+                    end
+                end
             elseif model == "h_voter"
                 if pos ∈ cs_alive
-                    if get_prop(G, cell, :Fit) < get_prop(G, pos, :Fit)
+                    if get_prop(G, cell, :Fit) <= get_prop(G, pos, :Fit)
                         rule = false
                     end
                 end
             end
+            #println("model: ",model)
+            #println("rule: ",rule)
             if rule   # Controllo che non è un phandom event
-
+                #println("nato davvero")
                 ## Funzione che duplica una cellula
                 num_pop = cell_birth(G,
                                      cell,
@@ -786,13 +840,19 @@ function simulate_evolution(G::AbstractGraph,
                                      ca_subpop,
                                      min,
                                      seed)
-                push!(cs_alive, pos) # Aggiorno la lista dei nodi occupati
-                n_cs_alive += 1      # Number of cell alive on lattice
+                #println("dopo la nascita")
+                #println("pos: ", pos)
+                #println("cs_alive: ",cs_alive)
+                if pos ∉ cs_alive
+                    push!(cs_alive, pos) # Aggiorno la lista dei nodi occupati
+                     #println("update cs_alive: ",cs_alive)
+                    n_cs_alive += 1      # Number of cell alive on lattice
+                end
                 push!(list_len_node_occ, n_cs_alive) # Update list nodes occ a t
             end
         end
     end
-    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α_subpop
+    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α_subpop_f
 end
 
 ### Include?  Non è una cosa che si fa a livello di progetto?

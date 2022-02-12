@@ -40,7 +40,7 @@ overwrite previous entries.
 - `destination` is column symbol for destination of each edge.
 
 ## Optional keyword arguments:
-   
+
 - `weight` is column symbol to be used to set weight property.
 - `edge_attributes` is a `Symbol` of `Vector{Symbol}` of columns whose
   values will be added as edge properties.
@@ -124,13 +124,15 @@ function metagraph_from_dataframe(graph_type,
                                   vertex_id_col::Symbol = Symbol())
     # Map node names to vertex IDs
     nodes = sort!(unique!([df[:, origin]; df[:, destination]])) #ho tutti i nodi
+    #println("nodes: ", nodes)
     vertex_names = DataFrame(name=nodes, vertex_id = eachindex(nodes)) #id ∀ nodi
+    #println("vertex_names: ", vertex_names)
     # Merge in to original
     for c in [origin, destination]
         temp = rename(vertex_names, :vertex_id => Symbol(c, :_id))
         df = innerjoin(df, temp; on = c => :name)
     end # crea 2 colone con gli indici appena creati
-
+    #println("df -> ",df)
     # Merge additional attributes to names
     if vertex_attributes != DataFrame()
         idsym =
@@ -141,15 +143,17 @@ function metagraph_from_dataframe(graph_type,
                                 vertex_attributes,
                                 on = :name => idsym)
     end
-    
+
     # Create Graph
     mg = graph_type(nrow(vertex_names))
     for r in eachrow(df)
+        #println("r[Symbol(origin, :_id)] ", r[Symbol(origin, :_id)])
+        #println("r[Symbol(destination, :_id)] ", r[Symbol(destination, :_id)])
         add_edge!(mg, r[Symbol(origin, :_id)], r[Symbol(destination, :_id)])
     end
 
     #add times on graph
-    times_df = df[:,[:Child, :Time]]
+    times_df = df[:,[:Child, :Time]] #prendo tutte le righe child
     vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
     #add subpop_child on graph
     subpop_df = df[:,[:Child, :Subpop_Child]]

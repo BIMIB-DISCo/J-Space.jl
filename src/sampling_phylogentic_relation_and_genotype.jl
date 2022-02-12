@@ -175,21 +175,24 @@ function create_tree(matrix::DataFrame, newick::Bool)
         set_prop!(tree, 1, :Subpop_Child, 1)
     end
     #println("props: ", props(tree, 1))
-    #=if path != ""
-        GLMakie.activate!()
-        color = [:blue for i in 1:nv(tree)]
-        color[1] = :black
-        f, ax, p =
+    #=
+    GLMakie.activate!()
+    color = [:blue for i in 1:nv(tree)]
+    color[1] = :black
+    f, ax, p =
             graphplot(tree,
                       layout = Buchheim(),
                       node_color = color,
                       nlabels = [string(v) for v in vertices(tree)])
-        hidedecorations!(ax)
-        hidespines!(ax)
-        save(path, f)
-        display(f)
-    end=#
+    hidedecorations!(ax)
+    hidespines!(ax)
+        #save(path, f)
+    display(f)
+    #end=#
     tree_reduce = reduce_tree(tree)
+    if typeof(tree_reduce) == String
+        return "Error", ""
+    end
     ## color = [:blue for i in 1:nv(tree_reduce)]
     ## color[1] = :black
     # f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
@@ -200,6 +203,7 @@ function create_tree(matrix::DataFrame, newick::Bool)
 
     ## Create format newick
     if newick == true
+        println("create format newick....")
         net = format_newick(tree_reduce)
         return tree_reduce, net
     end
@@ -246,8 +250,12 @@ function reduce_tree(tree::AbstractGraph)
     tree_reduce = MetaDiGraph(t_r)
     map_nodes = []
     for leaf in leafs
-        ## println("leaf: ",leaf)
+        #println("leaf: ",leaf)
         yen_k = yen_k_shortest_paths(tree, 1, leaf)
+        #println("yen_k: ",yen_k)
+        if length(yen_k.paths) == 0
+            return "error...this is fixed soon"
+        end
         path = yen_k.paths[1]
         v_mid = get_vertex_middle(tree, path)
         ## println("v_mid: ",v_mid)
