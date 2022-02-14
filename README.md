@@ -78,8 +78,16 @@ To run the examples, in the main folder of J-SPACE, from command line digit
 
 
 #### Run the variant calling pipeline
-##### Installation
+##### Necessary package
+- download the file `environment_j_space.yml` 
+- conda https://docs.conda.io/en/latest/
+
 ##### Run the variant calling
+First open the conda enviroment  
+> conda env create -f environment_j_space.yml --prefix "path to the enviroment directory"  
+
+
+
 
 
 ## OUTPUTS OF J-SPACE
