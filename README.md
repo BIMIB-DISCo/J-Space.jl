@@ -77,6 +77,10 @@ To run the examples, in the main folder of J-SPACE, from command line digit
 > julia --project=.  ./path/myscript.jl  
 
 
+#### Run the variant calling pipeline
+##### Installation
+##### Run the variant calling
+
 
 ## OUTPUTS OF J-SPACE
  J-SPACE provides the following outputs. 
