@@ -176,6 +176,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 #### if `type_isa = 1`
 - `neut_mut_rate`. Rate of mutation per site and per unit of time
 #### if `type_isa = 0`
+- `approx_snv_indel`. Integer number, if 0 SNV and INDEL are computed togheter, if 1 SNV and INDEL are computed separately
 - `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY85","TN93","K81"].
 - `indel_size`. Integer number, maximum size of indel .
 - `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
