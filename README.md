@@ -81,12 +81,26 @@ To run the examples, in the main folder of J-SPACE, from command line digit
 ##### Necessary package
 - download the file `environment_j_space.yml` 
 - conda https://docs.conda.io/en/latest/
-
+- gatk https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2
 ##### Run the variant calling
-First open the conda enviroment  
+First open the conda environment  
 > conda env create -f environment_j_space.yml --prefix "path to the enviroment directory"  
 
+Activate the conda environment
+> conda activate "path to the enviroment directory"  
 
+Then register to gatk (Not necessary in the same working folder)
+> gatk3-register "path to the gatk directory"  
+
+Move into working folder where you have `environment_j_space.yml`  
+Run pipeline  
+> ./environment_j_space.yml "path/to/reference/" "path/to/FastaQ" "path/working/directory"  
+
+- the first, "path/to/reference/", indicate where is the reference fasta, must specificated file.fasta
+- the second, "path/to/FastaQ", indicate where are the file FastaQ to analyzed, must specificated the folder
+- the third, "path/working/directory", indicate your working directory, where will save output files
+
+NOTE: the paths are absolute paths 
 
 
 
