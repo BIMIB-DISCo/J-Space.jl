@@ -127,7 +127,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 ### Parameters of the generation of the lattice
 - `row`. Integer number of the rows of the regular lattice, not used if a graph is imported
 - `col`. Integer number of the columns of the regular lattice, not used if a graph is imported
-- `dim`. Integer number of the height of the regular lattice, not used if a graph is imported. If = 2 the simulation is 2D. If = 3 the simulation is 3D.
+- `dim`. Integer number of the height of the regular lattice, not used if a graph is imported. 
 - `N_starting_cells`. Integer  the number of starting cells.
 
 ### Parameters of the clonal spatial dynamics
