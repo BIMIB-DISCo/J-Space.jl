@@ -107,7 +107,7 @@ function create_newick(Tree::AbstractMetaGraph,
                        dict::Dict,
                        leafs::Vector{Any})
     if root != 1
-        leafs = check_leafs(Tree, leafs, root)
+        leafs = check_leafs(Tree, leafs, root) #questo lo richiamo sempre, anche se è una ripetizione
     end
     deepest_leaf = max_shortest_path(Tree, leafs, root)
     parent = dict[deepest_leaf][:in]
@@ -128,7 +128,7 @@ function create_newick(Tree::AbstractMetaGraph,
         string(parent)
 
     new_parent = dict[parent][:in]
-    if typeof(get_prop(Tree, new_parent, :Time)) != Missing
+    if get_prop(Tree, new_parent, :Time) != 0
         t_np = t_p - get_prop(Tree, new_parent, :Time)
         str = str * ":" * string(t_np)
     else
@@ -159,7 +159,7 @@ function create_newick(Tree::AbstractMetaGraph,
         end
         if new_parent != 0
             t_p = get_prop(Tree, parent, :Time)
-            if typeof(get_prop(Tree, new_parent, :Time)) != Missing
+            if typeof(get_prop(Tree, new_parent, :Time)) != 0
                 t_np = t_p - get_prop(Tree, new_parent, :Time)
                 str = str * ":" * string(t_np)
             else

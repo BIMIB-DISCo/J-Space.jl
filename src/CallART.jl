@@ -119,7 +119,7 @@ function call_ART(profile::String,
     cd(path_fileout*"./Fasta output/")        # Cambio directory.
     for file in readdir()       # Scorro tutti i file
         f = hcat(split.(file, ".")...)[1, :]
-        if length(f) > 1 && f[2] == "fasta"
+        if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
             mkpath(f[1])
             cd(f[1])
             path_fasta = "../"*file

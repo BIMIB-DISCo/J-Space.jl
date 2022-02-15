@@ -22,18 +22,18 @@ function Start(paramaters::String, config::String)
       ###GRAPH
       println("CREATE/LOAD GRAPH....")
       #check if graph already exist
+      start_cell = Par_dict["Graph"][1]["N_starting_cells"]
       if Conf_dict["Config"][1]["Generate_graph"] == 0
             #probabilmente qui cambiare formato!!!!!!!!!
-            matrix_adjacency =  Conf_dict["Config"][1]["Path_to_Graph"]
-            ##leggere in base a che file è
+            path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
+            g_meta = spatial_graph(path_adj_matrix, seed, n_cell=start_cell)
       else
             row = Par_dict["Graph"][1]["row"]
             col = Par_dict["Graph"][1]["col"]
             dim = Par_dict["Graph"][1]["dim"]
-            start_cell = Par_dict["Graph"][1]["N_starting_cells"]
+            #create graph
+            g_meta = spatial_graph(row, col, seed, dim = dim, n_cell=start_cell)
       end
-      #create graph
-      g_meta = spatial_graph(row, col, seed, dim = dim, n_cell=start_cell)
 
       ###DYNAMIC
       println("RUN DYNAMIC....")
@@ -166,7 +166,7 @@ function Start(paramaters::String, config::String)
       end
       if is_ISA == 1
             neu_mut_rate = MolEvo_dict["neut_mut_rate"]
-            g_seq, fastaX, position_used = Molecular_evolution_ISA(tree_red,
+            g_seq, fastaX, position_used, mutation_driver = Molecular_evolution_ISA(tree_red,
                                                                neu_mut_rate,
                                                                seed,
                                                                ref,
@@ -176,7 +176,7 @@ function Start(paramaters::String, config::String)
             indel_size = MolEvo_dict["indel_size"]
             lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
-            approx_snv_indel = MolEvo["approx_snv_indel"]
+            approx_snv_indel = MolEvo_dict["approx_snv_indel"]
             #println("params: ",MolEvo_dict["params"])
             #println("type: ",typeof(MolEvo_dict["params"]))
             params = IdDict(MolEvo_dict["params"][1])
@@ -192,7 +192,10 @@ function Start(paramaters::String, config::String)
                                                                set_mut,
                                                                lavalette,
                                                                approx_snv_indel)
+
       end
+      println("set_mut: ",set_mut)
+      println("mutation_driver: ",mutation_driver)
       if fastaX == []
             return "Correct error input"
       end

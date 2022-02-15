@@ -40,8 +40,8 @@ end
 #par is a dictionary with rates (each model in its own way)
 function Q(model::String, par::IdDict)
 
-    println("============")
-    println("model $model")
+    #println("============")
+    #println("model $model")
 
     preferred_order = [:A, :C, :G, :T]
     ord=indexin(preferred_order,[:T, :C, :A, :G])
@@ -63,7 +63,7 @@ function Q(model::String, par::IdDict)
     else
         π=setequalfreqs()
 	end
-	println("par: ",par)
+	#println("par: ",par)
 	#check α
 	if ( model == "K80" || model == "HKY" || model == "TrN93ef" || model == "TrN" )
 		if "alpha" ∉ keys(par)
@@ -175,7 +175,7 @@ function Q(model::String, par::IdDict)
 			#make matrix symmetrical
 			a1=a; b1=b; c1=c; d1=d; e1=e; f1=f;
 
-            println("test for errors")
+            #println("test for errors")
 
             err_string="[MODEL] $model INT:makeQmatrix; " *
                 "DNA substitution parameter routine error -"*
@@ -186,7 +186,7 @@ function Q(model::String, par::IdDict)
                 c1==-1 || d1==-1 || e1==-1 || f1==-1 ) err_string
 
 
-			println("no errors")
+			#println("no errors")
 	end
 
     #set entries of Q matrix.

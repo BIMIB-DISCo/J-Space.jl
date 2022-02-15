@@ -169,13 +169,18 @@ function create_tree(matrix::DataFrame, newick::Bool)
     # !!!!!!!!!!!!||!!! DEVE ESSERE UN GRAFO DIRETTO, altrimenti non
     # funziona il plot
     tree = MetaDiGraph(matrix, :Father, :Child)
-    #println("props: ", props(tree, 1))
-    if get_prop(tree, 1, :Time) === missing
-        set_prop!(tree, 1, :Time, 0)
-        set_prop!(tree, 1, :Subpop_Child, 1)
+    t_v = filter_vertices(tree, :Time)
+    t_vs = [get_prop(tree, v, :Time) for v in t_v]
+    root = findall(t -> t === missing, t_vs)[1]
+    #println("root: ",root)
+    #println(typeof(root))
+    #println("props: ", props(tree, root))
+    if get_prop(tree, root, :Time) === missing
+        set_prop!(tree, root, :Time, 0)
+        set_prop!(tree, root, :Subpop_Child, 1)
     end
-    #println("props: ", props(tree, 1))
-    #=
+    #println("props: ", props(tree, root))
+    #=println("plot....")
     GLMakie.activate!()
     color = [:blue for i in 1:nv(tree)]
     color[1] = :black
@@ -186,13 +191,10 @@ function create_tree(matrix::DataFrame, newick::Bool)
                       nlabels = [string(v) for v in vertices(tree)])
     hidedecorations!(ax)
     hidespines!(ax)
-        #save(path, f)
+    #save(path, f)
     display(f)
     #end=#
-    tree_reduce = reduce_tree(tree)
-    if typeof(tree_reduce) == String
-        return "Error", ""
-    end
+    tree_reduce = reduce_tree(tree, root)
     ## color = [:blue for i in 1:nv(tree_reduce)]
     ## color[1] = :black
     # f, ax, p = graphplot(tree_reduce, layout = Buchheim(), node_color=color,
@@ -242,20 +244,20 @@ end
 """
 Reduce tree
 """
-function reduce_tree(tree::AbstractGraph)
+function reduce_tree(tree::AbstractGraph, root::Int)
     ## Check = true
     leafs = get_leafs(tree)
-    ## println("leafs: ",leafs)
+    #println("leafs: ",leafs)
     t_r = SimpleDiGraph()
     tree_reduce = MetaDiGraph(t_r)
     map_nodes = []
     for leaf in leafs
         #println("leaf: ",leaf)
-        yen_k = yen_k_shortest_paths(tree, 1, leaf)
+        yen_k = yen_k_shortest_paths(tree, root, leaf)
         #println("yen_k: ",yen_k)
-        if length(yen_k.paths) == 0
-            return "error...this is fixed soon"
-        end
+        #if length(yen_k.paths) == 0
+        #    return "error...this is fixed soon"
+        #end
         path = yen_k.paths[1]
         v_mid = get_vertex_middle(tree, path)
         ## println("v_mid: ",v_mid)

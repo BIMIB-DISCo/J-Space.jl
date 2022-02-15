@@ -24,6 +24,7 @@ using StatsBase                 # Sample
 using Distributions  # Library for calculate normal distributions
 using CSV, Tables
 using TOML
+using DelimitedFiles
 ### File da esportare
 export
     ## Simulation
@@ -69,8 +70,8 @@ function spatial_graph(row::Int, col::Int, seed::MersenneTwister;
 end
 
 function spatial_graph(path::String, seed::MersenneTwister; n_cell::Int = 1)
-    G = Graphs.grid((row, col, dim))
-    G_meta = initialize_graph(G, row,col, n_cell)
+    G = readdlm(path, Int)
+    G_meta = initialize_graph(G, n_cell, seed)
     return G_meta
 end
 
@@ -79,6 +80,43 @@ end
 Initialize graph with un single cell in the middle of the
 lattice/square
 """
+function initialize_graph(G::AbstractGraph, n_cell::Int,  seed::MersenneTwister)
+    G_meta = MetaGraphs.MetaGraph(G)
+    if n_cell == 1
+        closeness = closeness_centrality(G)
+        max_value=maximum(closeness)
+        pos_value = findall(p -> p == max_value , closeness)
+        v₀ = rand(seed, pos_value)
+        id = uuid1(seed)
+        for i in 1:nv(G_meta.graph)
+            ## Isn't this an 'if'?
+            i == v₀ ?
+                set_props!(G_meta,
+                           i,
+                           Dict(:mutation => (1),
+                                :name => "node$i",
+                                :id => id)) :
+                set_props!(G_meta, i, Dict(:name => "node$i"))
+        end
+    elseif n_cell == 0
+        for i in 1:nv(G_meta.graph)
+             set_props!(G_meta, i, Dict(:name=> "node$i"))
+        end
+    else
+        positions = Set(1:nv(G))
+        for i in 1:n_cell
+            id = uuid1(seed)
+            pos = rand(seed, positions)
+            delete!(positions, pos)
+            set_props!(G_meta, pos, Dict(:mutation => (1), :id => id))
+        end
+        for i in 1:nv(G_meta.graph)
+             set_props!(G_meta, i, Dict(:name=> "node$i"))
+        end
+    end
+    return G_meta
+end
+
 function initialize_graph(G::AbstractGraph, row::Int, col::Int, n_cell::Int,
                                                           seed::MersenneTwister)
     G_meta = MetaGraphs.MetaGraph(G)
@@ -116,8 +154,6 @@ function initialize_graph(G::AbstractGraph, row::Int, col::Int, n_cell::Int,
     end
     return G_meta
 end
-
-
 """
 Plots a graph in 2D.
 """
@@ -727,7 +763,7 @@ function simulate_evolution(G::AbstractGraph,
         for i in 1:length(α)
             push!(α_subpop, α[i] * length(ca_subpop[i]))
         end
-        α_subpop_f = α_subpop
+        α_subpop_f = copy(α_subpop)
         birth = sum(α_subpop)           # Tot prob nascita
         death = rate_death * n_cs_alive # Tot prob di morte
         M = rate_migration * n_cs_alive # Tot prob di migrazione
