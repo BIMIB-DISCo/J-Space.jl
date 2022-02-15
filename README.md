@@ -177,19 +177,19 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `neut_mut_rate`. Rate of mutation per site and per unit of time
 #### if `type_isa = 0`
 - `approx_snv_indel`. Integer number, if 0 SNV and INDEL are computed togheter, if 1 SNV and INDEL are computed separately
-- `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY85","TN93","K81"].
+- `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY","TrN93ef","TrN","K81","K81uf"].
 - `indel_size`. Integer number, maximum size of indel .
 - `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
 - `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulatio put this parameter to 0.0 .
-- `params`. Rates of the substitution models  in units of time of the simulation.  
- if `sub_model= "JC69" `-> params = [{"alpha" = 0.5}].   
- if `sub_model= "F81" ` -> params = [{"alpha" = 0.5}].    
- if `sub_models= "K80"  `-> params = [{"alpha" = 0.5, "beta" = 0.3}].    
- if `sub_models= "HKY" ` -> params = [{"alpha" = 0.5, "beta" = 0.3}].    
- if `sub_models = "TrN93ef"`  -> params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}].     
- if `sub_models = "TrN" `-> params = params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}].     
- if `sub_models = "K81" ` -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}].    
- if `sub_models = "K81uf"`  -> params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}].     
+- `params`. Rates of the substitution models  in units of time of the simulation.  Below, some examples:
+ if `sub_model= "JC69" `-> `params = [{"alpha" = 0.5}]`.   
+ if `sub_model= "F81" ` -> `params = [{"alpha" = 0.5}]`.    
+ if `sub_models= "K80"  `-> `params = [{"alpha" = 0.5, "beta" = 0.3}]`.    
+ if `sub_models= "HKY" ` -> `params = [{"alpha" = 0.5, "beta" = 0.3}]`.    
+ if `sub_models = "TrN93ef"`  -> `params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]`.     
+ if `sub_models = "TrN" `-> `params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]`.     
+ if `sub_models = "K81" ` -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.    
+ if `sub_models = "K81uf"`  -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.     
 
 
 ### Parameters of the bulk experiment (working only if `type_isa = 1`)
