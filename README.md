@@ -216,7 +216,6 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 
 For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
-## EXAMPLES
 
 ## POSSIBLE PROBLEM
  - la glmak usa gpu problema con macchine virtuali, per 
