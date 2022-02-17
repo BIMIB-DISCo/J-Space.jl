@@ -1,5 +1,3 @@
-#using DataFrames
-
 
 # π are basefrequencies and they do not need to  sum to 1
 #example
@@ -40,9 +38,6 @@ end
 #par is a dictionary with rates (each model in its own way)
 function Q(model::String, par::IdDict)
 
-    #println("============")
-    #println("model $model")
-
     preferred_order = [:A, :C, :G, :T]
     ord=indexin(preferred_order,[:T, :C, :A, :G])
 
@@ -63,7 +58,7 @@ function Q(model::String, par::IdDict)
     else
         π=setequalfreqs()
 	end
-	#println("par: ",par)
+
 	#check α
 	if ( model == "K80" || model == "HKY" || model == "TrN93ef" || model == "TrN" )
 		if "alpha" ∉ keys(par)
@@ -137,7 +132,6 @@ function Q(model::String, par::IdDict)
 
 		a=f=α;
 		b=c=d=e=β
-        #("beta" ∈ keys(par)) ? b=c=d=e=par["beta"] : b=c=d=e=1;  #check and delete
 
     elseif ( model == "TrN93ef" || model == "TrN" )
         #Tn93: Tamura, K. and Nei, M. (1993) Estimation of the number of nucleotide substitutions in the control region of mitochondrial DNA in humans and chimpanzees. Mol. Bio. Evol. 10:512-526.
@@ -150,7 +144,6 @@ function Q(model::String, par::IdDict)
 
 		a=αʸ;
 		b=c=d=e=β;
-        #("beta" ∈ keys(par)) ? b=c=d=e=par["beta"] : b=c=d=e=1;  #check and delete
         f=αʳ;
 
 	elseif ( model == "K81" || model == "K81uf" )
@@ -163,7 +156,6 @@ function Q(model::String, par::IdDict)
 		βᵃᶜ⁻ᵍᵗ = par["beta2"]
 
 		a=f=α
-		#("alpha" ∈ keys(par)) ? a=f=par["alpha"] : a=f=1;  #check and delete
         b=e=βᶜᵍ⁻ᵃᵗ;
         c=d=βᵃᶜ⁻ᵍᵗ;
     else
@@ -175,7 +167,6 @@ function Q(model::String, par::IdDict)
 			#make matrix symmetrical
 			a1=a; b1=b; c1=c; d1=d; e1=e; f1=f;
 
-            #println("test for errors")
 
             err_string="[MODEL] $model INT:makeQmatrix; " *
                 "DNA substitution parameter routine error -"*
@@ -186,7 +177,6 @@ function Q(model::String, par::IdDict)
                 c1==-1 || d1==-1 || e1==-1 || f1==-1 ) err_string
 
 
-			#println("no errors")
 	end
 
     #set entries of Q matrix.
@@ -241,31 +231,6 @@ function Q(model::String, par::IdDict)
 
 
     Q=Q[ord,ord]
-    #println("Q = $Q")
 
     return Q;
 end
-#=
-#Q("abc")
-par=IdDict()
-println(Q("JC69", par))
-println(Q("K80", par))
-
-par=IdDict( "alpha" => 0.5)
-println(Q("JC69", par))
-println(Q("K80", par))
-println(Q("K81", par))
-
-par=IdDict( "alpha" => 0.5, "beta" => 0.3)
-println(Q("JC69", par))
-println(Q("K80", par))
-println(Q("K81", par))
-
-par=IdDict( "beta" => 0.3, "beta2" => 0.3)
-println(Q("JC69", par))
-println(Q("K80", par))
-println(Q("K81", par))
-
-par=IdDict( "alpha" => 0.3, "alpha2" => 0.3)
-println(Q("TrN93ef", par))
-=#

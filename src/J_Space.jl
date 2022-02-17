@@ -1,8 +1,8 @@
 ### -*- Mode: Julia -*-
 
-### JOG_Space.jl
+### J_Space.jl
 
-module JOG_Space
+module J_Space
 
 using MetaGraphs                # Add property to graph
 using Graphs                    # Create graph
@@ -696,4 +696,4 @@ include("Start.jl")
 end # module
 
 
-### end of file -- JOG_Space.jl
+### end of file -- J_Space.jl

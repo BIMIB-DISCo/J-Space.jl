@@ -5,10 +5,10 @@
 "
 module DataFrameGraphBridge
 
-### In English!!!!
-#QUESTO MODULO FUNZIONA COME L'OMONIMO GraphDataFrameBridge MA VIENE UTILIZZATA
-#LA LIBRERIA GRAPH AL POSTO DI lightgraph ORMAI OBSOLETA
-#ho aggiunto la possibilità di inserire il campo tempo
+
+#this module works like the GraphDataFrameBridge module of the same name
+#but the GRAPHS library is used instead of the deprecated library lightgraph.
+#it add possibolity insert field time
 
 using Graphs
 using MetaGraphs
@@ -123,16 +123,15 @@ function metagraph_from_dataframe(graph_type,
                                   vertex_attributes::DataFrame = DataFrame(),
                                   vertex_id_col::Symbol = Symbol())
     # Map node names to vertex IDs
-    nodes = sort!(unique!([df[:, origin]; df[:, destination]])) #ho tutti i nodi
-    #println("nodes: ", nodes)
-    vertex_names = DataFrame(name=nodes, vertex_id = eachindex(nodes)) #id ∀ nodi
-    #println("vertex_names: ", vertex_names)
+    nodes = sort!(unique!([df[:, origin]; df[:, destination]]))
+    vertex_names = DataFrame(name=nodes, vertex_id = eachindex(nodes))
+
     # Merge in to original
     for c in [origin, destination]
         temp = rename(vertex_names, :vertex_id => Symbol(c, :_id))
         df = innerjoin(df, temp; on = c => :name)
-    end # crea 2 colone con gli indici appena creati
-    #println("df -> ",df)
+    end
+
     # Merge additional attributes to names
     if vertex_attributes != DataFrame()
         idsym =
@@ -147,13 +146,11 @@ function metagraph_from_dataframe(graph_type,
     # Create Graph
     mg = graph_type(nrow(vertex_names))
     for r in eachrow(df)
-        #println("r[Symbol(origin, :_id)] ", r[Symbol(origin, :_id)])
-        #println("r[Symbol(destination, :_id)] ", r[Symbol(destination, :_id)])
         add_edge!(mg, r[Symbol(origin, :_id)], r[Symbol(destination, :_id)])
     end
 
     #add times on graph
-    times_df = df[:,[:Child, :Time]] #prendo tutte le righe child
+    times_df = df[:,[:Child, :Time]] 
     vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
     #add subpop_child on graph
     subpop_df = df[:,[:Child, :Subpop_Child]]
