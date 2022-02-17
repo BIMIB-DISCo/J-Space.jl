@@ -1,9 +1,4 @@
-#include(".\\JOG_Space.jl")
-#include("sampling_phylogentic_relation_and_genotype.jl")
-#include("DataFrameGraphBridge.jl")
-#using JOG_Space
-#using Random
-#using TOML
+
 ################### function START
 
 function Start(paramaters::String, config::String)
@@ -21,18 +16,22 @@ function Start(paramaters::String, config::String)
 
       ###GRAPH
       println("CREATE/LOAD GRAPH....")
+
       #check if graph already exist
       start_cell = Par_dict["Graph"][1]["N_starting_cells"]
       if Conf_dict["Config"][1]["Generate_graph"] == 0
-            #probabilmente qui cambiare formato!!!!!!!!!
             path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
-            g_meta = spatial_graph(path_adj_matrix, seed, n_cell=start_cell)
+            g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
       else
             row = Par_dict["Graph"][1]["row"]
             col = Par_dict["Graph"][1]["col"]
             dim = Par_dict["Graph"][1]["dim"]
             #create graph
-            g_meta = spatial_graph(row, col, seed, dim = dim, n_cell=start_cell)
+            g_meta = spatial_graph(row,
+                                   col,
+                                   seed,
+                                   dim = dim,
+                                   n_cell = start_cell)
       end
 
       ###DYNAMIC
@@ -55,30 +54,35 @@ function Start(paramaters::String, config::String)
       avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
       std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
       #run simulation
-      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop = simulate_evolution(
-                                                        g_meta,
-                                                        Time,
-                                                        rate_birth,
-                                                        rate_death,
-                                                        rate_migration,
-                                                        driv_mut_rate,
-                                                        avg_driv_mut_rate,
-                                                        std_driv_mut_rate,
-                                                        Model,
-                                                        seed,
-                                                        Time_of_sampling =
-                                                               Time_of_sampling)
+      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
+                         simulate_evolution(g_meta,
+                                            Time,
+                                            rate_birth,
+                                            rate_death,
+                                            rate_migration,
+                                            driv_mut_rate,
+                                            avg_driv_mut_rate,
+                                            std_driv_mut_rate,
+                                            Model,
+                                            seed,
+                                            Time_of_sampling = Time_of_sampling)
       println("save plot...")
       #save configuration of time at specific time
       if Graph_configuration == 1
             for i in 1:length(Gs_conf)
                   f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
                   if Sys.iswindows()
-                        save(path_save_plot*"\\Conf_t_"*string(Time_of_sampling[i])*
-                                                                     ".png", f)
+                        save(path_save_plot
+                             * "\\Conf_t_"
+                             * string(Time_of_sampling[i])
+                             *".png",
+                             f)
                   elseif Sys.islinux()
-                        save(path_save_plot*"/Conf_t_"*string(Time_of_sampling[i])*
-                                                                     ".png", f)
+                        save(path_save_plot
+                             * "/Conf_t_"
+                             * string(Time_of_sampling[i])
+                             * ".png",
+                             f)
                   end
             end
       end
@@ -86,21 +90,21 @@ function Start(paramaters::String, config::String)
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
-                  save(path_save_plot*"\\Final_conf.png", f)
+                  save(path_save_plot * "\\Final_conf.png", f)
             elseif Sys.islinux()
-                  save(path_save_plot*"/Final_conf.png", f)
+                  save(path_save_plot * "/Final_conf.png", f)
             end
       end
       #save driver list
       if Conf_dict["OutputGT"][1]["Driver_list"] == 1
             List_driver = DataFrame(Driver = set_mut, Fitness = α_subpop)
             if Sys.iswindows()
-                  CSV.write(path_save_file*"\\DriverList.csv",
+                  CSV.write(path_save_file * "\\DriverList.csv",
                             List_driver,
                             header=false)
 
             elseif Sys.islinux()
-                  CSV.write(path_save_file*"/DriverList.csv",
+                  CSV.write(path_save_file * "/DriverList.csv",
                             List_driver,
                             header=false)
             end
@@ -132,22 +136,24 @@ function Start(paramaters::String, config::String)
                                                                driver_tree,
                                                                dist = rad_sampl)
       end
+
       if driver_tree == 1
             tree_mut = tree_mut[1]
             f, ax, p = plot_tree(tree_mut)
             if Sys.iswindows()
-                  save(path_save_plot*"\\driver_tree.png", f)
+                  save(path_save_plot * "\\driver_tree.png", f)
             elseif Sys.islinux()
-                  save(path_save_plot*"/driver_tree.png", f)
+                  save(path_save_plot * "/driver_tree.png", f)
             end
       end
+
       if Conf_dict["OutputGT"][1]["Tree_Newick"] == 1
             tree_red, net = create_tree(matrix_R, true)
             if Sys.iswindows()
-                  path_complete = path_save_file*"\\formatNewick"#inserire un formato?
+                  path_complete = path_save_file * "\\formatNewick"
                   writeTopology(net, path_complete)
             elseif Sys.islinux()
-                  path_complete = path_save_file*"/formatNewick"#inserire un formato?
+                  path_complete = path_save_file * "/formatNewick"
                   writeTopology(net, path_complete)
             end
       else
@@ -158,15 +164,17 @@ function Start(paramaters::String, config::String)
       println("MOLECULAR EVOLUTION....")
       MolEvo_dict = Par_dict["MolecularEvolution"][1]
       is_ISA = MolEvo_dict["type_isa"]
-      #controllo se ho la ref
+      #check if ref is present
       if Conf_dict["Config"][1]["generate_reference"] == 0
             ref = Conf_dict["Config"][1]["path_reference"]
       else
             ref =  MolEvo_dict["length_genome"]
       end
+
       if is_ISA == 1
             neu_mut_rate = MolEvo_dict["neut_mut_rate"]
-            g_seq, fastaX, position_used, mutation_driver = Molecular_evolution_ISA(tree_red,
+            g_seq, fastaX, position_used, mutation_driver =
+                                       Molecular_evolution_ISA(tree_red,
                                                                neu_mut_rate,
                                                                seed,
                                                                ref,
@@ -177,12 +185,9 @@ function Start(paramaters::String, config::String)
             lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
             approx_snv_indel = MolEvo_dict["approx_snv_indel"]
-            #println("params: ",MolEvo_dict["params"])
-            #println("type: ",typeof(MolEvo_dict["params"]))
             params = IdDict(MolEvo_dict["params"][1])
-            #println("params: ",params)
-            #println("type: ",typeof(params))
-            g_seq, fastaX, Tree_SC, mutation_driver = Molecular_evolution_NoISA(tree_red,
+            g_seq, fastaX, Tree_SC, mutation_driver =
+                                     Molecular_evolution_NoISA(tree_red,
                                                                ref,
                                                                submodel,
                                                                params,
@@ -194,8 +199,7 @@ function Start(paramaters::String, config::String)
                                                                approx_snv_indel)
 
       end
-      println("set_mut: ",set_mut)
-      println("mutation_driver: ",mutation_driver)
+
       if fastaX == []
             return "Correct error input"
       end
@@ -217,7 +221,8 @@ function Start(paramaters::String, config::String)
                   coverage = BulkExp_dict["coverage"]
                   FP = BulkExp_dict["FP"]
                   FN = BulkExp_dict["FN"]
-                  df_bulk, df_bulk_noise... = experiment_bulk(g_seq,
+                  df_bulk, df_bulk_noise... =
+                                           experiment_bulk(g_seq,
                                                            fastaX,
                                                            position_used,
                                                            path_save_file,
@@ -244,12 +249,15 @@ function Start(paramaters::String, config::String)
       SC_noise = Conf_dict["FileOutputExperiments"][1]["Single_cell_noise"]
       if SC_noise != 0
             println("CALL ART....")
+
             if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 0
                   println("WARNING -> ART must need file Fasta...")
                   println("I am save the files")
                   save_Fasta(g_seq, fastaX, tree_red, path_save_file)
             end
+
             ART_dict = Par_dict["ART"][1]
+
             if ART_dict["command"] != ""
                   call_ART(ART_dict["command"], path_save_file)
             else
@@ -299,69 +307,3 @@ function Start(paramaters::String, config::String)
                      no_ALN = no_ALN)
       end
 end
-#=
-################### START, single function
-seed = MersenneTwister(1234)
-g_meta = spatial_graph(21, 21, seed, dim = 1, n_cell=1)#creo il grafico
-df, G, n_cell_alive, set_mut = simulate_evolution(g_meta, 150.0, 0.2, 0.01,
-                                                          0.01, 0.05, 0.4, 0.1,
-                                                                "contact", seed)
-#G,T_final,birth,death,rate_migration,new_drive,driv_average_advantage,
-#                                             std_driver_mut_rate, model, seed
-
-times_tot, n_cell_alive_tot = simulate_MC(100, 21, 21, 150.0, 0.2, 0.01,
-                                                         0.01, 0.005, 0.4, seed)
-#n_simulation, rows, cols, time_f, rate_birth, rate_death, rate_migration,
-#                                           new_mut,driv_average_advantage, seed
-
-matrix_R, tree_mut = sampling_phylogentic_relation(G, "Random", df, 10, set_mut,
-                                                                        seed, 1)
-#matrix_R = sampling_phylogentic_relation(G, "Neighbourhood", df, 100, set_mut,
-                                                                      #dist = 8)
-
-tree_red, net = create_tree(matrix_R, true)
-writeTopology(net) #mostro la stringa
-
-#25*10⁻⁸ too small
-g_seq, fastaX, position_used = Molecular_evolution(tree_red, 0.000025, seed,
-                                      6000)
-
-
-df_bulk, df_bulk_noise = experiment_bulk(g_seq, fastaX, position_used, seed;
-                                            Noise=true, coverage=10.0,
-                                           FP = 0.0000005, FN = 0.0000002)
-
-#un pò lento
-g_seq, fastaX, Tree_SC = singlecell_NoISA(tree_red, g_seq, "isa", 0.0005, 300, 10.0, seed)
-
-################### PLOT
-plot_lattice_3D_web(g_meta)#stampo il grafico in 3D #100x100x2 => 20'000 nodi
-
-animation_2D(11, 11, colors, "Video\\prova.mp4")
-
-zs2 = create_heatmap(100.0, times_tot, n_cell_alive_tot,
-                        name = "Plot\\plot_heatmap_11x11_100_b20.png", bin = 20)
-
-
-################### Save DATA
-df = DataFrame(times = times_tot, cell = n_cell_alive_tot)
-CSV.write("df_11x11_100.csv", df, delim = ",")
-df2 = DataFrame(CSV.File("Data\\df_11x11_100.csv"))
-
-
-#################### phylogentic
-#Tree, Ref, Selector, rate_Indel, size_indel,branch_length, seed)
-#sequence = genomic_evolution(g_seq, "isa", 0.0005, 300, 10.0, Model_Selector_matrix)
-for v in vertices(tree_red)
-      println(v)
-      println(props(tree_red, v))
-end
-
-
-
-
-################### HDF5
-using HDF5
-fid = h5open("prova", "w") #create file -> qui metto path_save_file prima di prova
-close(fid) #close file
-=#

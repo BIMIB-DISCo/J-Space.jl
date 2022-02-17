@@ -51,10 +51,9 @@ function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
     end
 
     #if single-end => file, outputfile prefix, read length, count (-c)
-    #sempre vero ?
 
     #if paired-end => come single-end, mean_fragsize, std_fragsize
-    #if paired_end == 1(-> true) non posso avere mate_pair == 1 e viceversa
+    #if paired_end == 1(-> true), then mate_pair != 1 and vice versa
     return control
 end
 
@@ -71,12 +70,13 @@ function call_ART(profile::String,
                   mean_fragsize::Int = 0,
                   std_fragsize::Int = 0,
                   no_ALN::Bool = false)
-    #/!!!\ i file fasta vengono sovrascritti e/o presi tutti
+
     if paired_end == true || mate_pair == true
         control = check_input(paired_end,
                               mate_pair,
                               mean_fragsize,
                               std_fragsize)
+
         if control == false
             return "Error with input file"
         end
@@ -84,53 +84,72 @@ function call_ART(profile::String,
 
     #create command
     mean_std = false
-    #command = `sudo art_illumina `
+
     ss = ["-ss", profile]
     l = ["-l", len_read]
     c = ["-c", tot_num_reads]
     o = ["-o", outfile_prefix]
     ef_c = sam_c = p = mp = na = m_s = []
+
     if ef
-        #push!(command,"--errfree")
-        #command = command * "-ef"#`--errfree
         ef_c = ["-ef"]
     elseif sam
-        #push!(command,"--samout")
         sam_c = ["-sam"]
     end
+
     if paired_end
         p = ["-p"]
-        #command = command * "-p "#--paired
         mean_std = true
-    end
-    if mate_pair
-        mp = ["-mp"]
-        #command = command * "-mp "#--matepair
-        mean_std = true
-    end
-    if no_ALN
-        na = ["-na"]
-        #command = command * "-na "#--noALN
-    end
-    if mean_std
-        m_s = ["-m", mean_std, "-s", std_fragsize]
     end
 
-    cd(path_fileout*"./Fasta output/")        # Cambio directory.
-    for file in readdir()       # Scorro tutti i file
-        f = hcat(split.(file, ".")...)[1, :]
-        if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
-            mkpath(f[1])
-            cd(f[1])
-            path_fasta = "../"*file
-            i = ["-i", path_fasta]
-            command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
-            println("command: ", command)
-            run(command)
-            cd("../")
-        end
+    if mate_pair
+        mp = ["-mp"]
+        mean_std = true
     end
-    cd("../../")
+
+    if no_ALN
+        na = ["-na"]
+    end
+
+    if mean_std
+        m_s = ["-m", mean_fragsize, "-s", std_fragsize]
+    end
+
+    if Sys.iswindows()
+
+        cd(path_fileout * "Fasta output\\")        # Cambio directory.
+        for file in readdir()       # Scorro tutti i file
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
+                mkpath(f[1])
+                cd(f[1])
+                path_fasta = "..\\"*file
+                i = ["-i", path_fasta]
+                command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
+                println("command: ", command)
+                run(command)
+                cd("..\\")
+            end
+        end
+        cd("..\\..\\")
+
+    elseif Sys.islinux()
+        cd(path_fileout*"Fasta output/")
+        for file in readdir()
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
+                mkpath(f[1])
+                cd(f[1])
+                path_fasta = "../"*file
+                i = ["-i", path_fasta]
+                command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
+                println("command: ", command)
+                run(command)
+                cd("../")
+            end
+        end
+        cd("../../")
+    end
 end
 
 function call_ART(command::String, path_fileout::String)
@@ -140,24 +159,45 @@ function call_ART(command::String, path_fileout::String)
     if typeof(ind_ss) != Int
         ind_ss = 0
     end
-    cd(path_fileout*"/Fasta output/")
-    for file in readdir()       # Scorro tutti i file
-        f = hcat(split.(file, ".")...)[1, :]
-        if length(f) > 1 && f[2] == "fasta"
-            mkpath(f[1])
-            cd(f[1])
-            path_fasta = "../"*file
-            i = ["-i", path_fasta]
-            new_com = com[1:ind_ss+1]
-            append!(new_com, path_fasta)
-            append!(new_com, com[ind_ss+2:end])
-            com_run = `$new_com`
-            println("command: ", com_run)
-            run(com_run)
-            cd("../")
+
+    if Sys.islinux()
+        cd(path_fileout * "Fasta output/")
+        for file in readdir()
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta"
+                mkpath(f[1])
+                cd(f[1])
+                path_fasta = "../"*file
+                i = ["-i", path_fasta]
+                new_com = com[1:ind_ss+1]
+                append!(new_com, path_fasta)
+                append!(new_com, com[ind_ss+2:end])
+                com_run = `$new_com`
+                println("command: ", com_run)
+                run(com_run)
+                cd("../")
+            end
         end
+        cd("../../")
+    else
+        cd(path_fileout * "Fasta output\\")
+        for file in readdir()
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta"
+                mkpath(f[1])
+                cd(f[1])
+                path_fasta = "..\\"*file
+                i = ["-i", path_fasta]
+                new_com = com[1:ind_ss+1]
+                append!(new_com, path_fasta)
+                append!(new_com, com[ind_ss+2:end])
+                com_run = `$new_com`
+                println("command: ", com_run)
+                run(com_run)
+                cd("..\\")
+            end
+        end
+        cd("..\\..\\")
     end
-    cd("../../")
-    #cd("..\\")
 end
 ### end of file -- CallART.jl
