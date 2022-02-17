@@ -74,7 +74,10 @@ NOTE: the simulation does not start if in the working folder are absent the two 
 
 ### RUN THE EXAMPLES
 To run the examples, in the main folder of J-SPACE, from command line digit 
-> julia --project=.  ./path/myscript.jl  
+> julia --project=.  ./Experiments/Experiment_2D/experiment_2D.jl  
+
+or
+> julia --project=.  ./Experiments/Experiment_3D/experiment_3D.jl
 
 
 #### Run the variant calling pipeline
@@ -93,7 +96,7 @@ Activate the conda environment
 Then register to gatk (Not necessary in the same working folder)
 > gatk3-register "path to the gatk directory"  
 
-Move into working folder where you have `environment_j_space.yml` and `j_space_pipeline.sh` 
+Move into working folder where you have `j_space_pipeline.sh` 
 Run pipeline  
 > ./j_space_pipeline.sh "path/to/reference/" "path/to/FastaQ" "path/working/directory"  
 
