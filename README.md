@@ -87,7 +87,11 @@ or
 - conda https://docs.conda.io/en/latest/
 - gatk https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2
 ##### Run the variant calling
-First open the conda environment  
+First move where is file `environment_j_space.yml`
+
+Change field name and prefix into `environment_j_space.yml`
+
+Open the conda environment
 > conda env create -f environment_j_space.yml --prefix "path to the enviroment directory"  
 
 Activate the conda environment
@@ -220,6 +224,9 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 
 For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
+
+## POSSIBLE PROBLEM
+ - library GLMakie use gpu and a possible error on virtual machine(if you use that) is this:  LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")] 
 
 
 
