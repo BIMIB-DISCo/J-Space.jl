@@ -1,0 +1,3 @@
+@SQ	SN:NG_029639.1	LN:8233
+@RG	ID:Lane1	LB:Tumor	PL:art	SM:cell
+@PG	ID:bwa-mem2	PN:bwa-mem2	VN:2.2.1	CL:bwa-mem2 mem -t 2 -M -R @RG\tID:Lane1\tLB:Tumor\tPL:art\tSM:cell -L 50 /dati-raid/BimiB/share/aguidi/JOG-Space/ExperimentPipe/Reference/reference.fasta /dati-raid/BimiB/share/aguidi/JOG-Space/ExperimentPipe/FastaQ/sample92_1.fq /dati-raid/BimiB/share/aguidi/JOG-Space/ExperimentPipe/FastaQ/sample9_2.fq
