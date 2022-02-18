@@ -30,7 +30,7 @@ pos_center = 0
 radius_sampling = 10
 
 [[MolecularEvolution]]
-length_genome = 6000 #length of genome reference, if ref not given, else = 0
+length_genome = 6000 
 type_isa = 1
 approx_snv_indel = 1
 
@@ -62,4 +62,4 @@ paired_end = 0
 mean_fragsize = 200
 std_fragsize = 10
 
-mate_pair = 0 
+mate_pair = 0
