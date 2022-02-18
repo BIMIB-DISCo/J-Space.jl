@@ -66,6 +66,28 @@ function Start(paramaters::String, config::String)
                                             Model,
                                             seed,
                                             Time_of_sampling = Time_of_sampling)
+
+      CSV.write(path_save_plot * "Dinamica.csv",
+                df,
+                delim = ",")
+            l
+      CSV.write(path_save_plot * "n_cell_alive.csv",
+                Tables.table(n_cell_alive),
+                header=false)
+
+      List_driver = DataFrame(Driver = Set_mut, Fitness = α_subpop)
+      CSV.write(path_save_plot * "DriverList.csv",
+                List_driver,
+                delim = ",")
+
+      CSV.write(path_save_plot * "CA_subpop.csv",
+                Tables.table(CA_subpop),
+                header=false)
+
+      CSV.write(path_save_plot * "CA_subpop.csv",
+                Tables.table(CA_subpop),
+                header=false)
+                
       println("save plot...")
       #save configuration of time at specific time
       if Graph_configuration == 1

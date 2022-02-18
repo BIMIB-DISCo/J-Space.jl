@@ -649,7 +649,7 @@ function simulate_evolution(G::AbstractGraph,
                     end
                 end
 
-            elseif model == "h_voter"
+            elseif model == "h_voter" || model == "hvoter"
                 if pos ∈ cs_alive
                     if get_prop(G, cell, :Fit) <= get_prop(G, pos, :Fit)
                         rule = false

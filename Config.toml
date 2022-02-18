@@ -1,33 +1,32 @@
 #This is an example of config files
 
 [[Config]]
-seed = 1234 #choose yout seed => FATTO
-generate_reference = 0 # 0 if user have his ref, 1 if not have reference => FATTO
+seed = 1234
+generate_reference = 1
 #*** if generate_reference == 1 ***#
-path_reference = ".\\reference.fasta" #path where reference is saved => FATTO
-path_to_save_files = ".\\Fileoutput" #where you want save outputfile => FATTO
-path_to_save_plot = ".\\Plot" #where you want save your plot => FATTO
+path_reference = "./reference.fasta"
 
-Generate_graph = 1 #1 if graph is not already avaliable => FATTO
-Path_to_Graph = "\\graph_AM.csv" #example path where read graph => FATTO
+path_to_save_files = "./Fileoutput/"
+path_to_save_plot = "./Plot/"
+
+Generate_graph = 1
+Path_to_Graph = "./Example_adj_matrix.txt"
 
 
 [[OutputGT]]
-Tree_Newick = 1 #1 if you want graph in newick format => FATTO
-Final_configuration = 1 #if you want graph after simulation => FATTO
-Driver_list = 1 #list of all driver mutation => FATTO
-Driver_Tree = 1 #tree of driver mutation => FATTO
+Tree_Newick = 1
+Final_configuration = 1
+Driver_list = 1
+Driver_Tree = 1
 
 [[FileOutputExperiments]]
-#Single_cell_genotype = "./Experiments/" #Fasta cell GT
-Single_cell_fasta = 1 #1 if you want save the fasta of the GT sequences of cells => FATTO
-Single_cell_noise = 1 # if 0 nothing | if 1 SAM file | if 2 ef(SAM GT e Noise) =>FATTO
-VAF_GT = 1 #if model substitution is ISA => FATTO
-Bulk_noise = 1 #if model substitution is ISA => FATTO
-Alignment = 1 #do output ALN alignment file => FATTO
+Single_cell_fasta = 1
+Single_cell_noise = 1
+VAF_GT = 1
+Bulk_noise = 1
+Alignment = 1
 
 [[FileOutputPlot]]
-Time_of_sampling = [10, 20] #last element < t_max simulation => FATTO
-Dynamic_Clonal_genotype = 1 #grafico in cui ho la crescita del num di cell per ogni sottopopolazione(fino al tempo finale)
-#Division_time =1 or 0 #
-Graph_configuration = 1 #se vuole il plot del grafico => FATTO
+Time_of_sampling = [10, 20]
+Dynamic_Clonal_genotype = 1
+Graph_configuration = 1 

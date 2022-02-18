@@ -1,4 +1,4 @@
-using JOG_Space
+using J_Space
 using Random
 using CSV, PhyloNetworks, Graphs, MetaGraphs, Tables, FASTX, DataFrames
 
@@ -26,8 +26,6 @@ mut_driver_rate = [0.0, 0.00000001, 0.000001, 0.0001]
 
 # only for contact mode
 params = IdDict( "alpha" => 0.5)
-T_isa = []
-T_noIsa = []
 
 for mut_rate in mut_driver_rate
     println("runned configuration: mut_driver_rate -> ", mut_rate ,
@@ -37,7 +35,7 @@ for mut_rate in mut_driver_rate
     Set_mut_final = []
     CA_subpop_final = []
     α_subpop_final = []
-
+    G_state_final = []
     Tree_mut_final = []
     Tree_fil_final =[]
     Newick_final = []
@@ -58,11 +56,11 @@ for mut_rate in mut_driver_rate
                                                                    "contact",
                                                                    seed)
         if n_cell_alive[end] < 1000
-            println("Simulation with less than 1000 cells: simulation
-                                                                     discarded")
+            println("Simulation with less than 1000 cells: simulation ",
+                    "discarded")
             continue
         end
-
+        push!(G_state_final, copy(G))
         push!(dinamica_final, df)
         push!(n_cell_alive_final, n_cell_alive)
         push!(Set_mut_final, set_mut)
@@ -93,11 +91,11 @@ for mut_rate in mut_driver_rate
                                                                     set_mut)
         if length(mutation_driver) != 0
             if Sys.iswindows()
-                CSV.write(".\\Experiment_2D\\Fileoutput" *
+                CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\Mutation_driver_ISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
             else
-                CSV.write("./Experiment_2D/Fileoutput" *
+                CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                           "/Mutation_driver_ISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
             end
@@ -105,11 +103,11 @@ for mut_rate in mut_driver_rate
         println("save_fasta")
         leafs = get_leafs(tree_red)
         if Sys.iswindows()
-            mkpath(".\\Experiment_2D\\Fasta\\") # Create folder
-            path_for_fasta = ".\\Experiment_2D\\Fasta\\"
+            mkpath(".\\Experiments\\Experiment_2D\\Fasta\\") # Create folder
+            path_for_fasta = ".\\Experiments\\Experiment_2D\\Fasta\\"
         else
-            mkpath("./Experiment_2D/Fasta/")
-            path_for_fasta = "./Experiment_2D/Fasta/"
+            mkpath("./Experiments/Experiment_2D/Fasta/")
+            path_for_fasta = "./Experiments/Experiment_2D/Fasta/"
         end
         for le in 1:length(leafs)
             w = FASTA.Writer(open(path_for_fasta
@@ -141,11 +139,11 @@ for mut_rate in mut_driver_rate
                                                                   1)
         if length(mutation_driver) != 0
             if Sys.iswindows()
-                CSV.write(".\\Experiment_2D\\Fileoutput" *
+                CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\Mutation_driver_noISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
             else
-                CSV.write("./Experiment_2D/Fileoutput" *
+                CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                           "/Mutation_driver_noISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
             end
@@ -174,64 +172,64 @@ for mut_rate in mut_driver_rate
     println("SAVE final...")
     for l in 1:length(Newick_final)
         if Sys.iswindows()
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\Dinamica_$mut_rate-$l-contact.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\n_cell_alive_final_$mut_rate-$l-contact.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot *
-                        \\Final_conf_$mut_rate-$l-contact.lgz",
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
+                        "\\Final_conf_$mut_rate-$l-contact.lgz",
                         G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write(".\\Experiment_2D" *
+            CSV.write(".\\Experiments\\Experiment_2D" *
                       "\\Fileoutput\\DriverList_$mut_rate-$l-contact.csv",
                       List_driver,delim = ",")
-            CSV.write(".\\Experiment_2D_voter\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\CA_subpop_final_$mut_rate-$l-contact.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Muts_$mut_rate-$l-contact.lgz",
                       Tree_mut_final[l])
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Fil_$mut_rate-$l-contact.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          ".\\Experiment_2D\\Fileoutput" *
+                          ".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\formatNewick_$mut_rate-$l-contact")
         else
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/Dinamica_$mut_rate-$l-contact.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/n_cell_alive_final_$mut_rate-$l-contact.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Final_conf_$mut_rate-$l-contact.lgz",
                       G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/DriverList_$mut_rate-$l-contact.csv",
                       List_driver,delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/CA_subpop_final_$mut_rate-$l-contact.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Muts_$mut_rate-$l-contact.lgz",
                       Tree_mut_final[l])
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Fil_$mut_rate-$l-contact.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          "./Experiment_2D/Fileoutput" *
+                          "./Experiments/Experiment_2D/Fileoutput" *
                           "/formatNewick_$mut_rate-$l-contact")
         end
     end
@@ -249,7 +247,7 @@ for mut_rate in mut_driver_rate
     Set_mut_final = []
     CA_subpop_final = []
     α_subpop_final = []
-
+    G_state_final = []
     Tree_mut_final = []
     Tree_fil_final =[]
     Newick_final = []
@@ -270,10 +268,11 @@ for mut_rate in mut_driver_rate
                                                                        "voter",
                                                                        seed)
         if n_cell_alive[end] < 1000
-            println("Simulation with less than 1000 cells: simulation
-                                                                     discarded")
+            println("Simulation with less than 1000 cells: simulation ",
+                    "discarded")
             continue
         end
+        push!(G_state_final, copy(G))
         push!(dinamica_final, df)
         push!(n_cell_alive_final, n_cell_alive)
         push!(Set_mut_final, set_mut)
@@ -299,64 +298,64 @@ for mut_rate in mut_driver_rate
     println("SAVE final...")
     for l in 1:length(Newick_final)
         if Sys.iswindows()
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\Dinamica_$mut_rate-$l-voter.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\n_cell_alive_final_$mut_rate-$l-voter.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot *
-                        \\Final_conf_$mut_rate-$l-voter.lgz",
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
+                        "\\Final_conf_$mut_rate-$l-voter.lgz",
                         G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write(".\\Experiment_2D" *
+            CSV.write(".\\Experiments\\Experiment_2D" *
                       "\\Fileoutput\\DriverList_$mut_rate-$l-voter.csv",
                       List_driver,delim = ",")
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\CA_subpop_final_$mut_rate-$l-voter.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Muts_$mut_rate-$l-voter.lgz",
                       Tree_mut_final[l])
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Fil_$mut_rate-$l-voter.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          ".\\Experiment_2D\\Fileoutput" *
+                          ".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\formatNewick_$mut_rate-$l-voter")
         else
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/Dinamica_$mut_rate-$l-voter.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/n_cell_alive_final_$mut_rate-$l-voter.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Final_conf_$mut_rate-$l-voter.lgz",
                       G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/DriverList_$mut_rate-$l-voter.csv",
                       List_driver,delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/CA_subpop_final_$mut_rate-$l-voter.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Muts_$mut_rate-$l-voter.lgz",
                       Tree_mut_final[l])
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Fil_$mut_rate-$l-voter.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          "./Experiment_2D/Fileoutput" *
+                          "./Experiments/Experiment_2D/Fileoutput" *
                           "/formatNewick_$mut_rate-$l-voter")
         end
     end
@@ -370,7 +369,7 @@ for mut_rate in mut_driver_rate
     Set_mut_final = []
     CA_subpop_final = []
     α_subpop_final = []
-
+    G_state_final = []
     Tree_mut_final = []
     Tree_fil_final =[]
     Newick_final = []
@@ -391,10 +390,11 @@ for mut_rate in mut_driver_rate
                                                                        "h_voter"
                                                                        ,seed)
         if n_cell_alive[end] < 1000
-            println("Simulation with less than 1000 cells: simulation
-                                                                    discarded")
+            println("Simulation with less than 1000 cells: simulation ",
+                    "discarded")
             continue
         end
+        push!(G_state_final, copy(G))
         push!(dinamica_final, df)
         push!(n_cell_alive_final, n_cell_alive)
         push!(Set_mut_final, set_mut)
@@ -418,64 +418,64 @@ for mut_rate in mut_driver_rate
     println("SAVE final...")
     for l in 1:length(Newick_final)
         if Sys.iswindows()
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\Dinamica_$mut_rate-$l-hvoter.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write(".\\Experiment_2D\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\n_cell_alive_final_$mut_rate-$l-hvoter.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot *
-                        \\Final_conf_$mut_rate-$l-hvoter.lgz",
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
+                        "\\Final_conf_$mut_rate-$l-hvoter.lgz",
                         G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write(".\\Experiment_2D" *
+            CSV.write(".\\Experiments\\Experiment_2D" *
                       "\\Fileoutput\\DriverList_$mut_rate-$l-hvoter.csv",
                       List_driver,delim = ",")
-            CSV.write(".\\Experiment_2D_voter\\Fileoutput" *
+            CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                       "\\CA_subpop_final_$mut_rate-$l-hvoter.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Muts_$mut_rate-$l-hvoter.lgz",
                       Tree_mut_final[l])
-            savegraph(".\\Experiment_2D\\Plot" *
+            savegraph(".\\Experiments\\Experiment_2D\\Plot" *
                       "\\Tree_Fil_$mut_rate-$l-hvoter.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          ".\\Experiment_2D\\Fileoutput" *
+                          ".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\formatNewick_$mut_rate-$l-hvoter")
         else
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/Dinamica_$mut_rate-$l-hvoter.csv",
                       dinamica_final[l],
                       delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/n_cell_alive_final_$mut_rate-$l-hvoter.csv",
                       Tables.table(n_cell_alive_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Final_conf_$mut_rate-$l-hvoter.lgz",
                       G_state_final[l])
             List_driver = DataFrame(Driver = Set_mut_final[l],
                                     Fitness = α_subpop_final[l])
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/DriverList_$mut_rate-$l-hvoter.csv",
                       List_driver,delim = ",")
-            CSV.write("./Experiment_2D/Fileoutput" *
+            CSV.write("./Experiments/Experiment_2D/Fileoutput" *
                       "/CA_subpop_final_$mut_rate-$l-hvoter.csv",
                       Tables.table(CA_subpop_final[l]),
                       header=false)
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Muts_$mut_rate-$l-hvoter.lgz",
                       Tree_mut_final[l])
-            savegraph("./Experiment_2D/Plot" *
+            savegraph("./Experiments/Experiment_2D/Plot" *
                       "/Tree_Fil_$mut_rate-$l-hvoter.lgz",
                       Tree_fil_final[l])
             writeTopology(Newick_final[l],
-                          "./Experiment_2D/Fileoutput" *
+                          "./Experiments/Experiment_2D/Fileoutput" *
                           "/formatNewick_$mut_rate-$l-hvoter")
         end
     end

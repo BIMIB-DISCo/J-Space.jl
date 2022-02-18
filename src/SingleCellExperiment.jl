@@ -16,20 +16,18 @@ function save_Fasta_W(Ref::LongDNASeq,
       mkpath(path_save_file * "\\Fasta output") # Create folder
       path_for_fasta = path_save_file * "\\Fasta output"
       for i in 1:length(leafs)
-          w = FASTA.Writer(open(path_for_fasta
-                                * "\\sample"
-                                * string(leafs[i])
-                                * ".fasta",
+          w = FASTA.Writer(open(path_for_fasta *
+                                "\\sample" *
+                                string(leafs[i]) *
+                                ".fasta",
                                 "w"))
-          rec = FASTA.Record("Sample"
-                             * string(leafs[i]),
-                             fasta_samples[i])
+          rec = FASTA.Record("Sample" * string(leafs[i]), fasta_samples[i])
           write(w, rec)
           close(w)
       end
-      w = FASTA.Writer(open(path_for_fasta
-                            * "\\reference"
-                            * ".fasta",
+      w = FASTA.Writer(open(path_for_fasta *
+                            "\\reference" *
+                            ".fasta",
                             "w"))
       rec = FASTA.Record("Reference", Ref)
       write(w, rec)
@@ -48,20 +46,18 @@ function save_Fasta_L(Ref::LongDNASeq,
       mkpath(path_save_file * "/Fasta output") # Create folder
       path_for_fasta = path_save_file * "/Fasta output"
       for i in 1:length(leafs)
-          w = FASTA.Writer(open(path_for_fasta
-                                * "/sample"
-                                * string(leafs[i])
-                                * ".fasta",
+          w = FASTA.Writer(open(path_for_fasta *
+                                "/sample" *
+                                string(leafs[i]) *
+                                ".fasta",
                                 "w"))
-          rec = FASTA.Record("Sample"
-                             * string(leafs[i]),
-                             fasta_samples[i])
+          rec = FASTA.Record("Sample" * string(leafs[i]), fasta_samples[i])
           write(w, rec)
           close(w)
       end
-      w = FASTA.Writer(open(path_for_fasta
-                            * "/reference"
-                            * ".fasta",
+      w = FASTA.Writer(open(path_for_fasta *
+                            "/reference" *
+                            ".fasta",
                             "w"))
       rec = FASTA.Record("Reference", Ref)
       write(w, rec)
@@ -539,9 +535,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           * "_T>"
-                                           * string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_T>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -566,9 +562,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           * "_G>"
-                                           * string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_G>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -592,9 +588,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           *"_C>"
-                                           *string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_C>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -618,9 +614,9 @@ function genomic_evolution(Seq_f::LongDNASeq,
             new_nucleotide = collect(names(Model_Selector_matrix)[ff])[1]
             sequence_father[pos_mutation] = DNA(new_nucleotide)
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           *"_A>"
-                                           *string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_A>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
         end
@@ -1087,9 +1083,9 @@ function genomic_evolution_SNV(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           * "_T>"
-                                           * string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_T>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -1131,9 +1127,9 @@ function genomic_evolution_SNV(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           *"_G>"
-                                           *string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_G>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
 
             end
@@ -1176,9 +1172,9 @@ function genomic_evolution_SNV(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           * "_C>"
-                                           * string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_C>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -1220,9 +1216,9 @@ function genomic_evolution_SNV(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = string(pos_mutation)
-                                           * "_A>"
-                                           * string(new_nucleotide)
+                mutation_driver[mut_sub] = string(pos_mutation) *
+                                           "_A>" *
+                                           string(new_nucleotide)
                 push!(position_used, pos_mutation)
             end
 
@@ -1316,8 +1312,9 @@ function genomic_evolution_INDEL(Seq_f::LongDNASeq,
             len_father = len_father + length_ins
 
             if num_mut_driver >= 0
-                mutation_driver[mut_sub] = "ins $init_pos_ins-"*string(init_pos_ins + length_ins)
-                [push!(position_used, p) for p in init_pos:init_pos+length_ins]
+                fine = init_pos_ins + length_ins
+                mutation_driver[mut_sub] = "ins $init_pos_ins-" * string(fine)
+                [push!(position_used, p) for p in init_pos:fine]
             end
 
 
