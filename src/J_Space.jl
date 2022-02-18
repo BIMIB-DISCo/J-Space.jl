@@ -4,27 +4,22 @@
 
 module J_Space
 
-using MetaGraphs                # Add property to graph
-using Graphs                    # Create graph
-using Plots                     # Library as support
-using NetworkLayout             # Layout for lattice
-using GraphMakie                # Plot graph
-#using CairoMakie                # Library for heatmap
-#using JSServe                   # Create page for plot
-#using WGLMakie                  # Library for 2D/3D plot on web page
-using GLMakie                   # Library for 2D/3D plot
-using DataFrames                # Library for the main struct
-#using Makie
-#using Makie.MakieLayout
+using MetaGraphs
+using Graphs
+using Plots
+using NetworkLayout
+using GraphMakie
+using GLMakie
+using DataFrames
 using Random
-using UUIDs                     # Library for unique id
-using StatsBase                 # Sample
-
-using Distributions  # Library for calculate normal distributions
+using UUIDs
+using StatsBase
+using Distributions
 using CSV, Tables
 using TOML
 using DelimitedFiles
-### File da esportare
+
+### function to exports
 export
     ## Simulation
     spatial_graph, simulate_evolution, Start,
