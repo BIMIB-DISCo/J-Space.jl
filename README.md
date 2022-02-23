@@ -137,7 +137,7 @@ The following are the paramenters of such file:
 - `path_reference`. A string,  the path of the reference given by user.
 - `path_to_save_files`.  A string, path of the folder where the output files should be saved
 - `path_to_save_plot`. A string,  path of the folder where the output plots should be saved
-- `Generate_graph`. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Paramenters.toml".
+- `Generate_graph`. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Parameters.toml".
 - `Path_to_Graph`.  Path to the adjacency matrix of the graph if imported.
 - `Tree_Newick`. Integer, if 1  the phylogenentic tree of the cells is saved as newick file.
 - `Final_configuration`. Integer,  if 1 return the plot of the final configuration of the lattice.
