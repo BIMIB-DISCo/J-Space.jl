@@ -38,8 +38,9 @@ If the infinite-site model is used,  it is possible to obtain the VCF file direc
 
 ## INSTALLATION OF J-SPACE
 
-The J-SPACE can be downloaded from Github. To do so, we need to install the Julia from https://julialang.org/.   
-Fist the user need to copy the project folder in the chosen working directory. To install J-SPACE follow the steps:
+The J-SPACE can be downloaded from Github. 
+First, it is necessary to install the Julia from https://julialang.org/.   
+Next, the user need to copy the project folder in the chosen working directory. To install J-SPACE follow the steps:
 1. Using REPL or the COMMAND LINE move to the working directory.  
 2. If you use the COMMAND LINE, to start a Julia session run the command:
 
