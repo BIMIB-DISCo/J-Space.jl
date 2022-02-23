@@ -184,11 +184,11 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 #### if `type_isa = 1`
 - `neut_mut_rate`. Rate of mutation per site and per unit of time
 #### if `type_isa = 0`
-- `approx_snv_indel`. Integer number, if 0 SNV and INDEL are computed togheter, if 1 SNV and INDEL are computed separately
+- `approx_snv_indel`. Integer number, if 0 SNV and INDEL are computed togheter, if 1 SNV and INDEL are computed separately. The first choice is very slow, and we recommend the use only for small and short trees.
 - `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY","TrN93ef","TrN","K81","K81uf"].
 - `indel_size`. Integer number, maximum size of indel .
 - `Lavelette_par`. Real number, the parameter of  the Lavelette distribution for the size of indels
-- `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulatio put this parameter to 0.0 .
+- `indel_rate`. Rate of indel per site and per unit of time. To esclude indel in the simulation put this parameter to 0.0 .
 - `params`. Rates of the substitution models  in units of time of the simulation.  Below, some examples:
  if `sub_model= "JC69" `-> `params = [{"alpha" = 0.5}]`.   
  if `sub_model= "F81" ` -> `params = [{"alpha" = 0.5}]`.    
@@ -200,7 +200,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
  if `sub_models = "K81uf"`  -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.     
 
 
-### Parameters of the bulk experiment (working only if `type_isa = 1`)
+### Parameters of the bulk experiment (approximate version, very fast does not need ART, but it generates the VAF, not the reads. Working only if `type_isa = 1`)
 - `coverage`. Real number, average coverage of the simulate bulk experiment.
  - `FP`. Real number,  false positive rate.
 - `FN`. Real number, false negative rate.
