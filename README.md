@@ -122,7 +122,7 @@ NOTE: the paths are absolute paths
   - The list of the driver mutation with their birth rate advantage as .csv (if present).
   - The simulated next-generation sequencing reads as FASTQ files in the folder "/"path_to_save_files"/Fasta output/sample_#", where sample_# is the #-th sample.
   - The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
-  - The alignment file, whithout noise in format SAM.
+  - The alignment file, without noise in format SAM.
 
 
 
