@@ -227,7 +227,7 @@ For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resou
 
 
 ## POSSIBLE PROBLEM
- - library GLMakie use gpu and a possible error on virtual machine(if you use that) is this:  LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")] 
+ -  Since the library GLMakie uses gpu, a possible error on virtual machine is this:  LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")] 
 
 
 
