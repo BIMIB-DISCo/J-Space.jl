@@ -14,6 +14,15 @@ function Start(paramaters::String, config::String)
       path_save_file = Conf_dict["Config"][1]["path_to_save_files"]
       path_save_plot = Conf_dict["Config"][1]["path_to_save_plot"]
 
+      #check signature time
+      vector_activities = Par_dict["MolecularEvolution"][1]["vector_activities"]
+      for row in eachrow(vector_activities)
+              if sum(row) != 1.0
+                  println("Error -> ", row, " : its sum does not equal 1.0")
+                  exit()
+              end
+      end
+
       ###GRAPH
       println("CREATE/LOAD GRAPH....")
 
@@ -54,7 +63,8 @@ function Start(paramaters::String, config::String)
       avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
       std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
       #run simulation
-      df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
+      if Conf_dict["Config"][1]["Tree_Driver_Configure"] != 1
+            df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
                          simulate_evolution(g_meta,
                                             Time,
                                             rate_birth,
@@ -66,7 +76,21 @@ function Start(paramaters::String, config::String)
                                             Model,
                                             seed,
                                             Time_of_sampling = Time_of_sampling)
-
+      else
+            edge_list_path = Conf_dict["Config"][1]["edgelist_treedriver"]
+            driv_adv_path = Conf_dict["Config"][1]["driver_advantage"]
+            df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
+                         simulate_evolution(g_meta,
+                                            Time,
+                                            rate_death,
+                                            rate_migration,
+                                            driv_mut_rate,
+                                            Model,
+                                            edge_list_path,
+                                            driv_adv_path,
+                                            seed,
+                                            Time_of_sampling = Time_of_sampling)
+      end
       CSV.write(path_save_file * "Dinamica.csv",
                 df,
                 delim = ",")
@@ -166,7 +190,7 @@ function Start(paramaters::String, config::String)
       end
 
       if Conf_dict["OutputGT"][1]["Tree_Newick"] == 1
-            tree_red, net = create_tree(matrix_R, true)
+            tree_red, net = create_tree(matrix_R, true, Time)
             if Sys.iswindows()
                   path_complete = path_save_file * "\\formatNewick"
                   writeTopology(net, path_complete)
@@ -185,42 +209,83 @@ function Start(paramaters::String, config::String)
       #check if ref is present
       if Conf_dict["Config"][1]["generate_reference"] == 0
             ref = Conf_dict["Config"][1]["path_reference"]
+            prob_base = []
       else
             ref =  MolEvo_dict["length_genome"]
+            prob_base = MolEvo_dict["prob_base"]
       end
 
       if is_ISA == 1
             neu_mut_rate = MolEvo_dict["neut_mut_rate"]
-            g_seq, fastaX, position_used, mutation_driver =
-                                       Molecular_evolution_ISA(tree_red,
-                                                               neu_mut_rate,
-                                                               seed,
-                                                               ref,
-                                                               set_mut)
+            g_seq, fastaX, position_used, mutations_tot =
+                                    experiment_ISA(tree_red,
+                                                   neu_mut_rate,
+                                                   seed,
+                                                   ref,
+                                                   set_mut,
+                                                   frequency_dna = prob_base)
       else
-            submodel = MolEvo_dict["sub_model"]
             indel_size = MolEvo_dict["indel_size"]
             lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
-            approx_snv_indel = MolEvo_dict["approx_snv_indel"]
-            params = IdDict(MolEvo_dict["params"][1])
-            g_seq, fastaX, Tree_SC, mutation_driver =
-                                     Molecular_evolution_NoISA(tree_red,
-                                                               ref,
-                                                               submodel,
-                                                               params,
-                                                               indel_rate,
-                                                               indel_size,
-                                                               seed,
-                                                               set_mut,
-                                                               lavalette,
-                                                               approx_snv_indel)
+            submodel = MolEvo_dict["sub_model"]
+            if submodel in ["96-SBS"]
+                  mut_rate_avg = MolEvo_dict["mut_rate_avg"]
+                  used_sign = MolEvo_dict["used_sign"]
+                  vector_change_points = MolEvo_dict["vector_change_points"]
+                  vector_activities = MolEvo_dict["vector_activities"]
+                  ratio_bg_signature = MolEvo_dict["ratio_background_signature"]
+                  g_seq, fastaX, Tree_SC, mutations_tot =
+                                   experiment_noISA_sign(tree_red,
+                                                    ref,
+                                                    submodel,
+                                                    mut_rate_avg,
+                                                    indel_rate,
+                                                    indel_size,
+                                                    seed,
+                                                    set_mut,
+                                                    lavalette,
+                                                    used_sign,
+                                                    vector_change_points,
+                                                    vector_activities,
+                                                    ratio_bg_signature,
+                                                    frequency_dna = prob_base)
+
+            else
+                  params = IdDict(MolEvo_dict["params"][1])
+                  approx_snv_indel = MolEvo_dict["approx_snv_indel"]
+                  g_seq, fastaX, Tree_SC, mutations_tot =
+                                   experiment_noISA(tree_red,
+                                                    ref,
+                                                    submodel,
+                                                    params,
+                                                    indel_rate,
+                                                    indel_size,
+                                                    seed,
+                                                    set_mut,
+                                                    lavalette,
+                                                    approx_snv_indel,
+                                                    frequency_dna = prob_base)
+            end
 
       end
 
       if fastaX == []
             return "Correct error input"
+            exit()
       end
+      #save mutations_tot
+      if Sys.iswindows()
+            CSV.write(path_save_file * "\\Mutations_tot.csv",
+                      mutations_tot,
+                      header=false)
+
+      elseif Sys.islinux()
+            CSV.write(path_save_file * "/Mutations_tot.csv",
+                      mutations_tot,
+                      header=false)
+      end
+
       #save fasta
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
             if Sys.iswindows()

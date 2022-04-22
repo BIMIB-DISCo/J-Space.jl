@@ -15,12 +15,23 @@ Returns a list of samples.
 function list_sampling_cell(G::AbstractGraph,
                             Mode::String,
                             L::Int,
+                            set_mut::Vector{Any},
                             seed::MersenneTwister;
-                            dist::Int = 0)
+                            dist::Int = 0,
+                            purity::Float64=0.0)
     list_cell = []
     list_mut = []
-    cs_alive = cells_alive(G)
     if Mode == "Random"        # Choose random sample -> L = num sample
+        cs_alive = cells_alive(G)
+        #if purity != 0.0
+            #ca_subpop = cells_alive_subpop(G,set_mut)
+            #num_cell_pur = trunc((L * purity)/100)
+            #if num_cell_pur > ca_subpop[1]
+                #return "Error: there are not enought purity cell into cancer, reduce value of purity"
+            #else
+                #cell_pur = sample(seed, ca_subpop[1] , num_cell_pur, replace = false)
+            #end
+
         set = collect(1:length(cs_alive))
         for i in 1:L
             pos = rand(seed, set)
@@ -103,12 +114,13 @@ function sampling_phylogentic_relation(G::AbstractGraph,
                                        set_mut::Vector{Any},
                                        seed::MersenneTwister,
                                        driver_tree::Int;
-                                       dist::Int = 0)
+                                       dist::Int = 0,
+                                       purity::Float64=0.0)
     event_df = copy(df)
     times = df[!, :Time]        # df.Time
     event_df = event_df[event_df.Event .!= "Death", :]
     event_df = event_df[event_df.Event .!= "Migration", :]
-    list_sample, list_mut = list_sampling_cell(G, Mode, L, seed, dist = dist)
+    list_sample, list_mut = list_sampling_cell(G, Mode, L, set_mut, seed, dist = dist, purity = purity)
     matrix_R =
         create_matrix_relational(G,
                                  event_df,
@@ -127,7 +139,7 @@ end
 """
 Create and plot tree
 """
-function create_tree(matrix::DataFrame, newick::Bool)
+function create_tree(matrix::DataFrame, newick::Bool, tmax::Float64)
 
     tree = MetaDiGraph(matrix, :Father, :Child)
 
@@ -137,12 +149,15 @@ function create_tree(matrix::DataFrame, newick::Bool)
     root = findall(t -> t === missing, t_vs)[1]
 
     if get_prop(tree, root, :Time) === missing
-        set_prop!(tree, root, :Time, 0)
+        set_prop!(tree, root, :Time, 0.0)
         set_prop!(tree, root, :Subpop_Child, 1)
     end
 
     tree_reduce = reduce_tree(tree, root)
-
+    leafs = get_leafs(tree_reduce)
+    for l in leafs
+        set_prop!(tree_reduce, l, :Time, tmax)
+    end
     ## Create format newick
     if newick == true
         println("create format newick....")
@@ -151,7 +166,6 @@ function create_tree(matrix::DataFrame, newick::Bool)
     end
     return tree_reduce
 end
-
 
 """
 Return all leaves of tree.
@@ -187,11 +201,11 @@ Reduce tree
 function reduce_tree(tree::AbstractGraph, root::Int)
 
     leafs = get_leafs(tree)
-
     t_r = SimpleDiGraph()
     tree_reduce = MetaDiGraph(t_r)
 
     map_nodes = []
+
 
     for leaf in leafs
 
@@ -220,4 +234,25 @@ function reduce_tree(tree::AbstractGraph, root::Int)
     return tree_reduce
 end
 
+
+"""
+TO DO
+"""
+function read_newicks(path::String)#,Subpop::Vector{Any} #vector of int
+    work_dir = pwd()
+    cd(path)
+    Gs = []
+    for file in readdir()       # Scorro tutti i file
+        t = SimpleDiGraph()
+        tree = MetaDiGraph(t)
+        net = readTopology(file)
+        add_vertices!(tree, length(net.node))
+        for e in prova
+            nodes = e.node
+            add_edge!(tree, parse(Int, nodes[2].name), parse(Int, nodes[1].name))
+            #set_prop!(tree, parse(Int, nodes[2].name), :Time, e.length)
+        end
+    end
+    cd(work_dir)
+end
 ### end of file -- sampling_phylogenetic_relation_and_genotype.jl

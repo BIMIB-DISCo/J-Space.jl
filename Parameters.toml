@@ -30,7 +30,9 @@ pos_center = 0
 radius_sampling = 10
 
 [[MolecularEvolution]]
-length_genome = 6000 
+length_genome = 6000
+prob_base = [0.3,0.2,0.2] #only A,C,G
+
 type_isa = 1
 approx_snv_indel = 1
 
@@ -43,6 +45,13 @@ indel_size = 300
 lavalette_par = 0.5
 indel_rate = 0.0005
 params = [{"alpha" = 0.5, "beta" = 0.3}]
+
+#*** if signature ***#
+mut_rate_avg = 0.000001
+used_sign = ["SBS1","SBS4","SBS16"]
+vector_change_points = [0.0, 50.0]
+vector_activities = [0.7 0.2 0.1; 0.0 0.3 0.7]
+ratio_background_signature = 0.000001
 
 [[BulkExperiment]]
 coverage = 10.0

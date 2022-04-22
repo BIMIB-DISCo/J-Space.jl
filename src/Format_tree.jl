@@ -6,6 +6,7 @@
 
 
 #function that return a tree of mutations driver in newick format
+using Base.Threads
 
 """
 Returns a driver mutation tree in Newick format.
@@ -75,6 +76,20 @@ function max_shortest_path(Tree::AbstractMetaGraph,
     return max
 end
 
+"""
+Searches max shortert path with max leanght in tree with a root(possibile ̸= 1)
+"""
+function max_time_nodes(Tree::AbstractMetaGraph,
+                        leafs::Vector{Any})
+    max = 0
+    for l in leafs
+        time = get_prop(Tree, l, :Time)
+        if max < time
+            max = time
+        end
+    end
+    return max
+end
 
 """
 Returns all leaf in tree or subtree with several root.
@@ -121,7 +136,6 @@ function create_newick(Tree::AbstractMetaGraph,
         string(t_2) *
         ")" *
         string(parent)
-
     new_parent = dict[parent][:in]
     if get_prop(Tree, new_parent, :Time) != 0
         t_np = t_p - get_prop(Tree, new_parent, :Time)
@@ -135,7 +149,6 @@ function create_newick(Tree::AbstractMetaGraph,
         filter!(v -> v != parent, child)[1]
         t_1 = get_prop(Tree, child[1], :Time)
         t_1 = t_1 - get_prop(Tree, new_parent, :Time)
-
         if get(dict[child[1]], :out, 0) == 0
             str = "(" *
                   str *

@@ -6,7 +6,6 @@ module J_Space
 
 using MetaGraphs
 using Graphs
-using Plots
 using NetworkLayout
 using GraphMakie
 using GLMakie
@@ -18,7 +17,8 @@ using Distributions
 using CSV, Tables
 using TOML
 using DelimitedFiles
-
+using Distributed
+using LinearAlgebra
 ### function to exports
 export
     ## Simulation
@@ -26,7 +26,7 @@ export
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
-    Molecular_evolution_ISA, experiment_bulk, Molecular_evolution_NoISA,
+    experiment_ISA, experiment_bulk, experiment_noISA, experiment_noISA_sign,
     save_Fasta, Q,
     ## ART
     call_ART,
@@ -200,7 +200,8 @@ function color_index(driver_mut::Vector{Any}, Set_mut::Vector{Any})
             idx = findall(x -> x == driver_mut[i], Set_mut)[1]
             push!(colors, nodecolor_range[idx])
         else
-            push!(colors, colorant"white")
+            #push!(colors, colorant"white")
+            push!(colors, RGB(0, 0, 0))
         end
     end
 
@@ -414,6 +415,126 @@ function cell_birth(G::AbstractGraph,
     return length(set_mut)
 end
 
+###second method
+function cell_birth(G::AbstractGraph,
+                    cell::Int,
+                    pos::Int,
+                    df::DataFrame,
+                    μ_dri::AbstractFloat,
+                    set_mut::Vector{Any},
+                    α::Vector{Float64},
+                    edge_list::Matrix{String},
+                    driv_adv::Matrix{String},
+                    time::AbstractFloat,
+                    ca_subpop::Vector{Any},
+                    idx::Int,
+                    seed::MersenneTwister)
+
+    #delete old cell if use h_voter or voter
+    if has_prop(G, pos, :id)
+        filter!(e -> e != pos, ca_subpop[get_prop(G, pos, :Subpop)])
+        cell_death(G, pos, df, time)
+    end
+
+    id = uuid1(seed)
+    id2 = uuid1(seed)
+    parent = get_prop(G, cell, :id)
+    muts = get_prop(G, cell, :mutation)
+    subpop = get_prop(G, cell, :Subpop)
+    fitness = get_prop(G, cell, :Fit)
+
+    drivers_child = ""
+    r = rand(seed)
+    if r <= μ_dri
+        #controllo che posso eseguire una mutazione
+        if typeof(muts) == String
+            drivers_father = findall(x -> x == muts, edge_list[:,1])
+        else
+            drivers_father = findall(x -> x == muts[end], edge_list[:,1])
+        end
+        if drivers_father != []
+            for d_f in drivers_father
+                drivers_child = edge_list[d_f, :][2]
+                new_mut = []
+                if typeof(muts) == String
+                    push!(new_mut, muts)
+                    push!(new_mut, drivers_child)
+                else
+                    new_mut = copy(muts)
+                    push!(new_mut, drivers_child)
+                end
+                if new_mut ∉ set_mut
+                    break
+                else
+                    drivers_child = ""
+                end
+
+            end
+        end
+    end
+
+    if drivers_child == ""# NO driver mut
+        ## Update Dataframe
+        push!(df, ["Duplicate", time, id, [parent]])
+        push!(df, ["Duplicate", time, id2, [parent]])
+
+        ## Update  Graph
+        set_props!(G, cell, Dict(:mutation => muts,
+                                 :id => id,
+                                 :Subpop => subpop,
+                                 :Fit => fitness))
+        set_props!(G, pos, Dict(:mutation => muts,
+                                :id => id2,
+                                :Subpop => subpop,
+                                :Fit => fitness))
+        push!(ca_subpop[idx], pos)
+
+    else # NEW Driver mut
+        new_mut = []
+        if typeof(muts) == String
+            push!(new_mut, muts)
+            push!(new_mut, drivers_child)
+        else
+            new_mut = copy(muts)
+            push!(new_mut, drivers_child)
+        end
+
+        ## compute new α
+        new_α_id = findall(x -> x == drivers_child, driv_adv[:,1])[1]
+        new_α = parse(Float64, driv_adv[new_α_id, 2])
+        push!(α, new_α)
+        push!(set_mut, new_mut)
+        #Update DataFrame
+        push!(df, ["Mutation", time, id2, [parent, new_mut]])
+        push!(df, ["Duplicate", time, id, [parent]])
+
+        ## Update Graph and Subpop
+        if rand(seed) < 0.5 # Prob mut is in pos or new pos
+            set_props!(G, cell, Dict(:mutation => muts,
+                                     :id => id,
+                                     :Subpop => subpop,
+                                     :Fit => fitness))
+            set_props!(G, pos, Dict(:mutation => new_mut,
+                                    :id => id2,
+                                    :Subpop => length(set_mut),
+                                    :Fit => α[end]))
+            push!(ca_subpop, [pos])
+        else
+            set_props!(G, pos, Dict(:mutation => muts,
+                                    :id => id,
+                                    :Subpop => subpop,
+                                    :Fit => fitness))
+            set_props!(G, cell, Dict(:mutation => new_mut,
+                                     :id => id2,
+                                     :Subpop => length(set_mut),
+                                     :Fit => α[end]))
+            push!(ca_subpop[idx], pos)
+            filter!(e -> e != cell, ca_subpop[idx])
+            push!(ca_subpop, [cell])
+        end
+    end
+    return length(set_mut)
+end
 
 """
 Returns alive cells in subpopulation.
@@ -529,15 +650,18 @@ function simulate_evolution(G::AbstractGraph,
     Time_index = 1
     Gs_plot = []                           #Graphs to plot
     CA_Alive_TOT = []
-    set_mut_pop = unique(get_drivermut(G)) # All mutation
-    df = Graph_to_Dataframe(G)
-    t_curr = 0.0                           # initial time
-    α = [rate_birth]                       # create array alpha
-    num_pop = length(set_mut_pop)          # Num mutation tot
     cs_alive = cells_alive(G)              # Position cells alive = nodes busy
     list_len_node_occ = []                 # List num cells busy for each event
     n_cs_alive = length(cs_alive)          # Num cells alive
     push!(list_len_node_occ, n_cs_alive)   # Update list nodes
+
+    set_mut_pop = unique(get_drivermut(G)) # All mutation
+    df = Graph_to_Dataframe(G)             # create df foreach event
+    t_curr = 0.0                           # initial time
+    # create array alpha
+    α = [rate_birth]
+    num_pop = length(set_mut_pop)          # Num mutation tot
+
 
     #initialize metadata
     for alive in cs_alive
@@ -679,6 +803,220 @@ function simulate_evolution(G::AbstractGraph,
     return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α
 end
 
+
+"""
+Evolution simulation with tree driver #2
+"""
+function simulate_evolution(G::AbstractGraph,
+                            Tf::AbstractFloat,
+                            rate_death::AbstractFloat,
+                            rate_migration::AbstractFloat,
+                            μ_dri::AbstractFloat,
+                            model::String,
+                            edge_list_path::String,
+                            driv_adv_path::String,
+                            seed::MersenneTwister;
+                            Time_of_sampling = [])
+
+    ## Prepare values for simulation
+    Time_index = 1
+    Gs_plot = []                           #Graphs to plot
+    CA_Alive_TOT = []
+    cs_alive = cells_alive(G)              # Position cells alive = nodes busy
+    list_len_node_occ = []                 # List num cells busy for each event
+    n_cs_alive = length(cs_alive)          # Num cells alive
+    push!(list_len_node_occ, n_cs_alive)   # Update list nodes
+
+
+    edge_list = readdlm(edge_list_path, String) #read edge_list_driver
+    driv_adv = readdlm(driv_adv_path, String) #read advantage_driver
+    root = setdiff!(edge_list[:,1], edge_list[:,2])[1]
+    for alive in cs_alive
+        set_prop!(G, alive, :mutation, root) #change mutation
+    end
+
+    set_mut_pop = unique(get_drivermut(G)) # All mutation
+    df = Graph_to_Dataframe(G)             # create df foreach event
+    t_curr = 0.0                           # initial time
+    α = [parse(Float64, driv_adv[1,2])]    # create array alpha
+    num_pop = length(set_mut_pop)          # Num mutation tot
+
+
+    #initialize metadata
+    for alive in cs_alive
+        mutation = get_prop(G, alive, :mutation)
+        subpop = findall(m -> m == mutation, set_mut_pop)[1]
+        set_prop!(G, alive, :Subpop, subpop)
+        set_prop!(G, alive, :Fit, α[subpop])
+    end
+
+    cs_neighbors = cells_neighbors(G)
+    ca_subpop = cells_alive_subpop(G, set_mut_pop) # Num cells ∀ subpop
+    α_subpop_f = []
+
+    #simulation
+    while (t_curr < Tf && n_cs_alive > 0) ||
+          (rate_death == 0 && n_cs_alive == nv(G))
+
+        α_subpop = []           # alpha for each subpop
+
+        for i in 1:length(α)
+            push!(α_subpop, α[i] * length(ca_subpop[i]))
+        end
+        birth = sum(α_subpop)           # Tot prob birth
+        death = rate_death * n_cs_alive # Tot prob death
+        M = rate_migration * n_cs_alive # Tot prob migration
+        λ = birth + death + M
+        t_event = rand(seed, Exponential(1 / λ), 1)[1]
+        t_curr += t_event
+
+        Aₙ = α_subpop ./ λ
+        Bₙ = death / λ
+        Mₙ = M / λ
+
+        #plot
+        if Time_of_sampling != [] &&
+           Time_index <= length(Time_of_sampling) &&
+           t_curr > Time_of_sampling[Time_index]
+            push!(Gs_plot, copy(G))
+            push!(CA_Alive_TOT, length.(ca_subpop))
+            Time_index += 1
+        end
+
+        ## Probability vector
+        prob_vet = vcat(Aₙ, Bₙ, Mₙ)
+        prob_cum = cumsum(prob_vet)
+
+        ## Choose event
+        k = rand(seed)
+        target_subpop = collect(k .<= prob_cum)
+        min = findfirst(target_subpop)
+
+        if min == num_pop + 2   # Migration Event
+            # Choose random cell
+            x = rand(seed, (1:n_cs_alive))
+            cell = cs_alive[x]
+            # Choose random neighbor
+            pos = rand(seed, cs_neighbors[cell])
+
+            if pos ∉ cs_alive #phandom event?
+                mut = get_prop(G, cell, :mutation)
+                idx = findall(x -> x == mut, set_mut_pop)[1]
+                migration_cell(G, cell, pos, df, t_curr)
+                push!(cs_alive, pos)
+                push!(ca_subpop[idx], pos)
+                filter!(e -> e != cell, cs_alive)
+                filter!(e -> e != cell, ca_subpop[idx])
+                push!(list_len_node_occ, n_cs_alive)
+                push!(CA_Alive_TOT, length.(ca_subpop))
+            end
+
+        elseif min == num_pop + 1    # Death Event
+            # Choose random cell
+            x = rand(seed, (1:n_cs_alive))
+            cell = cs_alive[x]
+
+            mut = get_prop(G, cell, :mutation)
+            idx = findall(x -> x == mut, set_mut_pop)[1]
+            cell_death(G, cell, df, t_curr)
+
+            #Update list
+            filter!(e -> e != cell, cs_alive)
+            filter!(e -> e != cell, ca_subpop[idx])
+
+            n_cs_alive -= 1
+            push!(list_len_node_occ, n_cs_alive)
+            push!(CA_Alive_TOT, length.(ca_subpop))
+
+        else     # Birth event
+            x = rand(seed, 1:length(ca_subpop[min]))
+            cell = ca_subpop[min][x]
+            pos = rand(seed, cs_neighbors[cell])
+
+            #check model for birth
+            rule = true
+            if model == "contact"
+                if pos ∈ cs_alive
+                    rule = false
+                end
+
+            elseif  model == "voter"
+                if pos ∈ cs_alive
+                    if get_prop(G, cell, :Subpop) == get_prop(G, pos, :Subpop)
+                        rule = false
+                    end
+                end
+
+            elseif model == "h_voter" || model == "hvoter"
+                if pos ∈ cs_alive
+                    if get_prop(G, cell, :Fit) <= get_prop(G, pos, :Fit)
+                        rule = false
+                    end
+                end
+            end
+
+            if rule
+                num_pop = cell_birth(G,
+                                     cell,
+                                     pos,
+                                     df,
+                                     μ_dri,
+                                     set_mut_pop,
+                                     α,
+                                     edge_list,
+                                     driv_adv,
+                                     t_curr,
+                                     ca_subpop,
+                                     min,
+                                     seed)
+
+                if pos ∉ cs_alive
+                    push!(cs_alive, pos)
+                    n_cs_alive += 1
+                end
+                push!(list_len_node_occ, n_cs_alive)
+                push!(CA_Alive_TOT, length.(ca_subpop))
+            end
+        end
+    end
+    if length(set_mut_pop) != length(driv_adv[:,1])
+        println("WARNING: This simulation did not generate every subpopulation
+                                        specified in the driver mutation tree.")
+        println("\t in particolar, follow driver: ")
+        all_driver = []
+        for d in set_mut_pop
+            if typeof(d) == String
+                push!(all_driver, d)
+            else
+                push!(all_driver, d[end])
+            end
+        end
+        driver_print = setdiff!(driv_adv[:,1], all_driver)
+        for d in driver_print
+            println("\t \t \t \t ",d)
+        end
+    end
+    if 0 in CA_Alive_TOT[end]
+        leafs = setdiff!(edge_list[:,2], edge_list[:,1])
+        id_zero = findall(x -> x == 0, CA_Alive_TOT[end])
+        subpop_extinct = [set_mut_pop[id][end] for id in id_zero]
+        driver_print = []
+        for leaf in leafs
+            if leaf in subpop_extinct
+                push!(driver_print, leaf)
+            end
+        end
+        if driver_print != []
+            println("WARNING: In this simulation did not present every leaf in the
+                        driver mutation tree, because they have become extinct")
+            println("\t in particolar, follow driver: ")
+            for d in driver_print
+                println("\t \t \t \t ",d)
+            end
+        end
+    end
+    return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α
+end
 
 include("sampling_phylogentic_relation_and_genotype.jl")
 include("Format_tree.jl")

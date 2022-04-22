@@ -61,7 +61,7 @@ function call_ART(profile::String,
                   path_fileout::String,
                   len_read::Int,
                   tot_num_reads::Int,
-                  outfile_prefix::String,
+                  outfile_prefix::String, #this is unless
                   paired_end::Bool,
                   seed::MersenneTwister;
                   sam::Bool = false,
@@ -88,7 +88,7 @@ function call_ART(profile::String,
     ss = ["-ss", profile]
     l = ["-l", len_read]
     c = ["-c", tot_num_reads]
-    o = ["-o", outfile_prefix]
+    #o = ["-o", outfile_prefix]
     ef_c = sam_c = p = mp = na = m_s = []
 
     if ef
@@ -117,7 +117,7 @@ function call_ART(profile::String,
 
     if Sys.iswindows()
 
-        cd(path_fileout * "Fasta output\\")        # Cambio directory.
+        cd(path_fileout)        # Cambio directory.
         for file in readdir()       # Scorro tutti i file
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
@@ -125,6 +125,8 @@ function call_ART(profile::String,
                 cd(f[1])
                 path_fasta = "..\\"*file
                 i = ["-i", path_fasta]
+                outfile_prefix = f[1]*"_"
+                o = ["-o", outfile_prefix]
                 command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
                 println("command: ", command)
                 run(command)
@@ -134,7 +136,7 @@ function call_ART(profile::String,
         cd("..\\..\\")
 
     elseif Sys.islinux()
-        cd(path_fileout*"Fasta output/")
+        cd(path_fileout)
         for file in readdir()
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
@@ -142,6 +144,8 @@ function call_ART(profile::String,
                 cd(f[1])
                 path_fasta = "../"*file
                 i = ["-i", path_fasta]
+                outfile_prefix = f[1]*"_"
+                o = ["-o", outfile_prefix]
                 command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
                 println("command: ", command)
                 run(command)
@@ -161,7 +165,7 @@ function call_ART(command::String, path_fileout::String)
     end
 
     if Sys.islinux()
-        cd(path_fileout * "Fasta output/")
+        cd(path_fileout)
         for file in readdir()
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta"
@@ -180,7 +184,7 @@ function call_ART(command::String, path_fileout::String)
         end
         cd("../../")
     else
-        cd(path_fileout * "Fasta output\\")
+        cd(path_fileout)
         for file in readdir()
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta"
