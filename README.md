@@ -41,7 +41,7 @@ The user can use an infinite-site model to have fast simulations of situations w
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
 
-The user can also generate a custom time-dependetn substitution model based on the Mutational signatures of the COSMIC database. In this case the user should provide the list of labels of the desired SBS signature in the COSMIC database (https://cancer.sanger.ac.uk/signatures/) (e.g.,  `used_sign = ["SBS1","SBS4","SBS16"]`
+The user can also generate a custom time-dependent substitution model based on a linear combination of the Mutational signatures of the COSMIC database. In this case the user should provide the list of labels of the desired SBS signature in the COSMIC database (https://cancer.sanger.ac.uk/signatures/) (e.g.,  `used_sign = ["SBS1","SBS4","SBS16"]`
  ), the list of change points (e.g., one change-point at time  50 should be specified `vector_change_points = [0.0, 50.0]`), the values of the activations for each signature in each of the time span defined by the change-points (e.g., `vector_activities = [[0.7,0.2,0.1], [0.0,0.3,0.7]]`)
 ) and the ratio of mutation due to the background uniform process or due to the mutational signatures (e.g., `ratio_background_signature = 0.8`).
  Note that using finite-site for long genomes come at the cost of computational performance.
