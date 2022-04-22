@@ -8,7 +8,21 @@ After mimicking a spatial sampling of the tumour cells, J-SPACE  returns the phy
  ### Spatial clonal dynamics
  In J-SPACE the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
 arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path "Example_adj_matrix", it must is symmetric and with only values(0,1) separeted from space between them).   
-In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells, the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
+In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells (to simulate different mechanical interactions), the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
+If the user want a specific clona dynamics, it is possible to indicate the edge list representing the mutational tree of drivers and the path where this file is present. In this case the user should also specify the birth rate of each subpopulation. For example, a linear tree with tree drivers is described by the following:
+
+`Driver_1, Driver_2
+Driver_2, Driver_3
+Driver_3, Driver_4`
+
+The file with the birth rate must have the following format":
+`Driver_1 0.2
+Driver_2, 0.4
+Driver_3, 0.5
+Driver_4, 0.6`
+
+
+
 Note that every rate inserted in J-SPACE must have the same unit of time both for the spatial dynamics and the molecular evolution.  
 
  ### Molecular evolution
@@ -20,6 +34,9 @@ The user can use an infinite-site model to have fast simulations of situations w
 
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
+
+Mutational signature xxxx
+
  Note that using finite-site for long genomes come at the cost of computational performance.
  After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  /"path_to_save_files"/Fasta output/
  
