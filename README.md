@@ -237,10 +237,11 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `mut_rate_avg`. A real number, the average mutational rate per trinucleotide and unit of time. 
 - `used_sign`. An array of strings. The list of the labels of the used signatures (e.g., `used_sign = ["SBS1","SBS4","SBS16"]
 `) 
-- `vector_change_points`. An array of real number . It contains the list of the time in the change points (e.g., one change-point at time  50 should be specified - ----`vector_change_points = [0.0, 50.0]`). If no change point is desired (constant signature activity) one should use `vector_change_points = [0.0]`
+- `vector_change_points`. An array of real number . It contains the list of the time in the change points (e.g., one change-point at time  50 should be specified 
+- -`vector_change_points = [0.0, 50.0]`). If no change point is desired (constant signature activity) one should use `vector_change_points = [0.0]`
 - `vector_activities`. A vector of vectors. For each elements of `vector_change_points` it is necessary insert an array with the values of the activities for each signature (e.g., if `vector_change_points` has two elements `vector_activities = [[0.7,0.2,0.1], [0.0,0.3,0.7]]
 `)
-- `ratio_background_signature`. A real number between 1.0 and 0.0. 
+- `ratio_background_signature`. A real number between 1.0 and 0.0. If 1.0 all mutation will be due to mutational signatures, if 0 all ther mutations will be due to the background  process.
 ### Parameters of the bulk experiment (approximate version, very fast does not need ART, but it generates the VAF, not the reads. Working only if `type_isa = 1`)
 - `coverage`. Real number, average coverage of the simulate bulk experiment.
  - `FP`. Real number,  false positive rate.
