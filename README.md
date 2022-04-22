@@ -11,15 +11,22 @@ arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In
 In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells (to simulate different mechanical interactions), the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
 If the user want a specific the clonal dynamics, it is possible to indicate the edge list representing the mutational tree of drivers and the path where this file is present. In this case the user should also specify the birth rate of each subpopulation. For example, a linear tree with tree drivers is described by the following:
 
-`Driver_1, Driver_2`
-`Driver_2, Driver_3`
-`Driver_3, Driver_4`
+Driver_1, Driver_2
+
+Driver_2, Driver_3
+
+Driver_3, Driver_4
 
 The file with the birth rate must have the following format":
-`Driver_1 0.2`
-`Driver_2, 0.4`
-`Driver_3, 0.5`
-`Driver_4, 0.6`
+
+
+Driver_1 0.2
+
+Driver_2, 0.4
+
+Driver_3, 0.5
+
+Driver_4, 0.6
 
 In this case J-SPACE accept only the events that respect the mutational tree given.
 
