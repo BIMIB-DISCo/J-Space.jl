@@ -9,23 +9,23 @@ After mimicking a spatial sampling of the tumour cells, J-SPACE  returns the phy
  In J-SPACE the dynamics of the spatio-temporal evolution of a tumour is modelled by a stochastic multi-type Birth-Death process over an
 arbitrary graph. J-SPACE could generate by itself a 2D or 3D regular lattice. In addition, it is possible to give as input any graph as an adjacency matrix ( an example of the format needed for this matrix is given in path "Example_adj_matrix", it must is symmetric and with only values(0,1) separeted from space between them).   
 In this part, the user can tune the birth rate of wild type cells, the death rate of the cells, the rate of migration of cells (not tested), the rule of contact between cells (to simulate different mechanical interactions), the probability to develop a driver mutation per division, and the average birth rate advantage of a driver mutation.
-If the user want a specific the clonal dynamics, it is possible to indicate the edge list representing the mutational tree of drivers and the path where this file is present. In this case the user should also specify the birth rate of each subpopulation. For example, a linear tree with tree drivers is described by the following:
+If the user want a specific the clonal dynamics (i.e., `Tree_Driver_Configure = 1`), it is possible to indicate the edge list representing the mutational tree of drivers and the path where this file is supplied in txt (the parameter of the config file `edgelist_treedriver` ). In this case the user should also specify the birth rate of each subpopulation and the path where this file is supplied in txt (the parameter of the config file  `driver_birth_rates`  ). For example, a linear tree with tree drivers is described by the following:
 
-Driver_1, Driver_2
+Driver_1 Driver_2
 
-Driver_2, Driver_3
+Driver_2 Driver_3
 
-Driver_3, Driver_4
+Driver_3 Driver_4
 
 The file with the birth rate must have the following format:
 
 Driver_1 0.2
 
-Driver_2, 0.4
+Driver_2 0.4
 
-Driver_3, 0.5
+Driver_3 0.5
 
-Driver_4, 0.6
+Driver_4 0.6
 
 In this case J-SPACE accept only the events that respect the mutational tree given.
 
@@ -36,14 +36,16 @@ Note that every rate inserted in J-SPACE must have the same unit of time both fo
 J-SPACE simulate the evolution of the sequence of the sample after the simulation of the clonal dynamics. The user can sample the whole population or a subset of it, and the J-SPACE evaluate the phylogenetic tree of the samples. This GT tree is returned as a Newick file in the folder specified by the variable "/path_to_save_files/" .  
 
 The molecular evolution of an ancestral genome  (which can be given by the user as FASTA file or generated randomly) is simulated along the sampled tree via the Doob-Gillespie algorithm.
-The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time), and the total simulated time is long.
+The user can use an infinite-site model to have fast simulations of situations where the genome is long, the mutational rate is very low (e.g.,<10^-8 substitution for unit of time per site), and the total simulated time is long.
 
 In the case of finite-site models, J-SPACE takes as input the matrix of instantaneous rates for different substitution models: JC69, F81, K80, HKY85, TN93, and K81.
 We suppose that the indels have a size distributed as  a Lavalette distribution.
 
-The user can also generate a custom time-dependetn substitution model based on the Mutational signatures of the COSMIC database. In this case the user should provide the list of labels of the desired SBS signature in the COSMIC database (https://cancer.sanger.ac.uk/signatures/) (e.g.,  xxxx), the list of change points (xxxx), the values of the activations for each signature in each of the time span defined by the changepoints (e.g., xxxx) and the ratio of mutation due to the background uniform process or due to the mutational signatures (e.g.xxxx).
+The user can also generate a custom time-dependetn substitution model based on the Mutational signatures of the COSMIC database. In this case the user should provide the list of labels of the desired SBS signature in the COSMIC database (https://cancer.sanger.ac.uk/signatures/) (e.g.,  `used_sign = ["SBS1","SBS4","SBS16"]`
+ ), the list of change points (e.g., one change-point at time  50 should be specified `vector_change_points = [0.0, 50.0]`), the values of the activations for each signature in each of the time span defined by the change-points (e.g., `vector_activities = [[0.7,0.2,0.1], [0.0,0.3,0.7]]`)
+) and the ratio of mutation due to the background uniform process or due to the mutational signatures (e.g., `ratio_background_signature = 0.8`).
  Note that using finite-site for long genomes come at the cost of computational performance.
- After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  /"path_to_save_files"/Fasta output/
+ After this computation, the sequences of the samples (i.e., the leafs of the phylogenetic tree) are returned as FASTA file in the folder  /"path_to_save_files"/Fasta output.
  
  
 
@@ -146,7 +148,7 @@ NOTE: the paths are absolute paths
   - The simulated next-generation sequencing reads as FASTQ files in the folder "/"path_to_save_files"/Fasta output/sample_#", where sample_# is the #-th sample.
   - The alignment file, which maps the noisy reads on the sequences of the sampled cells both in formats SAM and ALN.
   - The alignment file, without noise in format SAM.
-  - The list of the mutations for each sample.
+  - The list of the mutations for each sample as csv.
 
 
 
@@ -159,10 +161,11 @@ The following are the paramenters of such file:
 - `seed`. Integer, the seed of the simulation.
 - `generate_reference`. Integer, If 0 the user should inser the ancestral genome in fasta format in the folder "path_reference". If 1 J-SPACE generate a random sequence.
 - `path_reference`. A string,  the path of the reference given by user.
-- `path_to_save_files`.  A string, path of the folder where the output files should be saved
-- `path_to_save_plot`. A string,  path of the folder where the output plots should be saved
+- `path_to_save_files`.  A string, path of the folder where the output files should be saved.
+- `path_to_save_plot`. A string,  path of the folder where the output plots should be saved.
 - `Generate_graph`. Integer, if 0 the user should inser the graph of the dynamics as an adjacency matrix. If 1 J-SPACE generate a regular lattice, the paramenters of such lattice are specified in the file "Parameters.toml".
 - `Path_to_Graph`.  Path to the adjacency matrix of the graph if imported.
+- `Tree_Driver_Configure`. Integer number. if 1 J-SPACE takes as input a driver mutational tree. With 0 J-SPACE generates the tree randomly. 
 - `Tree_Newick`. Integer, if 1  the phylogenentic tree of the cells is saved as newick file.
 - `Final_configuration`. Integer,  if 1 return the plot of the final configuration of the lattice.
 - `Driver_list`. Integer,  if 1 returns the list of the driver mutations.
@@ -175,6 +178,10 @@ The following are the paramenters of such file:
 - `Time_of_sampling`. Array of times in an incresing order (e.g., [10.0 , 20.3 , 50.2]). J-SPACE perform the plot of the state of the lattice in that times.
 - `Graph_configuration`. Integer,  if 1  returns the plot of the state of the lattice.
 
+#### If `Tree_Driver_Configure = 1` 
+- `edgelist_treedriver`. A string. The path to the txt file containg the edge list of the driver mutational tree.
+- `driver_birth_rates`. A string. The path to the txt file containg the edge list of the drivers birth rates.
+
 ## THE PARAMETERS FILE OF J-SPACE
 In the file "Parameters.toml" the user will find all the paramenters of the dynamics, molecular evolution and experiment. 
 
@@ -185,9 +192,9 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `N_starting_cells`. Integer  the number of starting cells.
 
 ### Parameters of the clonal spatial dynamics
-- `Model`. String, the possible values are ["contact", "voter", "hvoter"] they are the possible different  Models of interaction.
+- `Model`. String, the possible values are `["contact", "voter", "hvoter"]` they are the possible different  Models of interaction.
 - `Max_time`. Real number, it is the maximum time of the simulation 
-- `rate_birth`. Real number,  Birth rate per cell per unit of times
+- `rate_birth`. Real number,  Birth rate per cell per unit of times (not used if `Tree_Driver_Configure = 1`)
 - `rate_death`. Real number,  Death rate per cell per unit of times
 - `rate_migration`. Real number,  Migration rate per cell per unit of times
 - `drive_mut_rate`. Real number, probability of generate a new driver (i.e., subclones) after a division event.
@@ -195,7 +202,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `std_driver_mut_rate`. Real number, standard deviation of the birth rate advantage of a driver mutation 
 
 ### Parameters of the sampling
-- `Random_sampling`. Integer, if 1  Random sampling, if 0 cirular/spherical sampling 
+- `Random_sampling`. Integer, if 1  Random sampling, if 0 circular/spherical sampling 
 - `num_cell`. Integer, number of sampled cells
 
 #### If `Random_sampling = 0`
@@ -204,9 +211,12 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 
 ### Parameters of the molecular evolution
 - `length_genome`.  Length of the ancestral genome. Used  if ancestral genome is not given. If the ancestral genome is given as fasta file this line is ignored.
+- `prob_base`. An array of three real numbers (e.g., [0.3,0.2,0.2]).   the proportion of A, C, and G in the genome randomly generated. The proportion of T is calculated by normalization.
 - `type_isa`. Integer number, if 1 J-SPACE use the ISA to simulate the molecular evolution, if 0 it is necessary to specify the substituion model below.
+
 #### if `type_isa = 1`
 - `neut_mut_rate`. Rate of mutation per site and per unit of time
+
 #### if `type_isa = 0`
 - `approx_snv_indel`. Integer number, if 0 SNV and INDEL are computed togheter, if 1 SNV and INDEL are computed separately. The first choice is very slow, and we recommend the use only for small and short trees.
 - `sub_model`. A string, variable that select the subistituion model, possible value [ "JC69","F81","K80", "HKY","TrN93ef","TrN","K81","K81uf"].
@@ -222,8 +232,15 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
  if `sub_models = "TrN" `-> `params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]`.     
  if `sub_models = "K81" ` -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.    
  if `sub_models = "K81uf"`  -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.     
+#### if sub_model = "96SBS" J-Space uses a mutational signature based substitution model
 
-
+- `mut_rate_avg`. A real number, the average mutational rate per trinucleotide and unit of time. 
+- `used_sign`. An array of strings. The list of the labels of the used signatures (e.g., `used_sign = ["SBS1","SBS4","SBS16"]
+`) 
+- `vector_change_points`. An array of real number . It contains the list of the time in the change points (e.g., one change-point at time  50 should be specified - ----`vector_change_points = [0.0, 50.0]`). If no change point is desired (constant signature activity) one should use `vector_change_points = [0.0]`
+- `vector_activities`. A vector of vectors. For each elements of `vector_change_points` it is necessary insert an array with the values of the activities for each signature (e.g., if `vector_change_points` has two elements `vector_activities = [[0.7,0.2,0.1], [0.0,0.3,0.7]]
+`)
+- `ratio_background_signature`. A real number between 1.0 and 0.0. 
 ### Parameters of the bulk experiment (approximate version, very fast does not need ART, but it generates the VAF, not the reads. Working only if `type_isa = 1`)
 - `coverage`. Real number, average coverage of the simulate bulk experiment.
  - `FP`. Real number,  false positive rate.
