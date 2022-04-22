@@ -3,7 +3,7 @@
 ### J_Space.jl
 
 module J_Space
-
+using Plots
 using MetaGraphs
 using Graphs
 using NetworkLayout

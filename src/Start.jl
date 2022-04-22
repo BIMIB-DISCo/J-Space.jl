@@ -16,13 +16,15 @@ function Start(paramaters::String, config::String)
 
       #check signature time
       vector_activities = Par_dict["MolecularEvolution"][1]["vector_activities"]
-      for row in eachrow(vector_activities)
-              if sum(row) != 1.0
-                  println("Error -> ", row, " : its sum does not equal 1.0")
-                  exit()
-              end
+      if vector_activities != []
+            vector_activities = reduce(vcat,transpose.(vector_activities))
+            for row in eachrow(vector_activities)
+                  if sum(row) <= 0.999
+                        return println("Error -> ", row,
+                                               " : its sum does not equal 1.0")
+                  end
+            end
       end
-
       ###GRAPH
       println("CREATE/LOAD GRAPH....")
 
@@ -234,6 +236,7 @@ function Start(paramaters::String, config::String)
                   used_sign = MolEvo_dict["used_sign"]
                   vector_change_points = MolEvo_dict["vector_change_points"]
                   vector_activities = MolEvo_dict["vector_activities"]
+                  vector_activities = reduce(vcat,transpose.(vector_activities))
                   ratio_bg_signature = MolEvo_dict["ratio_background_signature"]
                   g_seq, fastaX, Tree_SC, mutations_tot =
                                    experiment_noISA_sign(tree_red,
@@ -271,8 +274,7 @@ function Start(paramaters::String, config::String)
       end
 
       if fastaX == []
-            return "Correct error input"
-            exit()
+            return "Fasta are empty, check your input"
       end
       #save mutations_tot
       if Sys.iswindows()
@@ -280,7 +282,7 @@ function Start(paramaters::String, config::String)
                       mutations_tot,
                       header=false)
 
-      elseif Sys.islinux()
+      else
             CSV.write(path_save_file * "/Mutations_tot.csv",
                       mutations_tot,
                       header=false)
@@ -332,7 +334,11 @@ function Start(paramaters::String, config::String)
       SC_noise = Conf_dict["FileOutputExperiments"][1]["Single_cell_noise"]
       if SC_noise != 0
             println("CALL ART....")
-
+            if Sys.iswindows()
+                  path_fasta = path_save_file*"\\Fasta output\\"
+            else
+                  path_fasta = path_save_file*"/Fasta output/"
+            end
             if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 0
                   println("WARNING -> ART must need file Fasta...")
                   println("I am save the files")
@@ -342,7 +348,7 @@ function Start(paramaters::String, config::String)
             ART_dict = Par_dict["ART"][1]
 
             if ART_dict["command"] != ""
-                  call_ART(ART_dict["command"], path_save_file)
+                  call_ART(ART_dict["command"], path_fasta)
             else
                   profile = ART_dict["profile"]
                   len_read = ART_dict["len_read"]
@@ -372,21 +378,19 @@ function Start(paramaters::String, config::String)
                   end
                   mean_fragsize = ART_dict["mean_fragsize"]
                   std_fragsize = ART_dict["std_fragsize"]
+                  call_ART(profile,
+                           path_fasta,
+                           len_read,
+                           tot_num_reads,
+                           outfile_prefix,
+                           paired_end,
+                           seed,
+                           sam = sam,
+                           ef = ef,
+                           mate_pair = mate_pair,
+                           mean_fragsize = mean_fragsize,
+                           std_fragsize = std_fragsize,
+                           no_ALN = no_ALN)
             end
-
-            #controllare il path_ref
-            call_ART(profile,
-                     path_save_file,
-                     len_read,
-                     tot_num_reads,
-                     outfile_prefix,
-                     paired_end,
-                     seed,
-                     sam = sam,
-                     ef = ef,
-                     mate_pair = mate_pair,
-                     mean_fragsize = mean_fragsize,
-                     std_fragsize = std_fragsize,
-                     no_ALN = no_ALN)
       end
 end

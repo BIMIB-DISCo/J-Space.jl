@@ -99,7 +99,7 @@ function transform_genome(genome::LongDNASeq,
                           sample::Int;
                           funct::Int = 0,
                           position_used::Vector{Any} = [],
-                          muts_driver::Vector{Any} = [])
+                          muts_driver = [])
 
     transition_matrix =
         DataFrame(A = [0.0, 0.33333333, 0.33333333, 0.33333333],

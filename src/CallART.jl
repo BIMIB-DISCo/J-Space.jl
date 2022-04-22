@@ -116,8 +116,8 @@ function call_ART(profile::String,
     end
 
     if Sys.iswindows()
-
         cd(path_fileout)        # Cambio directory.
+        println("sono qui dentro: ",path_fileout)
         for file in readdir()       # Scorro tutti i file
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
