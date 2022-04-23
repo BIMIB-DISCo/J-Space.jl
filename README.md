@@ -267,11 +267,16 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
 
 
-## POSSIBLE PROBLEM
- -  Since the library GLMakie uses gpu, a possible error on virtual machine is the following:  LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")] 
+## POSSIBLE PROBLEMS
+ -  Since the library GLMakie uses gpu, a possible error on virtual machines is the following:
+```
+ LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")]
+```
 
 
-
+## LICENSE
 See the file `COPYING` for license information.
+
+
 ## CONTACTS
 Please feel free to contact us if you have problems running our tool at fabrizio.angaroni@unimib.it and a.guidi@campus.unimib.it .
