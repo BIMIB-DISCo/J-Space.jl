@@ -16,7 +16,7 @@ Path_to_Graph = "./utility/Example_adj_matrix.txt"
 Tree_Driver_Configure = 0
 #*** if Tree_Driver == 1 ***#
 edgelist_treedriver = ".\\utility\\Tree_driver_example.txt"
-driver_advantage = ".\\utility\\driver_advantage.txt"
+driver_birth_rates = ".\\utility\\driver_advantage.txt"
 [[OutputGT]]
 Tree_Newick = 1
 Final_configuration = 1
@@ -32,5 +32,4 @@ Alignment = 1
 
 [[FileOutputPlot]]
 Time_of_sampling = [10, 20]
-Dynamic_Clonal_genotype = 1
 Graph_configuration = 1

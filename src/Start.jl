@@ -49,7 +49,7 @@ function Start(paramaters::String, config::String)
       println("RUN DYNAMIC....")
       Dyn_Clon_genotype = Conf_dict["FileOutputPlot"][1]["Dynamic_Clonal_genotype"]
       Graph_configuration = Conf_dict["FileOutputPlot"][1]["Graph_configuration"]
-      if Dyn_Clon_genotype == 1 || Graph_configuration == 1
+      if Graph_configuration == 1
             Time_of_sampling =  Conf_dict["FileOutputPlot"][1]["Time_of_sampling"]
       else
             Time_of_sampling = []
@@ -58,14 +58,14 @@ function Start(paramaters::String, config::String)
       Dynamic_dict = Par_dict["Dynamic"][1]
       Model = Dynamic_dict["Model"]
       Time = Dynamic_dict["Max_time"]
-      rate_birth = Dynamic_dict["rate_birth"]
       rate_death = Dynamic_dict["rate_death"]
       rate_migration = Dynamic_dict["rate_migration"]
       driv_mut_rate = Dynamic_dict["drive_mut_rate"]
-      avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
-      std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
       #run simulation
       if Conf_dict["Config"][1]["Tree_Driver_Configure"] != 1
+            rate_birth = Dynamic_dict["rate_birth"]
+            avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
+            std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
             df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
                          simulate_evolution(g_meta,
                                             Time,
@@ -80,7 +80,7 @@ function Start(paramaters::String, config::String)
                                             Time_of_sampling = Time_of_sampling)
       else
             edge_list_path = Conf_dict["Config"][1]["edgelist_treedriver"]
-            driv_adv_path = Conf_dict["Config"][1]["driver_advantage"]
+            driv_adv_path = Conf_dict["Config"][1]["driver_birth_rates"]
             df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
                          simulate_evolution(g_meta,
                                             Time,
@@ -119,13 +119,13 @@ function Start(paramaters::String, config::String)
                         save(path_save_plot
                              * "\\Conf_t_"
                              * string(Time_of_sampling[i])
-                             *".png",
+                             *".pdf",
                              f)
                   elseif Sys.islinux()
                         save(path_save_plot
                              * "/Conf_t_"
                              * string(Time_of_sampling[i])
-                             * ".png",
+                             * ".pdf",
                              f)
                   end
             end
@@ -134,9 +134,9 @@ function Start(paramaters::String, config::String)
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
-                  save(path_save_plot * "\\Final_conf.png", f)
+                  save(path_save_plot * "\\Final_conf.pdf", f)
             elseif Sys.islinux()
-                  save(path_save_plot * "/Final_conf.png", f)
+                  save(path_save_plot * "/Final_conf.pdf", f)
             end
       end
       #save driver list
@@ -185,9 +185,9 @@ function Start(paramaters::String, config::String)
             tree_mut = tree_mut[1]
             f, ax, p = plot_tree(tree_mut)
             if Sys.iswindows()
-                  save(path_save_plot * "\\driver_tree.png", f)
+                  save(path_save_plot * "\\driver_tree.pdf", f)
             elseif Sys.islinux()
-                  save(path_save_plot * "/driver_tree.png", f)
+                  save(path_save_plot * "/driver_tree.pdf", f)
             end
       end
 

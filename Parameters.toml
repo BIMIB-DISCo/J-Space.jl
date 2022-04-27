@@ -34,12 +34,12 @@ length_genome = 6000
 prob_base = [0.3,0.2,0.2] #only A,C,G
 
 type_isa = 0
-approx_snv_indel = 1
 
 #*** if type_isa = 1 ***#
 neut_mut_rate = 0.000025
 
 #*** if type_isa = 0 ***#
+approx_snv_indel = 1
 sub_model = "K80"
 indel_size = 300
 lavalette_par = 0.5

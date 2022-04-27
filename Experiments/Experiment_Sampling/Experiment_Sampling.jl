@@ -27,8 +27,10 @@ params = IdDict( "alpha" => 0.5)
 
 g_meta = spatial_graph(1000, 1000, seed, dim = 3, n_cell=1)
 println("simulation...")
-df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop, times =
-                                        J_Space.simulate_evolution_2(g_meta,
+#df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop, times =
+                                        #J_Space.simulate_evolution_2(g_meta,
+df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop=
+                                        J_Space.simulate_evolution(g_meta,
                                                            200.0,
                                                            0.4,
                                                            0.01,
@@ -63,15 +65,16 @@ sampling_cell = [10, 100, 1000]#,5000]
                                                           seed,
                                                           0)
         matrix_R = value[1]
-        value, times, allocated2, meta = @timed J_Space.create_tree_2(matrix_R, true)
+        #value, times, allocated2, meta = @timed J_Space.create_tree_2(matrix_R, true)
+        value, time2, allocated2, meta = @timed create_tree(matrix_R, true)
         #println("value[1]", value[1])
         push!(Tree_fil_final, copy(value[1]))
         push!(Newick_final, value[2])
-        time_f = time+value[3]
-        push!(Times_tree_phy, time_f)
-        mem = value[4]
-        mem_phy = allocated+(allocated2 - mem)
-        push!(Memory_tree_phy, mem_phy)
+        #time_f = time+value[3]
+        #push!(Times_tree_phy, time_f)
+        #mem = value[4]
+        #mem_phy = allocated+(allocated2 - mem)
+        #push!(Memory_tree_phy, mem_phy)
         tree_red = value[1]
         g_isa = copy(tree_red)
         println("ISA...")

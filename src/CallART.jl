@@ -5,7 +5,21 @@
 ####################### CALL ART
 #function call ART but only tecnology illumina
 
-"Function call_ART
+#=input : Profile::String    =>  -ss $Profile
+          ef::bool           =>  -ef
+          path_ref::String   => -i $file
+          paired_end::bool   => -p
+          mate_pair::Bool    => -mp
+          len_read::Int      => -l $len_read
+          tot_num_reads::Int => -c $tot_num_reads
+          mean_fragsize::Int => -m $mean_fragsize
+          std_fragsize::Int  => -s $std_fragsize
+          outfile_prefix::String => -o $outfile_prefix
+          no_ALN::Bool           => -na
+          seed::MersenneTwister => -rs $seed
+=#
+
+"""Function call_ART
  -ss The name of Illumina sequencing system of the built-in profile used
      for simulation
  -ef Indicate to generate the zero sequencing errors SAM file as well the
@@ -26,21 +40,7 @@
  -rs The seed for random number generator (default: system time in second)
      NOTE: using a fixed seed to generate two identical datasets from different
            runs
-"
-#=input : Profile::String    =>  -ss $Profile
-          ef::bool           =>  -ef
-          path_ref::String   => -i $file
-          paired_end::bool   => -p
-          mate_pair::Bool    => -mp
-          len_read::Int      => -l $len_read
-          tot_num_reads::Int => -c $tot_num_reads
-          mean_fragsize::Int => -m $mean_fragsize
-          std_fragsize::Int  => -s $std_fragsize
-          outfile_prefix::String => -o $outfile_prefix
-          no_ALN::Bool           => -na
-          seed::MersenneTwister => -rs $seed
-=#
-
+"""
 function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
     control = true
     if paired_end == mate_pair
@@ -57,7 +57,53 @@ function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
     return control
 end
 
+function call_ART(command::String, path_fasta::String ,path_fileout::String)
+    com = split(command)
+    ind_ss = findall(x -> x == "-ss", com)
+    next = 0
+    if typeof(ind_ss) != Int
+        ind_ss = 0
+    end
+    current_dir = pwd()
+    if Sys.islinux()
+        for file in readdir(path_fasta)
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta"
+                path_ref = path_fasta*file
+                i = ["-i", path_ref]
+                new_com = com[1:ind_ss+1]
+                append!(new_com, i)
+                append!(new_com, com[ind_ss+2:end])
+                cd(path_fileout)
+                com_run = `$new_com`
+                println("command: ", com_run)
+                run(com_run)
+                cd(current_dir)
+            end
+        end
+    else
+        for file in readdir(path_fasta)
+            f = hcat(split.(file, ".")...)[1, :]
+            if length(f) > 1 && f[2] == "fasta"
+                path_ref = path_fasta*file
+                i = ["-i", path_ref]
+                new_com = com[1:ind_ss+1]
+                append!(new_com, i)
+                append!(new_com, com[ind_ss+2:end])
+                cd(path_fileout)
+                com_run = `$new_com`
+                println("command: ", com_run)
+                run(com_run)
+                cd(current_dir)
+            end
+        end
+    end
+end
+### end of file -- CallART.jl
+
+
 function call_ART(profile::String,
+                  path_fasta::String,
                   path_fileout::String,
                   len_read::Int,
                   tot_num_reads::Int,
@@ -88,7 +134,6 @@ function call_ART(profile::String,
     ss = ["-ss", profile]
     l = ["-l", len_read]
     c = ["-c", tot_num_reads]
-    #o = ["-o", outfile_prefix]
     ef_c = sam_c = p = mp = na = m_s = []
 
     if ef
@@ -114,94 +159,36 @@ function call_ART(profile::String,
     if mean_std
         m_s = ["-m", mean_fragsize, "-s", std_fragsize]
     end
-
+    current_dir = pwd()
     if Sys.iswindows()
-        cd(path_fileout)        # Cambio directory.
-        println("sono qui dentro: ",path_fileout)
-        for file in readdir()       # Scorro tutti i file
+        for file in readdir(path_fasta)       # Scorro tutti i file
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
-                mkpath(f[1])
-                cd(f[1])
-                path_fasta = "..\\"*file
-                i = ["-i", path_fasta]
+                path_ref = path_fasta*file
+                i = ["-i", path_ref]
                 outfile_prefix = f[1]*"_"
                 o = ["-o", outfile_prefix]
+                cd(path_fileout)
                 command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
                 println("command: ", command)
                 run(command)
-                cd("..\\")
+                cd(current_dir)
             end
         end
-        cd("..\\..\\")
-
-    elseif Sys.islinux()
-        cd(path_fileout)
-        for file in readdir()
-            f = hcat(split.(file, ".")...)[1, :]
-            if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
-                mkpath(f[1])
-                cd(f[1])
-                path_fasta = "../"*file
-                i = ["-i", path_fasta]
-                outfile_prefix = f[1]*"_"
-                o = ["-o", outfile_prefix]
-                command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
-                println("command: ", command)
-                run(command)
-                cd("../")
-            end
-        end
-        cd("../../")
-    end
-end
-
-function call_ART(command::String, path_fileout::String)
-    com = split(command)
-    ind_ss = findall(x -> x == "-ss", com)
-    next = 0
-    if typeof(ind_ss) != Int
-        ind_ss = 0
-    end
-
-    if Sys.islinux()
-        cd(path_fileout)
-        for file in readdir()
-            f = hcat(split.(file, ".")...)[1, :]
-            if length(f) > 1 && f[2] == "fasta"
-                mkpath(f[1])
-                cd(f[1])
-                path_fasta = "../"*file
-                i = ["-i", path_fasta]
-                new_com = com[1:ind_ss+1]
-                append!(new_com, path_fasta)
-                append!(new_com, com[ind_ss+2:end])
-                com_run = `$new_com`
-                println("command: ", com_run)
-                run(com_run)
-                cd("../")
-            end
-        end
-        cd("../../")
     else
-        cd(path_fileout)
-        for file in readdir()
+        for file in readdir(path_fasta)
             f = hcat(split.(file, ".")...)[1, :]
-            if length(f) > 1 && f[2] == "fasta"
-                mkpath(f[1])
-                cd(f[1])
-                path_fasta = "..\\"*file
-                i = ["-i", path_fasta]
-                new_com = com[1:ind_ss+1]
-                append!(new_com, path_fasta)
-                append!(new_com, com[ind_ss+2:end])
-                com_run = `$new_com`
-                println("command: ", com_run)
-                run(com_run)
-                cd("..\\")
+            if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
+                path_ref = path_fasta*file
+                i = ["-i", path_ref]
+                outfile_prefix = f[1]*"_"
+                o = ["-o", outfile_prefix]
+                cd(path_fileout)
+                command = `art_illumina $ss $ef_c $p $mp $sam_c $na $i $l $c $m_s $o`
+                println("command: ", command)
+                run(command)
+                cd(current_dir)
             end
         end
-        cd("..\\..\\")
     end
 end
-### end of file -- CallART.jl
