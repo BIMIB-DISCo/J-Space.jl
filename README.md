@@ -200,7 +200,8 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `drive_mut_rate`. Real number, probability of generate a new driver (i.e., subclones) after a division event.
 - `average_driver_mut_rate`. Real number,  average birth rate advantage a driver mutation 
 - `std_driver_mut_rate`. Real number, standard deviation of the birth rate advantage of a driver mutation 
-
+- `t_bottleneck`. An array of real number, it contains the list of times of several bottleneck.
+- `ratio_bottleneck`. An array if real number, it contains the ratio of total alive cells that will die at times into `t_bottleneck`
 ### Parameters of the sampling
 - `Random_sampling`. Integer, if 1  Random sampling, if 0 circular/spherical sampling 
 - `num_cell`. Integer, number of sampled cells
