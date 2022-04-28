@@ -1,5 +1,4 @@
 using J_Space, Random, CSV, PhyloNetworks, Graphs, MetaGraphs, Tables, DataFrames
-using Distributed
 println("loading libraries")
 
 seed = MersenneTwister(1234)

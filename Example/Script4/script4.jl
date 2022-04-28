@@ -1,6 +1,6 @@
 using J_Space, Random, CSV, PhyloNetworks, Graphs, MetaGraphs, Tables, DataFrames
 using FASTX
-println("load library")
+println("loading libraries")
 
 seed = MersenneTwister(1234)
 
@@ -142,7 +142,7 @@ for coverage in values_of_covarage
         path_for_output = "./Example/script4/Fasta/coverage_$coverage/"
     end
 
-    call_ART2("HS25",
+    call_ART("HS25",
             path_for_fasta,
             path_for_output,
             150,

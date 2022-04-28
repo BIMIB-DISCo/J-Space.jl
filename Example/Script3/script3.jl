@@ -1,6 +1,6 @@
 using J_Space, Random, CSV, PhyloNetworks, Graphs, MetaGraphs, Tables, DataFrames
 using FASTX
-println("load library")
+println("loading libraries")
 
 seed = MersenneTwister(1234)
 
