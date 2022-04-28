@@ -645,7 +645,9 @@ function simulate_evolution(G::AbstractGraph,
                             driv_std_advantage::AbstractFloat,
                             model::String,
                             seed::MersenneTwister;
-                            Time_of_sampling = [])
+                            Time_of_sampling = [],
+                            t_bottleneck = [],
+                            ratio_bottleneck = [])
     ## Prepare values for simulation
     Time_index = 1
     Gs_plot = []                           #Graphs to plot
@@ -662,6 +664,12 @@ function simulate_evolution(G::AbstractGraph,
     α = [rate_birth]
     num_pop = length(set_mut_pop)          # Num mutation tot
 
+    # initialize bottleneck
+    if t_bottleneck != []
+        id_bottleneck = 1
+    else
+        id_bottleneck = 0
+    end
 
     #initialize metadata
     for alive in cs_alive
@@ -689,6 +697,7 @@ function simulate_evolution(G::AbstractGraph,
         M = rate_migration * n_cs_alive # Tot prob migration
         λ = birth + death + M
         t_event = rand(seed, Exponential(1 / λ), 1)[1]
+        t_old = copy(t_curr)
         t_curr += t_event
 
         Aₙ = α_subpop ./ λ
@@ -799,13 +808,42 @@ function simulate_evolution(G::AbstractGraph,
                 push!(CA_Alive_TOT, length.(ca_subpop))
             end
         end
+
+        #bottleneck
+        if id_bottleneck != 0
+            if t_bottleneck[id_bottleneck] > t_old &&
+               t_bottleneck[id_bottleneck] <= t_curr
+
+               ratio = ratio_bottleneck[id_bottleneck]
+               #compute the number of cells to be take
+               n_cells_taked = n_cs_alive * ratio
+               cells_taked = sample(seed,
+                                    cs_alive,
+                                    convert(Int, n_cells_taked),
+                                    replace = false)
+                for ct in cells_taked
+                    #foreach cell execute death event
+                    mut = get_prop(G, ct, :mutation)
+                    idx = findall(x -> x == mut, set_mut_pop)[1]
+                    cell_death(G, ct, df, t_bottleneck[id_bottleneck])
+                    #Update list
+                    filter!(e -> e != ct, cs_alive)
+                    filter!(e -> e != ct, ca_subpop[idx])
+                    n_cs_alive -= 1
+                end
+                #aggiorno tutti i parametri della morte
+                push!(list_len_node_occ, n_cs_alive)
+                push!(CA_Alive_TOT, length.(ca_subpop))
+           end
+       end
+
     end
     return df, G, list_len_node_occ, set_mut_pop, Gs_plot, CA_Alive_TOT, α
 end
 
 
 """
-Evolution simulation with tree driver #2
+Evolution simulation #2 given mutation driver tree
 """
 function simulate_evolution(G::AbstractGraph,
                             Tf::AbstractFloat,
@@ -816,7 +854,9 @@ function simulate_evolution(G::AbstractGraph,
                             edge_list_path::String,
                             driv_adv_path::String,
                             seed::MersenneTwister;
-                            Time_of_sampling = [])
+                            Time_of_sampling = [],
+                            t_bottleneck = [],
+                            ratio_bottleneck = [])
 
     ## Prepare values for simulation
     Time_index = 1
@@ -841,6 +881,12 @@ function simulate_evolution(G::AbstractGraph,
     α = [parse(Float64, driv_adv[1,2])]    # create array alpha
     num_pop = length(set_mut_pop)          # Num mutation tot
 
+    # initialize bottleneck
+    if t_bottleneck != []
+        id_bottleneck = 1
+    else
+        id_bottleneck = 0
+    end
 
     #initialize metadata
     for alive in cs_alive
@@ -868,6 +914,7 @@ function simulate_evolution(G::AbstractGraph,
         M = rate_migration * n_cs_alive # Tot prob migration
         λ = birth + death + M
         t_event = rand(seed, Exponential(1 / λ), 1)[1]
+        t_old = copy(t_curr)
         t_curr += t_event
 
         Aₙ = α_subpop ./ λ
@@ -978,6 +1025,37 @@ function simulate_evolution(G::AbstractGraph,
                 push!(CA_Alive_TOT, length.(ca_subpop))
             end
         end
+        #bottleneck
+        if id_bottleneck != 0
+            if t_bottleneck[id_bottleneck] > t_old &&
+               t_bottleneck[id_bottleneck] <= t_curr
+
+               ratio = ratio_bottleneck[id_bottleneck]
+               #compute the number of cells to be take
+               n_cells_taked = n_cs_alive * ratio
+               cells_taked = sample(seed,
+                                    cs_alive,
+                                    convert(Int, n_cells_taked),
+                                    replace = false)
+                #foreach cell execute death event
+                for ct in cells_taked
+                    mut = get_prop(G, ct, :mutation)
+                    idx = findall(x -> x == mut, set_mut_pop)[1]
+                    cell_death(G, ct, df, t_bottleneck[id_bottleneck])
+                    #Update list
+                    filter!(e -> e != ct, cs_alive)
+                    filter!(e -> e != ct, ca_subpop[idx])
+                    n_cs_alive -= 1
+                end
+                #update parameters
+                push!(list_len_node_occ, n_cs_alive)
+                push!(CA_Alive_TOT, length.(ca_subpop))
+
+           end
+           if id_bottleneck < length(t_bottleneck)
+               id_bottleneck += 1
+           end
+       end #end bottleneck
     end
     if length(set_mut_pop) != length(driv_adv[:,1])
         println("WARNING: This simulation did not generate every subpopulation

@@ -61,6 +61,8 @@ function Start(paramaters::String, config::String)
       rate_death = Dynamic_dict["rate_death"]
       rate_migration = Dynamic_dict["rate_migration"]
       driv_mut_rate = Dynamic_dict["drive_mut_rate"]
+      t_bottleneck = Dynamic_dict["t_bottleneck"]
+      ratio_bottleneck = Dynamic_dict["ratio_bottleneck"]
       #run simulation
       if Conf_dict["Config"][1]["Tree_Driver_Configure"] != 1
             rate_birth = Dynamic_dict["rate_birth"]
@@ -77,7 +79,9 @@ function Start(paramaters::String, config::String)
                                             std_driv_mut_rate,
                                             Model,
                                             seed,
-                                            Time_of_sampling = Time_of_sampling)
+                                            Time_of_sampling = Time_of_sampling,
+                                            t_bottleneck = t_bottleneck,
+                                            ratio_bottleneck =ratio_bottleneck)
       else
             edge_list_path = Conf_dict["Config"][1]["edgelist_treedriver"]
             driv_adv_path = Conf_dict["Config"][1]["driver_birth_rates"]
@@ -91,7 +95,9 @@ function Start(paramaters::String, config::String)
                                             edge_list_path,
                                             driv_adv_path,
                                             seed,
-                                            Time_of_sampling = Time_of_sampling)
+                                            Time_of_sampling = Time_of_sampling,
+                                            t_bottleneck = t_bottleneck,
+                                            ratio_bottleneck =ratio_bottleneck)
       end
       CSV.write(path_save_file * "Dinamica.csv",
                 df,

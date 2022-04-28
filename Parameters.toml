@@ -19,7 +19,8 @@ rate_migration = 0.01
 drive_mut_rate = 0.01
 average_driver_mut_rate = 0.4
 std_driver_mut_rate = 0.1
-
+t_bottleneck = [50.0, 150.0]
+ratio_bottleneck = [0.8, 0.8]
 [[Sampling]]
 Random_sampling = 1
 num_cell = 10
