@@ -1,6 +1,14 @@
 using J_Space, Random, CSV, PhyloNetworks, Graphs, MetaGraphs, Tables, DataFrames
 println("loading libraries")
 
+if Sys.iswindows()
+    mkpath(".\\Example\\script2\\Fileoutput\\") # Create folder
+    mkpath(".\\Example\\script2\\Plot\\") # Create folder
+else
+    mkpath("./Example/script2/Fileoutput/") # Create folder
+    mkpath("./Example/script2/Plot/") # Create folder
+end
+
 seed = MersenneTwister(1234)
 
 birth_rate_min = 0.1
