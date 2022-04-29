@@ -122,12 +122,22 @@ function transform_genome(genome::LongDNASeq,
         genome[p] = DNA(new_nucleotide)
         sub = string(p)*"_"*string(nucleotide)*">"*string(new_nucleotide)
         if funct == 1
-            push!(mutations_tot, [p, string(nucleotide), string(new_nucleotide), sub, muts_driver[index], sample])
+            push!(mutations_tot, [p,
+                                  string(nucleotide),
+                                  string(new_nucleotide),
+                                  sub,
+                                  muts_driver[index],
+                                  sample])
             push!(substitution, sub)
             push!(position_used, p)
             index += 1
         else
-            push!(mutations_tot, [p, string(nucleotide), string(new_nucleotide), sub, false, sample])
+            push!(mutations_tot, [p,
+                                  string(nucleotide),
+                                  string(new_nucleotide),
+                                  sub,
+                                  false,
+                                  sample])
         end
     end
 
@@ -184,7 +194,11 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
     ## Compute mutations ∀ node
     for i in [1,2,3]
         check = false
-        n_mutations = evolution_seq(Tree, neural_mut_rate, len_ROI, max_time, seed)
+        n_mutations = evolution_seq(Tree,
+                                    neural_mut_rate,
+                                    len_ROI,
+                                    max_time,
+                                    seed)
         check = check_num_path_mutation(Tree, len_ROI)
 
         if check == true && i >= 3
@@ -225,7 +239,11 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
             mut_f = set_mut[subpop_father]
             mut_child = set_mut[subpop_child]
 
-            g_seq_e, mutations_tot = transform_genome(g_seq_e, pos_edge, seed, mutations_tot, dst(e))
+            g_seq_e, mutations_tot = transform_genome(g_seq_e,
+                                                      pos_edge,
+                                                      seed,
+                                                      mutations_tot,
+                                                      dst(e))
 
             if length(mut_f) != length(mut_child)
                 if typeof(mut_f) == String
@@ -494,10 +512,20 @@ function genomic_evolution(Seq_f::LongDNASeq,
                  len_father = len_father + length_ins
                  fine = init_pos_ins + length_ins
                  if num_mut_driver >= 0
-                     push!(mutations_tot, [[init_pos_ins, fine],"-",string(insertion_sequence),"insertion", mut_sub, sample])
+                     push!(mutations_tot, [[init_pos_ins, fine],
+                                           "-",
+                                           string(insertion_sequence),
+                                           "insertion",
+                                           mut_sub,
+                                           sample])
                      [push!(position_used, p) for p in init_pos:fine]
                  else
-                     push!(mutations_tot, [[init_pos_ins, fine],"-",string(insertion_sequence),"insertion", false, sample])
+                     push!(mutations_tot, [[init_pos_ins, fine],
+                                           "-",
+                                           string(insertion_sequence),
+                                           "insertion",
+                                           false,
+                                           sample])
                  end
 
 
@@ -515,7 +543,8 @@ function genomic_evolution(Seq_f::LongDNASeq,
                      k = rand(seed)
                      id_size_indel = collect(k .<= prob_cum_size)
                      length_del = findfirst(id_size_indel)
-                     check = not_pos_driver(position_used,  [init_pos, length_del])
+                     check = not_pos_driver(position_used,
+                                            [init_pos, length_del])
                      trials += 1
                  end
 
@@ -532,9 +561,19 @@ function genomic_evolution(Seq_f::LongDNASeq,
                  len_father = len_father - length_del
                  if num_mut_driver >= 0
                      fine = init_pos_ins + length_ins
-                     push!(mutations_tot, [[init_pos_del, end_pos_del],string(deletion_sequence),"-","deletion", mut_sub, sample])
+                     push!(mutations_tot, [[init_pos_del, end_pos_del],
+                                           string(deletion_sequence),
+                                           "-",
+                                           "deletion",
+                                           mut_sub,
+                                           sample])
                  else
-                     push!(mutations_tot, [[init_pos_del, end_pos_del],string(deletion_sequence),"-","deletion", false, sample])
+                     push!(mutations_tot, [[init_pos_del, end_pos_del],
+                                           string(deletion_sequence),
+                                           "-",
+                                           "deletion",
+                                           false,
+                                           sample])
                  end
             end
 
@@ -561,10 +600,20 @@ function genomic_evolution(Seq_f::LongDNASeq,
 
             mut_id = string(pos_mutation)*"_T>"*string(new_nucleotide)
             if num_mut_driver >= 0
-                push!(mutations_tot, [pos_mutation,"T",string(new_nucleotide),mut_id, mut_sub, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "T",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      mut_sub,
+                                      sample])
                 push!(position_used, pos_mutation)
             else
-                push!(mutations_tot, [pos_mutation,"T",string(new_nucleotide),mut_id, false, sample])
+                push!(mutations_tot, [pos_mutation,
+                                     "T",
+                                     string(new_nucleotide),
+                                     mut_id,
+                                     false,
+                                     sample])
             end
 
 
@@ -589,10 +638,20 @@ function genomic_evolution(Seq_f::LongDNASeq,
 
             mut_id = string(pos_mutation)*"_G>"*string(new_nucleotide)
             if num_mut_driver >= 0
-                push!(mutations_tot, [pos_mutation,"G",string(new_nucleotide),mut_id, mut_sub, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "G",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      mut_sub,
+                                      sample])
                 push!(position_used, pos_mutation)
             else
-                push!(mutations_tot, [pos_mutation,"G",string(new_nucleotide),mut_id, false, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "G",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      false,
+                                      sample])
             end
 
         elseif min_mutation == 2 #C
@@ -616,10 +675,20 @@ function genomic_evolution(Seq_f::LongDNASeq,
 
             mut_id = string(pos_mutation)*"_C>"*string(new_nucleotide)
             if num_mut_driver >= 0
-                push!(mutations_tot, [pos_mutation,"C",string(new_nucleotide),mut_id, mut_sub, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "C",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      mut_sub,
+                                      sample])
                 push!(position_used, pos_mutation)
             else
-                push!(mutations_tot, [pos_mutation,"C",string(new_nucleotide),mut_id, false, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "C",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      false,
+                                      sample])
             end
 
 
@@ -643,10 +712,20 @@ function genomic_evolution(Seq_f::LongDNASeq,
             sequence_father[pos_mutation] = DNA(new_nucleotide)
             mut_id = string(pos_mutation)*"_A>"*string(new_nucleotide)
             if num_mut_driver >= 0
-                push!(mutations_tot, [pos_mutation,"A",string(new_nucleotide),mut_id, mut_sub, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "A",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      mut_sub,
+                                      sample])
                 push!(position_used, pos_mutation)
             else
-                push!(mutations_tot, [pos_mutation,"A",string(new_nucleotide),mut_id, false, sample])
+                push!(mutations_tot, [pos_mutation,
+                                      "A",
+                                      string(new_nucleotide),
+                                      mut_id,
+                                      false,
+                                      sample])
             end
         end
 
@@ -979,17 +1058,17 @@ function experiment_noISA(Tree::AbstractMetaGraph,
         Len = length(Ref)
 
         Ref, fasta_samples, position_used, mutations_tot =
-                                        Molecular_evolution_NoISA(Tree,
-                                                                  Ref,
-                                                                  Len,
-                                                                  Selector,
-                                                                  params,
-                                                                  rate_Indel,
-                                                                  size_indel,
-                                                                  seed,
-                                                                  set_mut,
-                                                                  lavalette_par,
-                                                                  approx_snv_indel)
+                                    Molecular_evolution_NoISA(Tree,
+                                                              Ref,
+                                                              Len,
+                                                              Selector,
+                                                              params,
+                                                              rate_Indel,
+                                                              size_indel,
+                                                              seed,
+                                                              set_mut,
+                                                              lavalette_par,
+                                                              approx_snv_indel)
 
         mutations_tot_2 = copy(mutations_tot)
         leafs = get_leafs(Tree)
@@ -1014,19 +1093,18 @@ end
 """
     Compute probability for signature
 """
-function linear_com_matrix(vector_change_points::Vector{Float64}, #num di tempi degli α
-                           vector_activities::Matrix{Float64}, #valore degli α
+function linear_com_matrix(vector_change_points::Vector{Float64},
+                           vector_activities::Matrix{Float64},
                            Matrix_sign::Matrix{String},
                            t_curr::Float64,
                            ratio_background_signature::Float64,
                            background_matrix::Vector{Float64})
 
 
-        #cambio il valore in float, dato che ho letto tutto in string
+        #change values in float
         Sign_matr = map((x) -> parse(Float64, x), Matrix_sign[:,2:end])
 
-        #time_possible = collect(t_curr .<= vector_change_points)
-        #matrix 96x1, moltiplico gli αᵢ per le signature associate e
+        #matrix 96x1, dot αᵢ for signature associated e
         sub_prob_matrix = []
         for time in 1:length(vector_change_points)
             sub_prob = Sign_matr * vector_activities[time, :]
@@ -1040,7 +1118,6 @@ function linear_com_matrix(vector_change_points::Vector{Float64}, #num di tempi 
          labels = Array{String,2}(undef, 96, 6)
          i = 1
 
-         #creo una matrice per tenere conto delle variazioni
          for s in variation
              v = []
              s_1 = split(s, ['['])
@@ -1078,14 +1155,14 @@ function collapsed_matrix(sub_prob_matrix::Vector{Any})
 
         coll_sub_prob = Array{Any,2}(undef,0,2)
         for first in ["A","C","G","T"], second in ["A","C","G","T"]
-            #prendo tutti gli elementi first[sub]second
+            #take all element first[sub]second
             check1 = findall(x-> x == first, labels[:, 2])
             check1 = labels[check1, :]
             check2 = findall(x-> x == second, check1[:, 4])
 
-            #aggiungo i valori uguali
-            labels[check2, :] #questi sono i valori
-            #scorro tutto e sommo
+            #add same values
+            labels[check2, :]
+            #slide and sum
             sum1 = []
             sum2 = []
             for i in 1:size(labels[check2, :])[1]
@@ -1135,7 +1212,7 @@ Call function noISA for signature
 function experiment_noISA_sign(Tree::AbstractMetaGraph,
                                Len::Int, #length genome
                                Selector::String,#96-SBS
-                               mut_rate_average::AbstractFloat,#da aggiungere al file toml
+                               mut_rate_average::AbstractFloat,
                                rate_Indel::AbstractFloat,
                                size_indel::Int,
                                seed::MersenneTwister,
@@ -1157,20 +1234,20 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
         close(w)
 
         g_seq, fasta_samples, position_used, mutations_tot =
-                                     Molecular_evolution_NoISA_sign(Tree,
-                                                                    Ref,
-                                                                    Len, #length genome,
-                                                                    Selector,#96-SBS
-                                                                    mut_rate_average,#da aggiungere al file toml
-                                                                    rate_Indel,
-                                                                    size_indel,
-                                                                    seed,
-                                                                    set_mut,
-                                                                    lavalette_par,
-                                                                    used_sign,
-                                                                    vector_change_points,
-                                                                    vector_activities,
-                                                                    ratio_background_signature)
+                    Molecular_evolution_NoISA_sign(Tree,
+                                                   Ref,
+                                                   Len, #length genome,
+                                                   Selector,#96-SBS-37 or -38
+                                                   mut_rate_average,
+                                                   rate_Indel,
+                                                   size_indel,
+                                                   seed,
+                                                   set_mut,
+                                                   lavalette_par,
+                                                   used_sign,
+                                                   vector_change_points,
+                                                   vector_activities,
+                                                   ratio_background_signature)
         mutations_tot_2 = copy(mutations_tot)
         leafs = get_leafs(Tree)
         paths_tot = []
@@ -1193,8 +1270,8 @@ end
 
 function experiment_noISA_sign(Tree::AbstractMetaGraph,
                                path::String, #length genome
-                               Selector::String,#96-SBS
-                               mut_rate_average::AbstractFloat,#da aggiungere al file toml
+                               Selector::String,#96-SBS-37 or -38
+                               mut_rate_average::AbstractFloat,
                                rate_Indel::AbstractFloat,
                                size_indel::Int,
                                seed::MersenneTwister,
@@ -1221,8 +1298,8 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
                     Molecular_evolution_NoISA_sign(Tree,
                                                    Ref,
                                                    Len, #length genome,
-                                                   Selector,#96-SBS
-                                                   mut_rate_average,#da aggiungere al file toml
+                                                   Selector,#96-SBS-37 or -38
+                                                   mut_rate_average,
                                                    rate_Indel,
                                                    size_indel,
                                                    seed,
@@ -1260,8 +1337,8 @@ end
 function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
                                         Ref::LongDNASeq,
                                         Len::Int, #length genome
-                                        Selector::String,#96-SBS
-                                        mut_rate_average::AbstractFloat,#da aggiungere al file toml
+                                        Selector::String,#96-SBS-37 or -38
+                                        mut_rate_average::AbstractFloat,
                                         rate_Indel::AbstractFloat,
                                         size_indel::Int,
                                         seed::MersenneTwister,
@@ -1290,9 +1367,17 @@ function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
     end
     #SIGNATURE
     if Sys.iswindows()
-        SBS = readdlm(".\\utility\\SBS_GRCh37.txt", String)
+        if Selector == "SBS-37"
+            SBS = readdlm(".\\utility\\SBS_GRCh37.txt", String)
+        else
+            SBS = readdlm(".\\utility\\SBS_GRCh38.txt", String)
+        end
     else
-        SBS = readdlm("./utility/SBS_GRCh37.txt", String)
+        if Selector == "SBS-37"
+            SBS = readdlm("./utility/SBS_GRCh37.txt", String)
+        else
+            SBS = readdlm("./utility/SBS_GRCh38.txt", String)
+        end
     end
     #labels
     names_sing = SBS[1, 2:end]
@@ -1348,7 +1433,8 @@ function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
         mut_f = set_mut[subpop_father]
         mut_child = set_mut[subpop_child]
         if length(mut_f) == length(mut_child)
-                sequence, mutations_tot, id_time = genomic_evolution_sign(g_seq_e,
+                sequence, mutations_tot, id_time =
+                            genomic_evolution_sign(g_seq_e,
                                                    branch_length,
                                                    coll_sub_prob,
                                                    seed,
@@ -1436,7 +1522,7 @@ function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
                                   num_mut_driver,
                                   replace = false)
                 new_muts = new_muts[end-num_mut_driver+1:end]
-                sequence, substitution, position_used, mutations_tot =#da cambiare
+                sequence, substitution, position_used, mutations_tot =
                                transform_genome(sequence,
                                                 pos_rand,
                                                 seed,
@@ -1660,7 +1746,11 @@ function genomic_evolution_sign(Seq_f::LongDNASeq,
          end
       end
       if len_num_mut_driver != -1
-          return sequence_father, mutations_tot, id_time, num_mut_driver, position_used
+          return sequence_father,
+                 mutations_tot,
+                 id_time,
+                 num_mut_driver,
+                 position_used
       else
           return sequence_father, mutations_tot, id_time
       end

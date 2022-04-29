@@ -237,7 +237,7 @@ function Start(paramaters::String, config::String)
             lavalette = MolEvo_dict["lavalette_par"]
             indel_rate = MolEvo_dict["indel_rate"]
             submodel = MolEvo_dict["sub_model"]
-            if submodel in ["96-SBS"]
+            if submodel in ["SBS-37","SBS-38"]
                   mut_rate_avg = MolEvo_dict["mut_rate_avg"]
                   used_sign = MolEvo_dict["used_sign"]
                   vector_change_points = MolEvo_dict["vector_change_points"]
