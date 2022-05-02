@@ -1,4 +1,4 @@
-In this example we show how it is possible to use single function of J-SPACE to performa a parameter-scan of a dynamical parameter (e.g., birth rate, death rate, etc.).
+In this example we show how it is possible to use  functions of J-SPACE to performa a parameter-scan of a dynamical parameter (e.g., birth rate, death rate, etc.).
 
 
 In this example we use in particular 2 functions:
