@@ -1,4 +1,4 @@
-In this example we show how it is possible to use single function of J-SPACE to performa perform different samplings of the same tumor and generate the sequence of the cells of the sampling using a substitution model based on the signatures. This kind of analysis is useful to study the effect of sampling on the data.
+In this example we show how it is possible to use functions of J-SPACE to perform a different samplings of the same tumor and generate the sequence of the cells of the sampling using a substitution model based on the signatures. This kind of analysis is useful to study the effect of sampling on the data.
 
 In this example we use in particular 4 functions:
 
