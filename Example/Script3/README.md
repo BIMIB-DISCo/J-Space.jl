@@ -92,6 +92,6 @@ In particular, for this example, we load :
 - Create a range of values with function range by specifying the chosen values(i.e. values_of_mut_rate_avg)
 - With a for loop we excute a simulation per point of the range *n_rep* (pay attention to indentation)  
 - Inside the loop, for each iteration we performs:  
-  1) a molecular evolution using singature with 'experiment_noISA_sign(tree_red, 10000, "SBS-37", 0.001, 0.0, 100, seed, set_mut, 0.5, ["SBS6","SBS22"], [0.0], [0.5 0.5], 0.8)'  
+  1) a molecular evolution using singature with 'g_seq, fasta_samples, Tree, mutations_tot = experiment_noISA_sign(tree_red, 10000, "SBS-37", 0.001, 0.0, 100, seed, set_mut, 0.5, ["SBS6","SBS22"], [0.0], [0.5 0.5], 0.8)'  
   2) saving the Fasta file into variable *fasta_sample*
 - Finally, we save all outputfiles that we have obtained from called function. 
