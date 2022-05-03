@@ -234,7 +234,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
  if `sub_models = "TrN" `-> `params = [{"alpha" = 0.5, "alpha2"=0.1,"beta" = 0.3}]`.     
  if `sub_models = "K81" ` -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.    
  if `sub_models = "K81uf"`  -> `params = [{"alpha" = 0.5, "beta"=0.1,"beta2" = 0.3}]`.     
-#### if sub_model = "96SBS" J-Space uses a mutational signature based substitution model
+#### if sub_model = "SBS-37" or "SBS-38" J-Space uses a mutational signature based substitution model
 
 - `mut_rate_avg`. A real number, the average mutational rate per trinucleotide and unit of time. 
 - `used_sign`. An array of strings. The list of the labels of the used signatures (e.g., `used_sign = ["SBS1","SBS4","SBS16"]
