@@ -69,5 +69,8 @@ In particular, for this example, we load :
 - We initialize all variables that we want to save (e.g., newick files, Newick_finals = [])
 - We create the regular graph with  'g_meta = spatial_graph(200, 200, seed, dim = 3, n_cell=1)'  
 - With a for loop we excute a simulation per point of the range (pay attention to indentation)
-- Inside the loop, for each iteration we performs the dynamics, an sampling and generate a Newick.   
+- Inside the loop, for each iteration we performs:
+  1) the dynamics with 'df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop = simulate_evolution(g_meta,200.0,0.3,0.01,0.01,0.00001,0.2,0.1,"contact",seed)'
+  2) an sampling with 'matrix_R, tree_mut = sampling_phylogentic_relation(G,"Random",df,100,set_mut,seed,1)'
+  3) a generation of a Newick file with 'tree_red, net = create_tree(matrix_R, true, 200.0)'   
 - Finally, we save all outputfiles that we have obtained from called function.
