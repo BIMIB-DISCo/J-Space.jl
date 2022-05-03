@@ -91,6 +91,6 @@ In particular, for this example, we load :
 - Inside the loop, for each iteration we performs:  
   1) an sampling with 'matrix_R, tree_mut = sampling_phylogentic_relation(G,"Random",df,100,set_mut,seed,1)'
   2) a generation of a Newick file with 'tree_red, net = create_tree(matrix_R, true, 200.0)'
-  3) a molecular evolution using singature with 'experiment_noISA_sign(tree_red, 10000, "SBS-37", 0.001, 0.0, 100, seed, set_mut, 0.5, ["SBS6","SBS22"], [0.0], [0.5 0.5], 0.8)'  
+  3) a molecular evolution using singature with 'g_seq, fasta_samples, Tree, mutations_tot = experiment_noISA_sign(tree_red, 10000, "SBS-37", 0.001, 0.0, 100, seed, set_mut, 0.5, ["SBS6","SBS22"], [0.0], [0.5 0.5], 0.8)'  
   4) saving the Fasta file into variable *fasta_sample*
 - Finally, we save all outputfiles that we have obtained from called function.
