@@ -105,7 +105,7 @@ for mut_rate_avg in values_of_mut_rate_avg
     g_seq, fasta_samples, position_used, mutations_tot = experiment_noISA_sign(
                                   g_sign,
                                   10000, #len genome
-                                  "96-SBS", #model
+                                  "SBS-37", #model
                                   mut_rate_avg, #mut_rate_avg
                                   0.0, #rate indel
                                   100, #size_indel

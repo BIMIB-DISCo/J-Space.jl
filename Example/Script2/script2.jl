@@ -95,7 +95,7 @@ for i in 1:n_rep
     g_seq, fasta_samples, position_used, mutations_tot = experiment_noISA_sign(
                                   g_sign,
                                   10000, #len genome
-                                  "96-SBS", #model
+                                  "SBS-37", #model
                                   0.001, #mut_rate_avg
                                   0.0, #rate indel
                                   100, #size_indel

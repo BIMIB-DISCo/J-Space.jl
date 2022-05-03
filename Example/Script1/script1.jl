@@ -27,16 +27,16 @@ Tree_mut_final = []
 Tree_fil_final =[]
 Newick_final = []
 
+println("generate graph...")
+g_meta = spatial_graph(200, 200, seed, dim = 3, n_cell=1)
 
 #@distributed for birth_rate in values_of_birth_rate
 for birth_rate in values_of_birth_rate
     println("runned configuration with birth_rate -> ", birth_rate ,
                                                        " in 3D mode -> contact")
-    println("generate graph...")
-    g_meta = spatial_graph(200, 200, seed, dim = 3, n_cell=1)
     println("simulation...")
     df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
-                                        simulate_evolution(g_meta,
+                                        simulate_evolution(copy(g_meta),
                                                                    200.0,
                                                                    birth_rate,
                                                                    0.01,

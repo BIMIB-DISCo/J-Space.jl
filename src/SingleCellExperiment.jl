@@ -1233,7 +1233,7 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
         write(w, rec)
         close(w)
 
-        g_seq, fasta_samples, position_used, mutations_tot =
+        g_seq, fasta_samples, Tree, mutations_tot =
                     Molecular_evolution_NoISA_sign(Tree,
                                                    Ref,
                                                    Len, #length genome,
@@ -1265,7 +1265,7 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
                 mutations_tot_2.Sample[i] = ls
             end
         end
-        return g_seq, fasta_samples, position_used, mutations_tot_2
+        return g_seq, fasta_samples, Tree, mutations_tot_2
 end
 
 function experiment_noISA_sign(Tree::AbstractMetaGraph,
@@ -1294,7 +1294,7 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
 
         Len = length(Ref)
 
-        Ref, fasta_samples, position_used, mutations_tot =
+        Ref, fasta_samples, Tree, mutations_tot =
                     Molecular_evolution_NoISA_sign(Tree,
                                                    Ref,
                                                    Len, #length genome,
@@ -1327,12 +1327,12 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
                 mutations_tot_2.Sample[i] = ls
             end
         end
-        return Ref, fasta_samples, position_used, mutations_tot_2
+        return Ref, fasta_samples, Tree, mutations_tot_2
 end
 
 
 """
-    TO DO 96-SBS
+    TO DO ["SBS-37","SBS-38"]
 """
 function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
                                         Ref::LongDNASeq,
