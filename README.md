@@ -256,7 +256,7 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 - `len_read`. Integer, the length of reads to be simulated.
 - `tot_num_reads`. Integer, number of reads/read pairs to be generated per sequence.
 - `outfile_prefix`. String, the prefix of output filename.
-- `paired_end`. Integer number,  0  indicate a paired-end read simulation, if 1 a paried_end simulation is performed. If `paired_end = 1`, it is necessary to set  `mate_pair = 0`.
+- `paired_end`. Integer number,  0  indicate a single-end read simulation, if 1 a paried_end simulation is performed. If `paired_end = 1`, it is necessary to set  `mate_pair = 0`.
    NOTE: if paired end is equal to 1 you will find 2 FASTQ files for sample.             		    
 - `mate_pair`. Integer, if  1 mate-pair read simulation. If `mate_pair = 1`, it is necessary to set  `paired_end = 0`.
    Art will automatically switch to a mate-pair simulation if the given mean fragment size >= 2000.
