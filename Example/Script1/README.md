@@ -39,7 +39,7 @@ This is the function that performs a sampling and it generates the relationals m
 - `num_cell`. Integer, number of sampled cells.  
 - `set_mut`, previously described. 
 - `seed`, previously described.
-- `Driver_Tree`. Integer, if 1 returns the plot tree of the driver mutations.
+- `Driver_Tree`. Integer, if 1 returns the plot tree of the driver mutations.  
 This function has the following outputs:
   - **matrix_R**, a data frame containing the relationals of the sampled cells "Father-Son", time of birth of the child, subpopolation and type of event.  
   - **tree_mutations**, a directed Int64 metagraph with Float64 weights, object MetaGraph{Int64, Float64}.  
@@ -48,7 +48,7 @@ This function has the following outputs:
 This is the function that generates the phylogenetic tree.  
 - `matrix_R`, previously described.  
 - `Tree_Newick`. Boolean, if true the phylogenentic tree of the cells is saved as newick file.
-- `Max_time`. It is the same in simulate_evolution
+- `Max_time`. It is the same in simulate_evolution.  
 This function has the following outputs:
   - **tree_phyl**, a directed Int64 metagraph with Float64 weights, object MetaGraph{Int64, Float64}. 
   - **newick**, is the format Newick of tree_phyl, object *PhyloNetworks.HybridNetwork, Rooted Network* in package PhyloNetworks.    
