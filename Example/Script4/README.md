@@ -96,8 +96,8 @@ This is the function that execute a experiment NGS to obtain FastQ and alignment
 - `Alignment`. Boolean, if true it returns the GT aligment file in ALN format.  
 This function don't return outputs but generates the following files:
   - **FastQ**, files in format .fq that contain the reads with noise given of the experiment NGS.  
-  - Alignment file in format .aln containing a multiple alignment of generated reads.  
-  - Sam file, a type of text file format that contains the alignment information of various sequences that are mapped against reference sequences. With/without noise.
+  - **Alignment file** in format .aln containing a multiple alignment of generated reads.  
+  - **Sam file**, a type of text file format that contains the alignment information of various sequences that are mapped against reference sequences. With/without noise.
 
 The script  work as follow:
 - Firstly, we use the command 'using' will load the module or package and make its exported names available for direct use.  
