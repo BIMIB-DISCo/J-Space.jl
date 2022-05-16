@@ -1,7 +1,7 @@
 ### -*- Mode: Julia -*-
 
 ### SingleCellExperiment.jl
-import BioSequences
+using BioSequences
 using FASTX
 using LinearAlgebra
 
@@ -215,6 +215,7 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
         # create fasta ∀ nodes
         for e in edges(Tree)
 
+            #g_seq_e = LongDNA{4}()
             g_seq_e = LongDNASeq()
 
             if has_prop(Tree, src(e), :Fasta)
@@ -355,7 +356,8 @@ function experiment_ISA(Tree::AbstractMetaGraph,
                         frequency_dna::Vector{Any} = [])
 
         ## load reference genome
-        g_seq = LongDNASeq()
+        #g_seq = LongDNA{4}()
+        g_seq_e = LongDNASeq()
         open(FASTA.Reader, path) do reader
             for record in reader
                 g_seq = FASTX.sequence(record)
@@ -810,8 +812,8 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     #max_time = max_time_nodes(Tree, get_leafs(Tree))
     for e in edges(Tree_SC)
 
+        #g_seq_e = LongDNA{4}()
         g_seq_e = LongDNASeq()
-
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
@@ -1046,8 +1048,8 @@ function experiment_noISA(Tree::AbstractMetaGraph,
                           frequency_dna::Vector{Any} = [])
 
         ## load reference genome
+        #Ref = LongDNA{4}()
         Ref = LongDNASeq()
-
         ## load reference genome
         open(FASTA.Reader, path) do reader
             for record in reader
@@ -1284,8 +1286,8 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
                                frequency_dna::Vector{Any} = [])
 
         ## load reference genome
+        #Ref = LongDNA{4}()
         Ref = LongDNASeq()
-
         open(FASTA.Reader, path) do reader
             for record in reader
                 Ref = FASTX.sequence(record)
@@ -1410,8 +1412,8 @@ function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
     #max_time = max_time_nodes(Tree, get_leafs(Tree))
     for e in edges(Tree_SC)
 
+        #g_seq_e = LongDNA{4}()
         g_seq_e = LongDNASeq()
-
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else

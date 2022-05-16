@@ -1,7 +1,7 @@
 
 ################### function START
 
-function Start(paramaters::String, config::String)
+function Start_J_Space(paramaters::String, config::String)
       println("START...")
       #read paramaters
       Par_dict = TOML.parsefile(paramaters)
@@ -386,6 +386,7 @@ function Start(paramaters::String, config::String)
                   std_fragsize = ART_dict["std_fragsize"]
                   call_ART(profile,
                            path_fasta,
+                           path_save_file,
                            len_read,
                            tot_num_reads,
                            outfile_prefix,

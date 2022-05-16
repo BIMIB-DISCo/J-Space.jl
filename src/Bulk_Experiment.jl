@@ -3,7 +3,7 @@
 ### Bulk_Experiment.jl
 
 ########################## Experiments
-
+using BioSequences
 
 """
 Function create_bulk_groundtruth

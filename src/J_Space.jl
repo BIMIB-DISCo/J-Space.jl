@@ -17,12 +17,12 @@ using Distributions
 using CSV, Tables
 using TOML
 using DelimitedFiles
-using Distributed
+#using Distributed
 using LinearAlgebra
 ### function to exports
 export
     ## Simulation
-    spatial_graph, simulate_evolution, Start,
+    spatial_graph, simulate_evolution, Start_J_Space,
     ## Sampling
     sampling_phylogentic_relation, create_tree,
     ## Experiment
@@ -819,7 +819,7 @@ function simulate_evolution(G::AbstractGraph,
                n_cells_taked = n_cs_alive * ratio
                cells_taked = sample(seed,
                                     cs_alive,
-                                    convert(Int, n_cells_taked),
+                                    convert(Int, trunc(n_cells_taked)),
                                     replace = false)
                 for ct in cells_taked
                     #foreach cell execute death event
@@ -909,6 +909,7 @@ function simulate_evolution(G::AbstractGraph,
         for i in 1:length(α)
             push!(α_subpop, α[i] * length(ca_subpop[i]))
         end
+
         birth = sum(α_subpop)           # Tot prob birth
         death = rate_death * n_cs_alive # Tot prob death
         M = rate_migration * n_cs_alive # Tot prob migration
@@ -956,6 +957,9 @@ function simulate_evolution(G::AbstractGraph,
                 filter!(e -> e != cell, ca_subpop[idx])
                 push!(list_len_node_occ, n_cs_alive)
                 push!(CA_Alive_TOT, length.(ca_subpop))
+                color[cell] = 0
+                color[pos] = idx
+                push!(colors, copy(color)) # Aggiorno il colore
             end
 
         elseif min == num_pop + 1    # Death Event
@@ -974,6 +978,9 @@ function simulate_evolution(G::AbstractGraph,
             n_cs_alive -= 1
             push!(list_len_node_occ, n_cs_alive)
             push!(CA_Alive_TOT, length.(ca_subpop))
+
+            color[cell] = 0
+            push!(colors, copy(color)) # Aggiorno il colore
 
         else     # Birth event
             x = rand(seed, 1:length(ca_subpop[min]))
@@ -1035,7 +1042,7 @@ function simulate_evolution(G::AbstractGraph,
                n_cells_taked = n_cs_alive * ratio
                cells_taked = sample(seed,
                                     cs_alive,
-                                    convert(Int, n_cells_taked),
+                                    convert(Int, trunc(n_cells_taked)),
                                     replace = false)
                 #foreach cell execute death event
                 for ct in cells_taked
