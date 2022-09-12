@@ -47,7 +47,7 @@ function Start_J_Space(paramaters::String, config::String)
 
       ###DYNAMIC
       println("RUN DYNAMIC....")
-      Dyn_Clon_genotype = Conf_dict["FileOutputPlot"][1]["Dynamic_Clonal_genotype"]
+      #Dyn_Clon_genotype = Conf_dict["FileOutputPlot"][1]["Dynamic_Clonal_genotype"]
       Graph_configuration = Conf_dict["FileOutputPlot"][1]["Graph_configuration"]
       if Graph_configuration == 1
             Time_of_sampling =  Conf_dict["FileOutputPlot"][1]["Time_of_sampling"]
