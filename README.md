@@ -1,4 +1,12 @@
 # J-SPACE 
+
+## POSSIBLE PROBLEMS
+
+Since the library GLMakie uses the GPU, a possible error on virtual machines is the following:
+```
+ LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")]
+```
+
 ## INTRODUCTION 
 J-SPACE is a Julia package to simulate the spatial growth and the genomic evolution  of a cell population and the experiment of sequencing the genome of the sampled cells.
 Firstly, the software simulates the spatial dynamics of the cells as a continuous-time multi-type birth-death stochastic process on a graph employing different rules of interaction and an optimised Gillespie algorithm. 
@@ -267,14 +275,6 @@ In the file "Parameters.toml" the user will find all the paramenters of the dyna
 
 
 For all paramenters of ART  please see: https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm
-
-
-## POSSIBLE PROBLEMS
-
-Since the library GLMakie uses the GPU, a possible error on virtual machines is the following:
-```
- LoadError: InitError: Exception[GLFW.GLFWError(GLFW.PLATFORM_ERROR, "X11: Failed to open display localhost:20.0"), ErrorException("glfwInit failed")]
-```
 
 
 ## LICENSE
