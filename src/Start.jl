@@ -125,13 +125,13 @@ function Start_J_Space(paramaters::String, config::String)
                         save(path_save_plot
                              * "\\Conf_t_"
                              * string(Time_of_sampling[i])
-                             *".pdf",
+                             *".png",
                              f)
                   elseif Sys.islinux()
                         save(path_save_plot
                              * "/Conf_t_"
                              * string(Time_of_sampling[i])
-                             * ".pdf",
+                             * ".png",
                              f)
                   end
             end
@@ -140,9 +140,9 @@ function Start_J_Space(paramaters::String, config::String)
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
-                  save(path_save_plot * "\\Final_conf.pdf", f)
+                  save(path_save_plot * "\\Final_conf.png", f)
             elseif Sys.islinux()
-                  save(path_save_plot * "/Final_conf.pdf", f)
+                  save(path_save_plot * "/Final_conf.png", f)
             end
       end
       #save driver list
@@ -191,9 +191,9 @@ function Start_J_Space(paramaters::String, config::String)
             tree_mut = tree_mut[1]
             f, ax, p = plot_tree(tree_mut)
             if Sys.iswindows()
-                  save(path_save_plot * "\\driver_tree.pdf", f)
+                  save(path_save_plot * "\\driver_tree.png", f)
             elseif Sys.islinux()
-                  save(path_save_plot * "/driver_tree.pdf", f)
+                  save(path_save_plot * "/driver_tree.png", f)
             end
       end
 
