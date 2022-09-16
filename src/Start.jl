@@ -116,25 +116,29 @@ function Start_J_Space(paramaters::String, config::String)
                 Tables.table(CA_subpop),
                 header=false)
 
-      println("save plot...")
       #save configuration of time at specific time
       if Graph_configuration == 1
-            for i in 1:length(Gs_conf)
-                  f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
-                  if Sys.iswindows()
-                        save(path_save_plot
-                             * "\\Conf_t_"
-                             * string(Time_of_sampling[i])
-                             *".png",
-                             f)
-                  elseif Sys.islinux()
-                        save(path_save_plot
-                             * "/Conf_t_"
-                             * string(Time_of_sampling[i])
-                             * ".png",
-                             f)
+            println("save plot...")
+            try
+                  for i in 1:length(Gs_conf)
+                        f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
+                        if Sys.iswindows()
+                              save(path_save_plot
+                              * "\\Conf_t_"
+                              * string(Time_of_sampling[i])
+                              *".png",
+                              f)
+                        elseif Sys.islinux()
+                              save(path_save_plot
+                              * "/Conf_t_"
+                              * string(Time_of_sampling[i])
+                              * ".png",
+                              f)
+                        end
                   end
-            end
+            catch e
+                  println("error to plot configuration")
+                  println("this is problem: ", e)
       end
 
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
