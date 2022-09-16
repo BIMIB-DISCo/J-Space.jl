@@ -201,7 +201,7 @@ function color_index(driver_mut::Vector{Any}, Set_mut::Vector{Any})
             push!(colors, nodecolor_range[idx])
         else
             #push!(colors, colorant"white")
-            push!(colors, RGB(0, 0, 0))
+            push!(colors, RGB(1, 1, 1))
         end
     end
 

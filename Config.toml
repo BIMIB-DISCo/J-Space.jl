@@ -6,7 +6,7 @@ generate_reference = 1
 #*** if generate_reference == 1 ***#
 path_reference = ".\\reference.fasta"
 
-path_to_save_files = ".\\Fileoutput\\"
+path_to_save_files = ".\\fileoutput\\"
 path_to_save_plot = ".\\Plot\\"
 
 Generate_graph = 1

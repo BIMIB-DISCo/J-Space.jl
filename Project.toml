@@ -1,6 +1,7 @@
 name = "J_Space"
 uuid = "fd1b0027-9d6f-49b5-97ba-2af5672b046a"
-authors = ["alessandro_guidi <a.guidi@campus.unimib.it>"]
+authors = ["alessandro_guidi <a.guidi@campus.unimib.it>",
+           "fabrizio_angaroni <fabrizio.angaroni@unimib.it>"]
 version = "0.1.0"
 
 [deps]
