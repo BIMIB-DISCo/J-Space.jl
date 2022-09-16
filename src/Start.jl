@@ -139,6 +139,7 @@ function Start_J_Space(paramaters::String, config::String)
             catch e
                   println("error to plot configuration")
                   println("this is problem: ", e)
+            end
       end
 
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
