@@ -8,7 +8,7 @@ using MetaGraphs
 using Graphs
 using NetworkLayout
 using GraphMakie
-using GLMakie
+using CairoMakie
 using DataFrames
 using Random
 using UUIDs
@@ -230,16 +230,16 @@ end
 Plots tree.
 """
 function plot_tree(Tree::AbstractMetaGraph)
-      color = [:black for i in 1:nv(Tree)]
-      color[1] = :red
-      f, ax, p =
-      graphplot(Tree,
-                layout = Buchheim(),
-                node_color = color,
-                nlabels = [string(v) for v in vertices(Tree)])
-      hidedecorations!(ax)
-      hidespines!(ax)
-      return f, ax, p
+    color = [:black for i in 1:nv(Tree)]
+    color[1] = :red
+    f, ax, p =
+    graphplot(Tree,
+              layout = Buchheim(),
+              node_color = color,
+              nlabels = [string(v) for v in vertices(Tree)])
+    hidedecorations!(ax)
+    hidespines!(ax)
+    return f, ax, p
 end
 
 

@@ -13,7 +13,6 @@ function Start_J_Space(paramaters::String, config::String)
       seed = MersenneTwister(seed_n)
       path_save_file = Conf_dict["Config"][1]["path_to_save_files"]
       path_save_plot = Conf_dict["Config"][1]["path_to_save_plot"]
-
       #check signature time
       vector_activities = Par_dict["MolecularEvolution"][1]["vector_activities"]
       if vector_activities != []
@@ -119,30 +118,26 @@ function Start_J_Space(paramaters::String, config::String)
       #save configuration of time at specific time
       if Graph_configuration == 1
             println("save plot...")
-            try
-                  for i in 1:length(Gs_conf)
-                        f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
-                        if Sys.iswindows()
-                              save(path_save_plot
-                              * "\\Conf_t_"
-                              * string(Time_of_sampling[i])
-                              *".png",
-                              f)
-                        elseif Sys.islinux()
-                              save(path_save_plot
-                              * "/Conf_t_"
-                              * string(Time_of_sampling[i])
-                              * ".png",
-                              f)
-                        end
+            for i in 1:length(Gs_conf)
+                  f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
+                  if Sys.iswindows()
+                        save(path_save_plot
+                        * "\\Conf_t_"
+                        * string(Time_of_sampling[i])
+                        *".png",
+                        f)
+                  elseif Sys.islinux()
+                        save(path_save_plot
+                        * "/Conf_t_"
+                        * string(Time_of_sampling[i])
+                        * ".png",
+                        f)
                   end
-            catch e
-                  println("error to plot configuration")
-                  println("this is problem: ", e)
             end
       end
 
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
+
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\Final_conf.png", f)
