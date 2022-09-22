@@ -86,11 +86,12 @@ for mut_rate in mut_driver_rate
         println("ISA...")
         mutation_driver = Dict{}()
         g_seq, fastaX, position_used, mutation_driver =
-                                            Molecular_evolution_ISA(g_isa,
-                                                                    0.00000001,
-                                                                    seed,
-                                                                    ref,
-                                                                    set_mut)
+                                            experiment_ISA(g_isa,
+                                                           0.00000001,
+                                                           seed,
+                                                           ref,
+                                                           set_mut,
+                                                           frequency_dna = [])
         if length(mutation_driver) != 0
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_3D\\Fileoutput" *
@@ -129,16 +130,17 @@ for mut_rate in mut_driver_rate
         println("NoISA")
         mutation_driver = Dict{}()
         g_seq, fastaX, Tree_SC, mutation_driver =
-                                        Molecular_evolution_NoISA(tree_red,
-                                                                  ref,
-                                                                  "JC69",
-                                                                  params,
-                                                                  0.00000001,
-                                                                  100,
-                                                                  seed,
-                                                                  set_mut,
-                                                                  0.5,
-                                                                  1)
+                                        experiment_noISA(tree_red,
+                                                        ref,
+                                                        "JC69",
+                                                        params,
+                                                        0.00000001,
+                                                        100,
+                                                        seed,
+                                                        set_mut,
+                                                        0.5,
+                                                        1,
+                                                        frequency_dna = [])
         if length(mutation_driver) != 0
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_3D\\Fileoutput" *

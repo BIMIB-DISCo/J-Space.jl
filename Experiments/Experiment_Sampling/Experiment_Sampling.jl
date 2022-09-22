@@ -79,11 +79,12 @@ sampling_cell = [10, 100, 1000]#,5000]
         g_isa = copy(tree_red)
         println("ISA...")
         mutation_driver = Dict{}()
-        value, time, allocated, meta = @timed Molecular_evolution_ISA(g_isa,
-                                                                0.000001,
-                                                                seed,
-                                                                ref,
-                                                                set_mut)
+        value, time, allocated, meta = @timed experiment_ISA(g_isa,
+                                                            0.000001,
+                                                            seed,
+                                                            ref,
+                                                            set_mut,
+                                                            frequency_dna = [])
         fastaX = value[2]
         push!(Times_ISA_tot, time)
         push!(memory_ISA, allocated)
@@ -115,16 +116,17 @@ sampling_cell = [10, 100, 1000]#,5000]
         println("NoISA")
         mutation_driver = Dict{}()
         value, time, allocated, meta =
-                                    @timed Molecular_evolution_NoISA(tree_red,
-                                                              ref,
-                                                              "JC69",
-                                                              params,
-                                                              0.000001,
-                                                              100,
-                                                              seed,
-                                                              set_mut,
-                                                              0.5,
-                                                              1)
+                                    @timed experiment_noISA(tree_red,
+                                                            ref,
+                                                            "JC69",
+                                                            params,
+                                                            0.000001,
+                                                            100,
+                                                            seed,
+                                                            set_mut,
+                                                            0.5,
+                                                            1,
+                                                            frequency_dna = [])
 
         fastaX = value[2]
         push!(Times_NoIsa_tot, time)
