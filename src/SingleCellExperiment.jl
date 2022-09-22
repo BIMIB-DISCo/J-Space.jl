@@ -811,8 +811,8 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     #max_time = max_time_nodes(Tree, get_leafs(Tree))
     for e in edges(Tree_SC)
 
-        #g_seq_e = LongDNA{4}()
-        g_seq_e = LongSequence()
+        g_seq_e = LongDNA{4}()
+        #g_seq_e = LongSequence()
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
