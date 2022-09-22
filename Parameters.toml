@@ -1,9 +1,9 @@
 #This is an example of parameters files of dynamic
 
 [[Graph]]
-row = 100
-col = 100
-dim = 2
+row = 25
+col = 25
+dim = 3
 N_starting_cells = 1
 # ***
 # Otherwise matrix adjacency

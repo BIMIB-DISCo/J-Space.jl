@@ -4,11 +4,10 @@
 using BioSequences
 using FASTX
 using LinearAlgebra
-
 """
 Save fasta.
 """
-function save_Fasta_W(Ref::LongDNASeq,
+function save_Fasta_W(Ref::LongSequence,
                       fasta_samples::Vector{Any},
                       tree::AbstractMetaGraph,
                       path_save_file::String)
@@ -35,7 +34,7 @@ function save_Fasta_W(Ref::LongDNASeq,
       close(w)
 end
 
-function save_Fasta_L(Ref::LongDNASeq,
+function save_Fasta_L(Ref::LongSequence,
                       fasta_samples::Vector{Any},
                       tree::AbstractMetaGraph,
                       path_save_file::String)
@@ -92,7 +91,7 @@ end
 """
 Change genome in position pos.
 """
-function transform_genome(genome::LongDNASeq,
+function transform_genome(genome::LongSequence,
                           pos,
                           seed::MersenneTwister,
                           mutations_tot::DataFrame,
@@ -179,7 +178,7 @@ Creates a input for tool ART -> FASTA file
 function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
                              neural_mut_rate::Float64,
                              seed::MersenneTwister,
-                             g_seq::LongDNASeq,
+                             g_seq::LongSequence,
                              len_ROI::Int,
                              set_mut::Vector{Any})
 
@@ -215,8 +214,8 @@ function Molecular_evolution_ISA(Tree::AbstractMetaGraph,
         # create fasta ∀ nodes
         for e in edges(Tree)
 
-            #g_seq_e = LongDNA{4}()
-            g_seq_e = LongDNASeq()
+            g_seq_e = LongDNA{4}()
+            #g_seq_e = LongDNASeq()
 
             if has_prop(Tree, src(e), :Fasta)
                 g_seq_e = copy(get_prop(Tree, src(e), :Fasta))
@@ -356,8 +355,8 @@ function experiment_ISA(Tree::AbstractMetaGraph,
                         frequency_dna::Vector{Any} = [])
 
         ## load reference genome
-        #g_seq = LongDNA{4}()
-        g_seq_e = LongDNASeq()
+        g_seq = LongDNA{4}()
+        #g_seq_e = LongDNASeq()
         open(FASTA.Reader, path) do reader
             for record in reader
                 g_seq = FASTX.sequence(record)
@@ -418,7 +417,7 @@ end
 """
     comment gemonic evolution INDEL + SVN
 """
-function genomic_evolution(Seq_f::LongDNASeq,
+function genomic_evolution(Seq_f::LongSequence,
                            rate_Indel::AbstractFloat,
                            size_indel_arr::Vector{Float64},
                            branch_length::AbstractFloat,
@@ -770,7 +769,7 @@ end
     Molecular evolution with several substitution models
 """
 function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
-                                   Ref::LongDNASeq,
+                                   Ref::LongSequence,
                                    Len::Int,
                                    Selector::String,
                                    params::IdDict,
@@ -813,7 +812,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     for e in edges(Tree_SC)
 
         #g_seq_e = LongDNA{4}()
-        g_seq_e = LongDNASeq()
+        g_seq_e = LongSequence()
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
@@ -1048,8 +1047,8 @@ function experiment_noISA(Tree::AbstractMetaGraph,
                           frequency_dna::Vector{Any} = [])
 
         ## load reference genome
-        #Ref = LongDNA{4}()
-        Ref = LongDNASeq()
+        Ref = LongDNA{4}()
+        #Ref = LongDNASeq()
         ## load reference genome
         open(FASTA.Reader, path) do reader
             for record in reader
@@ -1189,7 +1188,7 @@ end
 """
     Compute count trinucleotide
 """
-function vector_count_genome(Ref::LongDNASeq,
+function vector_count_genome(Ref::LongSequence,
                              labels::Vector{Any})
     Count_trinuclotide = []
     Count_trinuclotide = DataFrame(Labels = Any[],
@@ -1286,8 +1285,8 @@ function experiment_noISA_sign(Tree::AbstractMetaGraph,
                                frequency_dna::Vector{Any} = [])
 
         ## load reference genome
-        #Ref = LongDNA{4}()
-        Ref = LongDNASeq()
+        Ref = LongDNA{4}()
+        #Ref = LongDNASeq()
         open(FASTA.Reader, path) do reader
             for record in reader
                 Ref = FASTX.sequence(record)
@@ -1337,7 +1336,7 @@ end
     TO DO ["SBS-37","SBS-38"]
 """
 function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
-                                        Ref::LongDNASeq,
+                                        Ref::LongSequence,
                                         Len::Int, #length genome
                                         Selector::String,#96-SBS-37 or -38
                                         mut_rate_average::AbstractFloat,
@@ -1412,8 +1411,8 @@ function Molecular_evolution_NoISA_sign(Tree::AbstractMetaGraph,
     #max_time = max_time_nodes(Tree, get_leafs(Tree))
     for e in edges(Tree_SC)
 
-        #g_seq_e = LongDNA{4}()
-        g_seq_e = LongDNASeq()
+        g_seq_e = LongDNA{4}()
+        #g_seq_e = LongDNASeq()
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
@@ -1561,7 +1560,7 @@ end
 """
     simulate signature on genome
 """
-function genomic_evolution_sign(Seq_f::LongDNASeq,
+function genomic_evolution_sign(Seq_f::LongSequence,
                                branch_length::AbstractFloat,
                                coll_sub_prob::Vector{Any},
                                seed::MersenneTwister,
@@ -1761,7 +1760,7 @@ end
 """
 Simulate SNV on genome
 """
-function genomic_evolution_SNV(Seq_f::LongDNASeq,
+function genomic_evolution_SNV(Seq_f::LongSequence,
                                branch_length::AbstractFloat,
                                Model_Selector_matrix::DataFrame,
                                prob_A::Vector{Float64},
@@ -2046,7 +2045,7 @@ end
 """
 Simulate INDEL on genome
 """
-function genomic_evolution_INDEL(Seq_f::LongDNASeq,
+function genomic_evolution_INDEL(Seq_f::LongSequence,
                                  rate_Indel::AbstractFloat,
                                  size_indel_arr::Vector{Float64},
                                  branch_length::AbstractFloat,
