@@ -90,7 +90,7 @@ for mut_rate in mut_driver_rate
                                                            ref,
                                                            set_mut,
                                                            frequency_dna = [])
-        if length(mutation_driver) != 0
+        if isempty(mutation_driver) == false
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\Mutation_driver_ISA_$mut_rate-$i-contact.csv",
@@ -139,7 +139,7 @@ for mut_rate in mut_driver_rate
                                                               0.5,
                                                               1,
                                                               frequency_dna =[])
-        if length(mutation_driver) != 0
+        if isempty(mutation_driver) == false
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
                           "\\Mutation_driver_noISA_$mut_rate-$i-contact.csv",
