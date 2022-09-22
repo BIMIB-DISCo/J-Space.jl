@@ -78,7 +78,7 @@ for mut_rate in mut_driver_rate
                                                            seed,
                                                            1)
         push!(Tree_mut_final, copy(tree_mut))
-        tree_red, net = create_tree(matrix_R, true)
+        tree_red, net = create_tree(matrix_R, true, 200.0)
         push!(Tree_fil_final, copy(tree_red))
         push!(Newick_final, net)
 
@@ -291,7 +291,7 @@ for mut_rate in mut_driver_rate
                                                            1)
 
         push!(Tree_mut_final, copy(tree_mut))
-        tree_red, net = create_tree(matrix_R, true)
+        tree_red, net = create_tree(matrix_R, true, 200.0)
         push!(Tree_fil_final, copy(tree_red))
         push!(Newick_final, net)
 
@@ -412,7 +412,7 @@ for mut_rate in mut_driver_rate
                                                               seed,
                                                               1)
         push!(Tree_mut_final, copy(tree_mut))
-        tree_red, net = create_tree(matrix_R, true)
+        tree_red, net = create_tree(matrix_R, true, 200.0)
         push!(Tree_fil_final, copy(tree_red))
         push!(Newick_final, net)
 

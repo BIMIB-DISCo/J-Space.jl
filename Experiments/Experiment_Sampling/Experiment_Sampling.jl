@@ -66,7 +66,7 @@ sampling_cell = [10, 100, 1000]#,5000]
                                                           0)
         matrix_R = value[1]
         #value, times, allocated2, meta = @timed J_Space.create_tree_2(matrix_R, true)
-        value, time2, allocated2, meta = @timed create_tree(matrix_R, true)
+        value, time2, allocated2, meta = @timed create_tree(matrix_R, true, 200.0)
         #println("value[1]", value[1])
         push!(Tree_fil_final, copy(value[1]))
         push!(Newick_final, value[2])
