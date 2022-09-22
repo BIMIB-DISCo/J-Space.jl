@@ -8,7 +8,7 @@ using BioSequences
 """
 Function create_bulk_groundtruth
 """
-function create_bulk_groundtruth(G_seq::LongDNASeq,
+function create_bulk_groundtruth(G_seq::LongSequence,
                                  Fasta_sample::Vector{Any},
                                  Position::Vector{Any})
 
@@ -68,7 +68,7 @@ end
 """
 Function experiment_bulk
 """
-function experiment_bulk(reference::LongDNASeq,
+function experiment_bulk(reference::LongSequence,
                          fasta_samples::Vector{Any},
                          position_used::Vector{Any},
                          path::String,
