@@ -154,6 +154,8 @@ sampling_cell = [10, 100, 1000]#,5000]
     println("SAVE final...")
     for l in 1:length(Newick_final)
         if Sys.iswindows()
+            mkpath(".\\Experiments\\Experiment_Sampling\\Plot")
+            mkpath(".\\Experiments\\Experiment_Sampling\\Fileoutput")
             savegraph(".\\Experiments\\Experiment_Sampling\\Plot" *
                       "\\Tree_Fil_$sampling-$l.mg",
                       Tree_fil_final[l])
@@ -185,6 +187,8 @@ sampling_cell = [10, 100, 1000]#,5000]
                   Tables.table(memory_NoISA),
                   header=false)
         else
+            mkpath("./Experiments/Experiment_Sampling/Plot")
+            mkpath("./Experiments/Experiment_Sampling/Fileoutput")
             savegraph("./Experiments/Experiment_Sampling/Plot" *
                   "/Tree_Fil_$sampling-$l-contact.mg",
                   Tree_fil_final[l])

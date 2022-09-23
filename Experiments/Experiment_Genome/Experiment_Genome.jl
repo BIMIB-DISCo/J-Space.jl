@@ -178,6 +178,7 @@ leafs = get_leafs(tree_red)
 
     println("SAVE final...")
     if Sys.iswindows()
+        mkpath(".\\Experiments\\Experiment_Genome\\Fileoutput\\")
         CSV.write(".\\Experiments\\Experiment_Genome\\Fileoutput" *
               "\\Times_ISA_$len.csv",
               Tables.table(Times_ISA_tot),
@@ -203,6 +204,7 @@ leafs = get_leafs(tree_red)
               Tables.table(memory_NoISA_indel),
               header=false)
     else
+        mkpath("./Experiments/Experiment_Genome/Fileoutput")
         CSV.write("./Experiments/Experiment_Genome/Fileoutput" *
                   "/Times_ISA_$len.csv",
                   Tables.table(Times_ISA_tot),

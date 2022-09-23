@@ -94,10 +94,12 @@ for mut_rate in mut_driver_rate
                                                            frequency_dna = [])
         if isempty(mutation_driver) == false
             if Sys.iswindows()
+                mkpath(".\\Experiments\\Experiment_3D\\Fileoutput\\")
                 CSV.write(".\\Experiments\\Experiment_3D\\Fileoutput" *
                           "\\Mutation_driver_ISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
             else
+                mkpath("./Experiments/Experiment_3D/Fileoutput/")
                 CSV.write("./Experiments/Experiment_3D/Fileoutput" *
                           "/Mutation_driver_ISA_$mut_rate-$i-contact.csv",
                           mutation_driver)
@@ -176,6 +178,7 @@ for mut_rate in mut_driver_rate
     println("SAVE final...")
     for l in 1:length(Newick_final)
         if Sys.iswindows()
+            mkpath(".\\Experiments\\Experiment_3D\\Plot\\")
             CSV.write(".\\Experiments\\Experiment_3D\\Fileoutput" *
                       "\\Dinamica_$mut_rate-$l-contact.csv",
                       dinamica_final[l],
@@ -206,6 +209,7 @@ for mut_rate in mut_driver_rate
                           ".\\Experiments\\Experiment_3D\\Fileoutput" *
                           "\\formatNewick_$mut_rate-$l-contact")
         else
+            mkpath("./Experiments/Experiment_3D/Plot/")
             CSV.write("./Experiments/Experiment_3D/Fileoutput" *
                       "/Dinamica_$mut_rate-$l-contact.csv",
                       dinamica_final[l],

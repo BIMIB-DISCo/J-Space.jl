@@ -29,7 +29,7 @@ time_dynamics = []
     println("simulation...")
     #df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop, times =
     value, times, bytes, meta = @timed J_Space.simulate_evolution_2(g_meta,
-                                                                   300.0, 
+                                                                   300.0,
                                                                    0.4,
                                                                    0.01,
                                                                    0.0,
@@ -57,6 +57,8 @@ end
 println("SAVE final...")
 for l in 1:length(G_state_final)
     if Sys.iswindows()
+        mkpath(".\\Experiments\\Experiment_3D\\Fileoutput\\")
+        mkpath(".\\Experiments\\Experiment_3D\\Plot\\")
         CSV.write(".\\Experiments\\Experiment_3D\\Fileoutput" *
                   "\\Dynamics-$l.csv",
                   dinamica_final[l],
@@ -86,6 +88,8 @@ for l in 1:length(G_state_final)
                   Tables.table(allocated_tot[l]),
                   header=false)
     else
+        mkpath("./Experiments/Experiment_3D/Fileoutput/")
+        mkpath("./Experiments/Experiment_3D/Plot/")
         CSV.write("./Experiments/Experiment_3D/Fileoutput" *
                   "/Dynamics-$l.csv",
                   dinamica_final[l],

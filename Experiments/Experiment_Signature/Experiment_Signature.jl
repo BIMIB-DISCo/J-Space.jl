@@ -42,6 +42,7 @@ tree_red, net = create_tree(matrix_R, true, 200.0)
 leafs = J_Space.get_leafs(tree_red)
 #save
 if Sys.iswindows()
+    mkpath(".\\Experiments\\Experiment_Signature\\Fileoutput\\")
     writeTopology(net,
                   ".\\Experiments\\Experiment_Signature\\Fileoutput\\formatNewick")
     CSV.write(".\\Experiments\\Experiment_Signature\\Fileoutput\\Dinamica.csv",
@@ -51,6 +52,7 @@ if Sys.iswindows()
                 Tables.table(CA_subpop),
                 header=false)
 else
+    mkpath("./Experiments/Experiment_Signature/Fileoutput/")
     writeTopology(net,
                   "./Experiments/Experiment_Signature/Fileoutput/formatNewick")
     CSV.write("./Experiments/Experiment_Signature/Fileoutput/Dinamica.csv",
