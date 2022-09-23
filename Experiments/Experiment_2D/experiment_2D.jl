@@ -88,8 +88,7 @@ for mut_rate in mut_driver_rate
                                                            0.00000001,
                                                            seed,
                                                            ref,
-                                                           set_mut,
-                                                           frequency_dna = [])
+                                                           set_mut)
         if isempty(mutation_driver) == false
             if Sys.iswindows()
                 mkpath(".\\Experiments\\Experiment_2D\\Fileoutput\\")
@@ -139,8 +138,7 @@ for mut_rate in mut_driver_rate
                                                         seed,
                                                         set_mut,
                                                         0.5,
-                                                        1,
-                                                        frequency_dna = [])
+                                                        1)
         if isempty(mutation_driver) == false
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *

@@ -83,8 +83,7 @@ sampling_cell = [10, 100, 1000]#,5000]
                                                             0.000001,
                                                             seed,
                                                             ref,
-                                                            set_mut,
-                                                            frequency_dna = [])
+                                                            set_mut)
         fastaX = value[2]
         push!(Times_ISA_tot, time)
         push!(memory_ISA, allocated)
@@ -125,8 +124,7 @@ sampling_cell = [10, 100, 1000]#,5000]
                                                             seed,
                                                             set_mut,
                                                             0.5,
-                                                            1,
-                                                            frequency_dna = [])
+                                                            1)
 
         fastaX = value[2]
         push!(Times_NoIsa_tot, time)
