@@ -130,17 +130,17 @@ for mut_rate in mut_driver_rate
         println("NoISA")
         mutation_driver = Dict{}()
         g_seq, fastaX, Tree_SC, mutation_driver =
-                                        experiment_noISA_sign(tree_red,
-                                                              ref,
-                                                              "JC69",
-                                                              params,
-                                                              0.00000001,
-                                                              100,
-                                                              seed,
-                                                              set_mut,
-                                                              0.5,
-                                                              1,
-                                                              frequency_dna =[])
+                                        experiment_noISA(tree_red,
+                                                        ref,
+                                                        "JC69",
+                                                        params,
+                                                        0.00000001,
+                                                        100,
+                                                        seed,
+                                                        set_mut,
+                                                        0.5,
+                                                        1,
+                                                        frequency_dna = [])
         if isempty(mutation_driver) == false
             if Sys.iswindows()
                 CSV.write(".\\Experiments\\Experiment_2D\\Fileoutput" *
