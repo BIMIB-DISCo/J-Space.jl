@@ -8,19 +8,19 @@ N_starting_cells = 1
 # ***
 # Otherwise matrix adjacency
 # ***#
-matrix_adjacency = "path/matrix/adjacency"
+matrix_adjacency = "./utility/Example_adj_matrix.txt"
 
 [[Dynamic]]
 Model = "contact"
-Max_time = 200.0
+Max_time = 1000.0
 rate_birth = 0.2
 rate_death = 0.01
 rate_migration = 0.01
 drive_mut_rate = 0.01
 average_driver_mut_rate = 0.4
 std_driver_mut_rate = 0.1
-t_bottleneck = [50.0, 150.0]
-ratio_bottleneck = [0.8, 0.8]
+t_bottleneck = [50.0,150.0]
+ratio_bottleneck = [0.8,0.8]
 [[Sampling]]
 Random_sampling = 1
 num_cell = 10
@@ -50,8 +50,8 @@ params = [{"alpha" = 0.5, "beta" = 0.3}]
 #*** if signature ***#
 mut_rate_avg = 0.000001
 used_sign = ["SBS1","SBS4","SBS16"]
-vector_change_points = [0.0, 50.0]
-vector_activities = [[0.7,0.2,0.1], [0.0,0.3,0.7]]
+vector_change_points = [0.0,50.0]
+vector_activities = [[0.7,0.2,0.1],[0.0,0.3,0.7]]
 ratio_background_signature = 0.000001
 
 [[BulkExperiment]]

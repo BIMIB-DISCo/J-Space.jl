@@ -32,10 +32,11 @@ function list_sampling_cell(G::AbstractGraph,
                 #cell_pur = sample(seed, ca_subpop[1] , num_cell_pur, replace = false)
             #end
 
-        set = collect(1:length(cs_alive))
+        set = Set(1:length(cs_alive))
         for i in 1:L
-            pos = rand(seed, set)
+            pos = rand(seed, collect(set))
             push!(list_cell, cs_alive[pos])
+            delete!(set, pos)
             filter!(s -> s != pos, set)
         end
     elseif  Mode == "Neighbourhood" # Choose neighbourhood -> L = start pos
@@ -160,7 +161,7 @@ function create_tree(matrix::DataFrame, newick::Bool, tmax::Float64)
     end
     ## Create format newick
     if newick == true
-        println("create format newick....")
+        println("J-SPACE: CREATE FORMAT NEWICK....")
         net = format_newick(tree_reduce)
         return tree_reduce, net
     end

@@ -1,15 +1,15 @@
 #This is an example of config files
 
 [[Config]]
-seed = 1234
-generate_reference = 1
+seed = 0
+generate_reference = 0
 #*** if generate_reference == 1 ***#
 path_reference = "./reference.fasta"
 
 path_to_save_files = "./fileoutput/"
 path_to_save_plot = "./Plot/"
 
-Generate_graph = 1
+Generate_graph = 0
 #*** if Generate_graph == 0 ***#
 Path_to_Graph = "./utility/Example_adj_matrix.txt"
 
@@ -25,11 +25,11 @@ Driver_Tree = 1
 
 [[FileOutputExperiments]]
 Single_cell_fasta = 1
-Single_cell_noise = 0
+Single_cell_noise = 2
 VAF_GT = 1
 Bulk_noise = 1
 Alignment = 1
 
 [[FileOutputPlot]]
-Time_of_sampling = [10, 20]
+Time_of_sampling = [10,20]
 Graph_configuration = 1
