@@ -190,6 +190,81 @@ function metagraph_from_dataframe(graph_type,
     return mg
 end
 
+function metagraph_from_dataframe_JHistint(graph_type,
+                                  df::DataFrame,
+                                  origin::Symbol,
+                                  destination::Symbol,
+                                  weight::Symbol = Symbol(),
+                                  edge_attributes::Union{Vector{Symbol}, Symbol}
+                                  = Vector{Symbol}(),
+                                  vertex_attributes::DataFrame = DataFrame(),
+                                  vertex_id_col::Symbol = Symbol())
+    # Map node names to vertex IDs
+    nodes = sort!(unique!([df[:, origin]; df[:, destination]]))
+    vertex_names = DataFrame(name=nodes, vertex_id = eachindex(nodes))
+    # Merge in to original
+    for c in [origin, destination]
+        temp = rename(vertex_names, :vertex_id => Symbol(c, :_id))
+        df = innerjoin(df, temp; on = c => :name)
+    end
+    # Merge additional attributes to names
+    if vertex_attributes != DataFrame()
+        idsym =
+            vertex_id_col == Symbol() ?
+            first(propertynames(vertex_attributes)) :
+            vertex_id_col
+        vertex_names = leftjoin(vertex_names,
+                                vertex_attributes,
+                                on = :name => idsym)
+    end
+
+    # Create Graph
+    mg = graph_type(nrow(vertex_names))
+    for r in eachrow(df)
+        MetaGraphs.add_edge!(mg, r[Symbol(origin, :_id)], r[Symbol(destination, :_id)])
+    end
+
+    # add times on graph
+    # times_df = df[:,[:Child, :Time]]
+    # vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
+    # add subpop_child on graph
+    # subpop_df = df[:,[:Child, :Subpop_Child]]
+    # vertex_names = leftjoin(vertex_names, subpop_df, on = :name => :Child)
+    # Set vertex names and attributes
+    
+    attr_names = propertynames(vertex_names[!, Not(:vertex_id)])
+    for r in eachrow(vertex_names)
+        MetaGraphs.set_props!(mg, r[:vertex_id], Dict([a => r[a] for a in attr_names]))
+    end
+    # Set edge attributes
+    if typeof(edge_attributes) == Symbol
+        edge_attributes = Vector{Symbol}([edge_attributes])
+    end
+    show(edge_attributes)
+    origin_id = Symbol(origin, :_id)
+    destination_id = Symbol(destination, :_id)
+
+    for e in edge_attributes
+        for r in eachrow(df)
+            MetaGraphs.set_prop!(mg, MetaGraphs.Edge(r[origin_id], r[destination_id]), e, r[e])
+        end
+    end
+
+    # Weight
+    if weight != Symbol()
+        for r in eachrow(df)
+            set_prop!(mg,
+                      MetaGraphs.Edge(r[origin_id], r[destination_id]),
+                      :weight, r[weight])
+        end
+    end
+
+    # Set name as index (Issue #9)
+    set_indexing_prop!(mg, :name)
+
+    return mg
+end
+
 end # modules
 
 ### end of file -- DataFrameGrtaphBridge.jl

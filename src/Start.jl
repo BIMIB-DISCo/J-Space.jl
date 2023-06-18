@@ -403,9 +403,16 @@ function Start_J_Space(paramaters::String, config::String)
 end
 
 
-# Interface with JHistint , START
+# Interface with JHistint , START J-Space
 
-function Start_J_Space(filepath_reference::AbstractString, filepath_matrix::AbstractString, filepath_file::AbstractString, filpeath_plot::AbstractString, slide_id::AbstractString)
+function Start_J_Space(filepath_reference::AbstractString,
+                       filepath_matrix::AbstractString,
+                       filepath_file::AbstractString,
+                       filpeath_plot::AbstractString,
+                       slide_id::AbstractString,
+                       filepath_dataframe_edges::AbstractString,
+                       filepath_dataframe_labels::AbstractString)
+
       println("J-SPACE: START... ($slide_id)")
       paramaters =  joinpath(@__DIR__, "..", "Parameters.toml")
       config =  joinpath(@__DIR__, "..", "Config.toml")
@@ -441,7 +448,8 @@ function Start_J_Space(filepath_reference::AbstractString, filepath_matrix::Abst
       if Conf_dict["Config"][1]["Generate_graph"] == 0
             path_adj_matrix = filepath_matrix
             # path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
-            g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
+            # g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
+            g_meta = spatial_graph(filepath_dataframe_edges, filepath_dataframe_labels)
       else
             row = Par_dict["Graph"][1]["row"]
             col = Par_dict["Graph"][1]["col"]

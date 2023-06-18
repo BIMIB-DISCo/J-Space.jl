@@ -70,6 +70,16 @@ function spatial_graph(path::String, seed::MersenneTwister; n_cell::Int = 1)
     return G_meta
 end
 
+####Load Graphs from DataFrames
+function spatial_graph(path_dataframe_edges::String, path_dataframe_labels::String)
+    df_edges_file = CSV.File(path_dataframe_edges)
+    df_edges = DataFrame(df_edges_file)
+
+    df_labels_file = CSV.File(path_dataframe_labels)
+    df_labels = DataFrame(df_labels_file)
+    G_meta = metagraph_from_dataframe_JHistint(MetaGraph, df_edges, :origin, :destination, :weight, :weight, df_labels, :label)
+    return G_meta
+end
 
 """
 Initialize graph with un single cell in the middle of the
