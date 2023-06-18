@@ -150,7 +150,7 @@ function metagraph_from_dataframe(graph_type,
     end
 
     #add times on graph
-    times_df = df[:,[:Child, :Time]] 
+    times_df = df[:,[:Child, :Time]]
     vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
     #add subpop_child on graph
     subpop_df = df[:,[:Child, :Subpop_Child]]
