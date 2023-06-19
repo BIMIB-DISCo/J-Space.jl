@@ -77,7 +77,7 @@ function spatial_graph(path_dataframe_edges::String, path_dataframe_labels::Stri
 
     df_labels_file = CSV.File(path_dataframe_labels)
     df_labels = DataFrame(df_labels_file)
-    G_meta = metagraph_from_dataframe_JHistint(MetaGraph, df_edges, :origin, :destination, :weight, :weight, df_labels, :label)
+    G_meta = DataFrameGraphBridge.metagraph_from_dataframe_JHistint(MetaGraph, df_edges, :origin, :destination, :weight, :weight, df_labels, :label)
     return G_meta
 end
 
