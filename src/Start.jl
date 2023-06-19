@@ -405,13 +405,7 @@ end
 
 # Interface with JHistint , START J-Space
 
-function Start_J_Space(filepath_reference::AbstractString,
-                       filepath_matrix::AbstractString,
-                       filepath_file::AbstractString,
-                       filpeath_plot::AbstractString,
-                       slide_id::AbstractString,
-                       filepath_dataframe_edges::AbstractString,
-                       filepath_dataframe_labels::AbstractString)
+function Start_J_Space(filepath_reference::String, filepath_matrix::String, filepath_file::String, filpeath_plot::String, slide_id::SubString{String}, filepath_dataframe_edges::String, filepath_dataframe_labels::String)
 
       println("J-SPACE: START... ($slide_id)")
       paramaters =  joinpath(@__DIR__, "..", "Parameters.toml")
