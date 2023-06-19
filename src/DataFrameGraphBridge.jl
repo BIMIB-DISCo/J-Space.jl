@@ -13,7 +13,7 @@ module DataFrameGraphBridge
 using Graphs
 using MetaGraphs
 using DataFrames
-export MetaGraph, MetaDiGraph
+export MetaGraph, MetaDiGraph, metagraph_from_dataframe_JHistint
 
 import MetaGraphs.MetaGraph
 import MetaGraphs.MetaDiGraph
@@ -231,7 +231,7 @@ function metagraph_from_dataframe_JHistint(graph_type,
     # subpop_df = df[:,[:Child, :Subpop_Child]]
     # vertex_names = leftjoin(vertex_names, subpop_df, on = :name => :Child)
     # Set vertex names and attributes
-    
+
     attr_names = propertynames(vertex_names[!, Not(:vertex_id)])
     for r in eachrow(vertex_names)
         MetaGraphs.set_props!(mg, r[:vertex_id], Dict([a => r[a] for a in attr_names]))
