@@ -673,7 +673,7 @@ function simulate_evolution(G::AbstractGraph,
     # create array alpha
     α = [rate_birth]
     num_pop = length(set_mut_pop)          # Num mutation tot
-
+    show(df)
     # initialize bottleneck
     if t_bottleneck != []
         id_bottleneck = 1
@@ -692,7 +692,8 @@ function simulate_evolution(G::AbstractGraph,
     cs_neighbors = cells_neighbors(G)
     ca_subpop = cells_alive_subpop(G, set_mut_pop) # Num cells ∀ subpop
     α_subpop_f = []
-
+    show(cs_neighbors)
+    show(ca_subpop)
     #simulation
     while (t_curr < Tf && n_cs_alive > 0) ||
           (rate_death == 0 && n_cs_alive == nv(G))
