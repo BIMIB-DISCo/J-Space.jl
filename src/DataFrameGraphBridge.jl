@@ -229,8 +229,8 @@ function metagraph_from_dataframe_JHistint(graph_type,
     df[!, :Subpop_Child] .= ""
     # add times on graph
     times_df = df[:,[:Child, :Time]]
-    # vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
-    add subpop_child on graph
+    vertex_names = leftjoin(vertex_names, times_df, on = :name => :Child)
+    # add subpop_child on graph
     subpop_df = df[:,[:Child, :Subpop_Child]]
     vertex_names = leftjoin(vertex_names, subpop_df, on = :name => :Child)
     # Set vertex names and attributes
