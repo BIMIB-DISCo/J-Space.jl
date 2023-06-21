@@ -442,8 +442,8 @@ function Start_J_Space(filepath_reference::String, filepath_matrix::String, file
       if Conf_dict["Config"][1]["Generate_graph"] == 0
             path_adj_matrix = filepath_matrix
             # path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
-            # g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
-            g_meta = spatial_graph(filepath_dataframe_edges, filepath_dataframe_labels)
+            g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
+            # g_meta = spatial_graph(filepath_dataframe_edges, filepath_dataframe_labels)
       else
             row = Par_dict["Graph"][1]["row"]
             col = Par_dict["Graph"][1]["col"]
