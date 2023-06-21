@@ -185,6 +185,18 @@ function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
                          node_color = colors)
     hidedecorations!(ax)
     hidespines!(ax)
+    save("image.png", f)
+    return f, ax, p, colors
+end
+
+function plot_lattice_JHistint(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
+    driver_mut, labels, colors = get_drivermut_name_colors(G, Set_mut)
+    mylayout = NetworkLayout.Spectral(dim)
+    f, ax, p = graphplot(G,
+                         layout = mylayout,
+                         node_size = repeat([5], nv(G)),
+                         edge_width=1.0,
+                         node_color = colors)
     return f, ax, p, colors
 end
 
@@ -673,7 +685,6 @@ function simulate_evolution(G::AbstractGraph,
     # create array alpha
     α = [rate_birth]
     num_pop = length(set_mut_pop)          # Num mutation tot
-    show(df)
     # initialize bottleneck
     if t_bottleneck != []
         id_bottleneck = 1
@@ -692,8 +703,6 @@ function simulate_evolution(G::AbstractGraph,
     cs_neighbors = cells_neighbors(G)
     ca_subpop = cells_alive_subpop(G, set_mut_pop) # Num cells ∀ subpop
     α_subpop_f = []
-    show(cs_neighbors)
-    show(ca_subpop)
     #simulation
     while (t_curr < Tf && n_cs_alive > 0) ||
           (rate_death == 0 && n_cs_alive == nv(G))
@@ -1122,6 +1131,7 @@ include("CallART.jl")
 include("DataFrameGraphBridge.jl")
 include("Models.jl")
 include("Start.jl")
+include("DataFrameAPI.jl")
 end # module
 
 
