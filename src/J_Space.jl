@@ -185,7 +185,6 @@ function plot_lattice(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=2)
                          node_color = colors)
     hidedecorations!(ax)
     hidespines!(ax)
-    save("image.png", f)
     return f, ax, p, colors
 end
 
