@@ -198,7 +198,7 @@ end
 
 function plot_lattice_JHistint(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
     driver_mut, labels, colors = get_drivermut_name_colors(G, Set_mut)
-    mylayout = NetworkLayout.Spectral(dim)
+    mylayout = NetworkLayout.Spectral(dim=3)
     f, ax, p = graphplot(G,
                          layout = mylayout,
                          node_size = repeat([5], nv(G)),
