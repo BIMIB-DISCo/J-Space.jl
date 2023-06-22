@@ -65,8 +65,16 @@ end
 
 ####Load graphs
 function spatial_graph(path::String, seed::MersenneTwister; n_cell::Int = 1)
-    G = readdlm(path, Int)
-    G_meta = initialize_graph(G, n_cell, seed)
+    mat = readdlm(path, Int)
+    n = size(mat, 1) # Numero di nodi
+    graph = SimpleGraph(n)
+    for i in 1:n, j in 1:i
+        if mat[i,j] != 0
+            add_edge!(graph, i, j)
+        end
+    end
+    abstract_g = Graph(graph)
+    G_meta = initialize_graph(abstract_g, n_cell, seed)
     return G_meta
 end
 
