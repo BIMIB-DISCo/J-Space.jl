@@ -405,7 +405,13 @@ end
 
 # Interface with JHistint , START J-Space
 
-function Start_J_Space(filepath_reference::String, filepath_matrix::String, filepath_file::String, filpeath_plot::String, slide_id::SubString{String}, filepath_dataframe_edges::String, filepath_dataframe_labels::String)
+function Start_J_Space(filepath_reference::AbstractString,
+                        filepath_matrix::AbstractString,
+                        filepath_file::AbstractString,
+                        filpeath_plot::AbstractString,
+                        slide_id::AbstractString,
+                        filepath_dataframe_edges::AbstractString,
+                        filepath_dataframe_labels::AbstractString)
 
       println("J-SPACE: START... ($slide_id)")
       paramaters =  joinpath(@__DIR__, "..", "Parameters.toml")
@@ -479,6 +485,8 @@ function Start_J_Space(filepath_reference::String, filepath_matrix::String, file
             rate_birth = Dynamic_dict["rate_birth"]
             avg_driv_mut_rate = Dynamic_dict["average_driver_mut_rate"]
             std_driv_mut_rate = Dynamic_dict["std_driver_mut_rate"]
+
+            # SIMULATION BLOCKED ON METAGRAPH, ISSUE ON GITHUB
             df, G, n_cell_alive, set_mut, Gs_conf, CA_subpop, α_subpop =
                          simulate_evolution(g_meta,
                                             Time,
