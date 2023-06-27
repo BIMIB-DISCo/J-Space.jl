@@ -761,7 +761,8 @@ function Start_J_Space(filepath_reference::AbstractString,
 
        SC_noise = Conf_dict["FileOutputExperiments"][1]["Single_cell_noise"]
        if SC_noise != 0
-           println("J-SPACE: CALL ART... ($slide_id)")
+           """
+        println("J-SPACE: CALL ART... ($slide_id)")
             if Sys.iswindows()
                  path_fasta = path_save_file*"\\Fasta output\\"
             else
@@ -821,6 +822,7 @@ function Start_J_Space(filepath_reference::AbstractString,
                            std_fragsize = std_fragsize,
                            no_ALN = no_ALN)
             end
+            """
       end
       println("J-SPACE: SIMULATION TERMINATED... ($slide_id)")
       println("---------------------------------------------")

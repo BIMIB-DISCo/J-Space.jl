@@ -2,7 +2,7 @@
 
 [[Config]]
 seed = 0
-generate_reference = 0
+generate_reference = 1
 #*** if generate_reference == 1 ***#
 path_reference = "./reference.fasta"
 
