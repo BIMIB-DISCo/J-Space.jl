@@ -539,7 +539,7 @@ function Start_J_Space(filepath_reference::AbstractString,
       if Graph_configuration == 1
             println("J-SPACE: SAVE PLOT... ($slide_id)")
             for i in 1:length(Gs_conf)
-                  f, ax, p, colors = plot_lattice(Gs_conf[i], set_mut)
+                  f, ax, p, colors = plot_lattice_JHistint(Gs_conf[i], set_mut)
                   if Sys.iswindows()
                         save(path_save_plot
                         * "\\Conf_t_"
