@@ -558,7 +558,7 @@ function Start_J_Space(filepath_reference::AbstractString,
 
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
 
-            f, ax, p, colors = plot_lattice(G, set_mut)
+            f, ax, p, colors = plot_lattice_JHistint(G, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\Final_conf.png", f)
             elseif Sys.islinux()
