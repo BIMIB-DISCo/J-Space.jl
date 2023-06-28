@@ -210,9 +210,7 @@ end
 function plot_lattice_metagraph(G::MetaGraph; dim::Int=3)
     mylayout = NetworkLayout.Spectral(dim=3)
     f, ax, p = graphplot(G,
-                         layout = mylayout,
-                         node_size = repeat([5], nv(G)),
-                         edge_width=1.0)
+                         layout = mylayout)
     return f, ax, p
 end
 
