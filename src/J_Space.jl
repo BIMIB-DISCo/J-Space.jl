@@ -208,7 +208,7 @@ function plot_lattice_JHistint(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
 end
 
 function plot_lattice_metagraph(G::MetaGraph; dim::Int=3)
-    mylayout = NetworkLayout.Spectral(dim=3)
+    mylayout = NetworkLayout.SquareGrid(cols=:auto)
     f, ax, p = graphplot(G,
                          layout = mylayout)
     return f, ax, p
