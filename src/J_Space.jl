@@ -213,7 +213,7 @@ function plot_lattice_metagraph(G::MetaGraph; dim::Int=3)
                          layout = mylayout,
                          node_size = repeat([5], nv(G)),
                          edge_width=1.0)
-    return f, ax, p, colors
+    return f, ax, p
 end
 
 
