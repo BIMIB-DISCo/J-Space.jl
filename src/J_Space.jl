@@ -207,6 +207,15 @@ function plot_lattice_JHistint(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
     return f, ax, p, colors
 end
 
+function plot_lattice_metagraph(G::MetaGraph; dim::Int=3)
+    mylayout = NetworkLayout.Spectral(dim=3)
+    f, ax, p = graphplot(G,
+                         layout = mylayout,
+                         node_size = repeat([5], nv(G)),
+                         edge_width=1.0)
+    return f, ax, p, colors
+end
+
 
 """
 Creates a palette based on the number of driver mutations present.
