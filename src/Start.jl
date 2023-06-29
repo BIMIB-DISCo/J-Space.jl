@@ -449,12 +449,6 @@ function Start_J_Space(filepath_reference::AbstractString,
             path_adj_matrix = filepath_matrix
             # path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
             g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
-            f, ax, p, colors = plot_lattice_metagraph(g_meta)
-            if Sys.iswindows()
-                  save(path_save_plot * "\\metagraph.png", f)
-            elseif Sys.islinux()
-                  save(path_save_plot * "/metagraaph.png", f)
-            end
             # g_meta = spatial_graph(filepath_dataframe_edges, filepath_dataframe_labels)
       else
             row = Par_dict["Graph"][1]["row"]
@@ -569,6 +563,13 @@ function Start_J_Space(filepath_reference::AbstractString,
                   save(path_save_plot * "\\Final_conf.png", f)
             elseif Sys.islinux()
                   save(path_save_plot * "/Final_conf.png", f)
+            end
+
+            f, ax, p, colors = plot_lattice_metagraph(g_meta, set_mut)
+            if Sys.iswindows()
+                  save(path_save_plot * "\\metagraph.png", f)
+            elseif Sys.islinux()
+                  save(path_save_plot * "/metagraaph.png", f)
             end
       end
       #save driver list
