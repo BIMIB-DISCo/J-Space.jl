@@ -207,7 +207,7 @@ function plot_lattice_JHistint(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
     return f, ax, p, colors
 end
 
-function plot_lattice_metagraph(G::MetaGraph; dim::Int=3)
+function plot_lattice_metagraph(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
     driver_mut, labels, colors = get_drivermut_name_colors(G, Set_mut)
     mylayout = NetworkLayout.SquareGrid(cols=:auto)
     f, ax, p = graphplot(G,
