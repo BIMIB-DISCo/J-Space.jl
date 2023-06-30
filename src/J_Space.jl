@@ -209,13 +209,12 @@ end
 
 function plot_lattice_metagraph(G::MetaGraph, Set_mut::Vector{Any}; dim::Int=3)
     driver_mut, labels, colors = get_drivermut_name_colors(G, Set_mut)
-    mylayout = NetworkLayout.SquareGrid(cols=:auto)
+    mylayout = NetworkLayout.Spectral(dim=2)
     f, ax, p = graphplot(G,
                          layout = mylayout,
                          node_size = repeat([5], nv(G)),
+                         edge_width=1.0,
                          node_color = colors)
-    hidedecorations!(ax)
-    hidespines!(ax)
     return f, ax, p, colors
 end
 
