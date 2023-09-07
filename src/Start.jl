@@ -449,6 +449,7 @@ function Start_J_Space(filepath_reference::AbstractString,
             path_adj_matrix = filepath_matrix
             # path_adj_matrix =  Conf_dict["Config"][1]["Path_to_Graph"]
             g_meta = spatial_graph(path_adj_matrix, seed, n_cell = start_cell)
+            # Issue #6 Github
             # g_meta = spatial_graph(filepath_dataframe_edges, filepath_dataframe_labels)
       else
             row = Par_dict["Graph"][1]["row"]
@@ -539,7 +540,7 @@ function Start_J_Space(filepath_reference::AbstractString,
       if Graph_configuration == 1
             println("J-SPACE: SAVE PLOT... ($slide_id)")
             for i in 1:length(Gs_conf)
-                  f, ax, p, colors = plot_lattice_JHistint(Gs_conf[i], set_mut)
+                  f, ax, p, colors = plot_lattice_metagraph(Gs_conf[i], set_mut)
                   if Sys.iswindows()
                         save(path_save_plot
                         * "\\Conf_t_"
@@ -558,7 +559,7 @@ function Start_J_Space(filepath_reference::AbstractString,
 
       if Conf_dict["OutputGT"][1]["Final_configuration"] == 1
 
-            f, ax, p, colors = plot_lattice_JHistint(G, set_mut)
+            f, ax, p, colors = plot_lattice_metagraph(G, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\Final_conf.png", f)
             elseif Sys.islinux()
@@ -569,7 +570,7 @@ function Start_J_Space(filepath_reference::AbstractString,
             if Sys.iswindows()
                   save(path_save_plot * "\\metagraph.png", f)
             elseif Sys.islinux()
-                  save(path_save_plot * "/metagraaph.png", f)
+                  save(path_save_plot * "/metagraph.png", f)
             end
       end
       #save driver list
