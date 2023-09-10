@@ -1,3 +1,7 @@
+### -*- Mode: Julia -*-
+
+### Start.jl
+
 
 ################### function START
 
@@ -126,7 +130,7 @@ function Start_J_Space(paramaters::String, config::String)
                         * string(Time_of_sampling[i])
                         *".png",
                         f)
-                  elseif Sys.islinux()
+                  elseif Sys.isunix()
                         save(path_save_plot
                         * "/Conf_t_"
                         * string(Time_of_sampling[i])
@@ -141,7 +145,7 @@ function Start_J_Space(paramaters::String, config::String)
             f, ax, p, colors = plot_lattice(G, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\Final_conf.png", f)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save(path_save_plot * "/Final_conf.png", f)
             end
       end
@@ -153,7 +157,7 @@ function Start_J_Space(paramaters::String, config::String)
                             List_driver,
                             header=false)
 
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   CSV.write(path_save_file * "/DriverList.csv",
                             List_driver,
                             header=false)
@@ -192,7 +196,7 @@ function Start_J_Space(paramaters::String, config::String)
             f, ax, p = plot_tree(tree_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\driver_tree.png", f)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save(path_save_plot * "/driver_tree.png", f)
             end
       end
@@ -202,7 +206,7 @@ function Start_J_Space(paramaters::String, config::String)
             if Sys.iswindows()
                   path_complete = path_save_file * "\\formatNewick"
                   writeTopology(net, path_complete)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   path_complete = path_save_file * "/formatNewick"
                   writeTopology(net, path_complete)
             end
@@ -298,7 +302,7 @@ function Start_J_Space(paramaters::String, config::String)
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
             if Sys.iswindows()
                   save_Fasta_W(g_seq, fastaX, tree_red, path_save_file)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save_Fasta_L(g_seq, fastaX, tree_red, path_save_file)
             end
 
@@ -547,7 +551,7 @@ function Start_J_Space(filepath_reference::AbstractString,
                         * string(Time_of_sampling[i])
                         *".png",
                         f)
-                  elseif Sys.islinux()
+                  elseif Sys.isunix()
                         save(path_save_plot
                         * "/Conf_t_"
                         * string(Time_of_sampling[i])
@@ -562,15 +566,20 @@ function Start_J_Space(filepath_reference::AbstractString,
             f, ax, p, colors = plot_lattice_metagraph(G, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\Final_conf.png", f)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save(path_save_plot * "/Final_conf.png", f)
             end
 
             f, ax, p, colors = plot_lattice_metagraph(g_meta, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\metagraph.png", f)
+<<<<<<< HEAD
             elseif Sys.islinux()
                   save(path_save_plot * "/metagraph.png", f)
+=======
+            elseif Sys.isunix()
+                  save(path_save_plot * "/metagraaph.png", f)
+>>>>>>> aa15fa71e9dc17f6bcb83a854f83cf369608687c
             end
       end
       #save driver list
@@ -581,7 +590,7 @@ function Start_J_Space(filepath_reference::AbstractString,
                             List_driver,
                             header=false)
 
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   CSV.write(path_save_file * "/DriverList.csv",
                             List_driver,
                             header=false)
@@ -620,7 +629,7 @@ function Start_J_Space(filepath_reference::AbstractString,
             f, ax, p = plot_tree(tree_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\driver_tree.png", f)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save(path_save_plot * "/driver_tree.png", f)
             end
       end
@@ -630,7 +639,7 @@ function Start_J_Space(filepath_reference::AbstractString,
             if Sys.iswindows()
                   path_complete = path_save_file * "\\formatNewick"
                   writeTopology(net, path_complete)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   path_complete = path_save_file * "/formatNewick"
                   writeTopology(net, path_complete)
             end
@@ -727,7 +736,7 @@ function Start_J_Space(filepath_reference::AbstractString,
       if Conf_dict["FileOutputExperiments"][1]["Single_cell_fasta"] == 1
             if Sys.iswindows()
                   save_Fasta_W(g_seq, fastaX, tree_red, path_save_file)
-            elseif Sys.islinux()
+            elseif Sys.isunix()
                   save_Fasta_L(g_seq, fastaX, tree_red, path_save_file)
             end
 
