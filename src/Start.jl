@@ -573,13 +573,8 @@ function Start_J_Space(filepath_reference::AbstractString,
             f, ax, p, colors = plot_lattice_metagraph(g_meta, set_mut)
             if Sys.iswindows()
                   save(path_save_plot * "\\metagraph.png", f)
-<<<<<<< HEAD
-            elseif Sys.islinux()
-                  save(path_save_plot * "/metagraph.png", f)
-=======
             elseif Sys.isunix()
                   save(path_save_plot * "/metagraaph.png", f)
->>>>>>> aa15fa71e9dc17f6bcb83a854f83cf369608687c
             end
       end
       #save driver list
