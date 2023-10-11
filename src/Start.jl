@@ -653,7 +653,7 @@ function Start_J_Space(filepath_reference::AbstractString,
           size = (800, 600), showtips = true,
           linecolor = :steelblue, linewidth = 2,
           markersize = 10, markercolor = :orange, markerstrokecolor = :black,
-          series_annotations = text.(1:nnodes(hummers), 7, :center, :center, :black)
+          series_annotations = Plots.text.(1:Phylo.nnodes(hummers), 7, :center, :center, :black)
       )
       Plots.savefig(phyloTree, filepath_phylo)
 
