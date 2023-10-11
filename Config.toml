@@ -13,7 +13,7 @@ Generate_graph = 0
 #*** if Generate_graph == 0 ***#
 Path_to_Graph = "./utility/Example_adj_matrix.txt"
 
-Tree_Driver_Configure = 1
+Tree_Driver_Configure = 0
 #*** if Tree_Driver == 1 ***#
 edgelist_treedriver = "./utility/Tree_driver_example.txt"
 driver_birth_rates = "./utility/driver_advantage.txt"
