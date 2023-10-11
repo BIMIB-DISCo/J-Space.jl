@@ -19,6 +19,9 @@ using TOML
 using DelimitedFiles
 #using Distributed
 using LinearAlgebra
+# * NEW PACKAGE *
+using Phylo
+
 ### function to exports
 export
     ## Simulation

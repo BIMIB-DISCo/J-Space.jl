@@ -641,6 +641,21 @@ function Start_J_Space(filepath_reference::AbstractString,
       else
             tree_red = create_tree(matrix_R, false)
       end
+      ## ** SAVE FORMAT NEWICK TREE **
+      filepath_phylo = ""
+      if Sys.iswindows()
+            filepath_phylo = path_save_plot * "\\phylo_tree.png"
+      elseif Sys.isunix()
+            filepath_phylo = path_save_plot * "/phylo_tree.png"
+      end
+      hummers = Phylo.open(parsenewick, Phylo.path(path_complete))
+      phyloTree = Plots.plot(hummers,
+          size = (800, 600), showtips = true,
+          linecolor = :steelblue, linewidth = 2,
+          markersize = 10, markercolor = :orange, markerstrokecolor = :black,
+          series_annotations = text.(1:nnodes(hummers), 7, :center, :center, :black)
+      )
+      Plots.savefig(phyloTree, filepath_phylo)
 
       ##MolecularEvolution
       println("J-SPACE: MOLECULAR EVOLUTION... ($slide_id)")
