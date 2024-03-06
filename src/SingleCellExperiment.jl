@@ -313,14 +313,18 @@ function experiment_ISA(tree::AbstractMetaGraph,
                         len_ROI::Int,
                         set_mut::Vector{Any};
                         frequency_dna::Vector{Float64} = [0.3,0.2,0.3])
-    ## Create reference genome
+    
+    ## Creates reference genome
+    
     sw = SamplerWeighted(dna"ACGT", frequency_dna)
     g_seq = randseq(seed, DNAAlphabet{4}(), sw, len_ROI)
-    # g_seq = randdnaseq(seed, len_ROI)
+    
+    ## g_seq = randdnaseq(seed, len_ROI)
+    
     rec = FASTA.Record("Reference", g_seq)
-    w = FASTA.Writer(open("Reference.fasta", "w"))
-    write(w, rec)
-    close(w)
+    FASTA.Writer(open("Reference.fasta", "w")) do w
+        write(w, rec)
+    end
     
     g_seq, fasta_samples, position_used, mutations_tot =
         Molecular_evolution_ISA(tree,
@@ -338,7 +342,7 @@ function experiment_ISA(tree::AbstractMetaGraph,
         path = yen_k.paths[1]
         push!(paths_tot, path)
     end
-    paths_tot
+    ## paths_tot
     
     for i in 1:length(mutations_tot_2.Sample)
         sample = mutations_tot_2.Sample[i]
@@ -358,8 +362,10 @@ function experiment_ISA(tree::AbstractMetaGraph,
                         set_mut::Vector{Any};
                         frequency_dna::Vector{Any} = [])
 
-    ## load reference genome
+    ## Load reference genome
+    
     g_seq = LongDNA{4}()
+    
     ## g_seq_e = LongDNASeq()
     open(FASTA.Reader, path) do reader
         for record in reader
@@ -443,6 +449,10 @@ function genomic_evolution(Seq_f::LongSequence,
 
     As = findall(x -> x == 'A', string(sequence_father))
     n_A = length(As)
+
+    ## We must change the above (and below) like the line below.
+    ## num_A = count(x -> x == 'A', string(sequence_father))
+    
     Cs = findall(x -> x == 'C', string(sequence_father))
     n_C = length(Cs)
     Gs = findall(x -> x == 'G', string(sequence_father))
@@ -480,7 +490,7 @@ function genomic_evolution(Seq_f::LongSequence,
             end
         end
 
-        if min_mutation == 5 #indel
+        if min_mutation == 5 # indel
             e = rand(seed, ["insertion", "deletion"])
 
             init_pos = rand(seed, 1:len_father)
@@ -534,7 +544,7 @@ function genomic_evolution(Seq_f::LongSequence,
                  end
 
 
-             else #deletion
+             else # deletion
                  prob_cum_size = cumsum(size_indel_arr)
                  k = rand(seed)
                  id_size_indel = collect(k .<= prob_cum_size)
@@ -583,10 +593,10 @@ function genomic_evolution(Seq_f::LongSequence,
             end
 
 
-        elseif min_mutation == 4 #T
+        elseif min_mutation == 4 # T
             pos_mutation = rand(seed, Ts)
 
-            #not overwrite driver mut
+            ## not overwrite driver mut
             check = not_pos_driver(position_used, pos_mutation)
             trials = 1
             while check == false && trials < length(Ts)
@@ -622,10 +632,10 @@ function genomic_evolution(Seq_f::LongSequence,
             end
 
 
-        elseif min_mutation == 3 #G
+        elseif min_mutation == 3 # G
             pos_mutation = rand(seed, Gs)
 
-            #not overwrite driver mut
+            ## not overwrite driver mut
             check = not_pos_driver(position_used, pos_mutation)
             trials = 1
             while check == false && trials < length(Gs)
@@ -659,7 +669,7 @@ function genomic_evolution(Seq_f::LongSequence,
                                       sample])
             end
 
-        elseif min_mutation == 2 #C
+        elseif min_mutation == 2 # C
             pos_mutation = rand(seed, Cs)
 
             #not overwrite driver mut
@@ -752,6 +762,7 @@ function genomic_evolution(Seq_f::LongSequence,
      end
 end
 
+
 """
     compute distribution for size indel
 """
@@ -768,6 +779,7 @@ function size_indel_dist(len_g::Int,
     size_indel_arr = size_indel_arr ./ sum(size_indel_arr)
     return size_indel_arr
 end
+
 
 """
     Molecular evolution with several substitution models
@@ -800,7 +812,9 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     else
         size_indel_arr = [0.0]
     end
-    #Model_Selector
+    
+    ## Model_Selector
+
     Model_Selector_matrix = Q(Selector, params)
     if typeof(Model_Selector_matrix) == String
         return Ref, [], Tree_SC
@@ -812,20 +826,25 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
     prob_T = Model_Selector_matrix[:,4] ./ sum(Model_Selector_matrix[:,4])
 
     position_used = []
-    #max_time = max_time_nodes(Tree, get_leafs(Tree))
+    ## max_time = max_time_nodes(Tree, get_leafs(Tree))
     for e in edges(Tree_SC)
 
         g_seq_e = LongDNA{4}()
-        #g_seq_e = LongSequence()
+        
+        ## g_seq_e = LongSequence()
+        
         if has_prop(Tree_SC, src(e), :Fasta)
             g_seq_e = copy(get_prop(Tree_SC, src(e), :Fasta))
         else
             g_seq_e = copy(Ref)
         end
 
-        branch_length = get_prop(Tree_SC, dst(e), :Time) -
-                        get_prop(Tree_SC, src(e), :Time)
-        #branch_length = branch_length/max_time
+        branch_length =
+            get_prop(Tree_SC, dst(e), :Time) -
+            get_prop(Tree_SC, src(e), :Time)
+        
+        ## branch_length = branch_length/max_time
+        
         subpop_father = get_prop(Tree_SC, src(e), :Subpop_Child)
         subpop_child = get_prop(Tree_SC, dst(e), :Subpop_Child)
         mut_f = set_mut[subpop_father]
@@ -833,18 +852,19 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
 
         if length(mut_f) == length(mut_child)
             if approx_snv_indel == 0
-                sequence, mutations_tot = genomic_evolution(g_seq_e,
-                                             rate_Indel,
-                                             size_indel_arr,
-                                             branch_length,
-                                             Model_Selector_matrix,
-                                             prob_A,
-                                             prob_C,
-                                             prob_G,
-                                             prob_T,
-                                             seed,
-                                             mutations_tot,
-                                             dst(e))
+                sequence, mutations_tot =
+                    genomic_evolution(g_seq_e,
+                                      rate_Indel,
+                                      size_indel_arr,
+                                      branch_length,
+                                      Model_Selector_matrix,
+                                      prob_A,
+                                      prob_C,
+                                      prob_G,
+                                      prob_T,
+                                      seed,
+                                      mutations_tot,
+                                      dst(e))
             else
                 sequence, mutations_tot = genomic_evolution_SNV(g_seq_e,
                                                    branch_length,
@@ -981,6 +1001,7 @@ function Molecular_evolution_NoISA(Tree::AbstractMetaGraph,
 
     return Ref, fasta_samples, Tree_SC, mutations_tot
 end
+
 
 """
 Call function Molecular_evolution_NoISA
