@@ -744,7 +744,8 @@ function genomic_evolution(Seq_f::LongSequence,
             end
         end
 
-        #update values
+        ## Update values.
+        
         As = findall(x -> x == 'A', string(sequence_father))
         n_A = length(As)
         Cs = findall(x -> x == 'C', string(sequence_father))
@@ -774,8 +775,9 @@ function size_indel_dist(len_g::Int,
         size_indel = len_g - 1
     end
 
-    size_indel_arr = [( (u * size_indel) / (size_indel-u +1)) ^ (-lavalette_par)
-                                                          for u in 1:size_indel]
+    size_indel_arr =
+        [((u * size_indel) / (size_indel-u + 1)) ^ (- lavalette_par)
+         for u in 1:size_indel]
     size_indel_arr = size_indel_arr ./ sum(size_indel_arr)
     return size_indel_arr
 end
