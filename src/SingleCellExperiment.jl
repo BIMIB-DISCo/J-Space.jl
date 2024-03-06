@@ -1,9 +1,12 @@
 ### -*- Mode: Julia -*-
 
 ### SingleCellExperiment.jl
+
 using BioSequences
 using FASTX
 using LinearAlgebra
+
+
 """
 Save fasta.
 """
@@ -304,92 +307,93 @@ end
 """
 Call function ISA
 """
-function experiment_ISA(Tree::AbstractMetaGraph,
+function experiment_ISA(tree::AbstractMetaGraph,
                         neural_mut_rate::Float64,
                         seed::MersenneTwister,
                         len_ROI::Int,
                         set_mut::Vector{Any};
                         frequency_dna::Vector{Float64} = [0.3,0.2,0.3])
-        ## Create reference genome
-        sw = SamplerWeighted(dna"ACGT", frequency_dna)
-        g_seq = randseq(seed, DNAAlphabet{4}(), sw, len_ROI)
-        #g_seq = randdnaseq(seed, len_ROI)
-        rec = FASTA.Record("Reference", g_seq)
-        w = FASTA.Writer(open("Reference.fasta", "w"))
-        write(w, rec)
-        close(w)
+    ## Create reference genome
+    sw = SamplerWeighted(dna"ACGT", frequency_dna)
+    g_seq = randseq(seed, DNAAlphabet{4}(), sw, len_ROI)
+    # g_seq = randdnaseq(seed, len_ROI)
+    rec = FASTA.Record("Reference", g_seq)
+    w = FASTA.Writer(open("Reference.fasta", "w"))
+    write(w, rec)
+    close(w)
+    
+    g_seq, fasta_samples, position_used, mutations_tot =
+        Molecular_evolution_ISA(tree,
+                                neural_mut_rate,
+                                seed,
+                                g_seq,
+                                len_ROI,
+                                set_mut)
 
-        g_seq, fasta_samples, position_used, mutations_tot =
-                                        Molecular_evolution_ISA(Tree,
-                                                                neural_mut_rate,
-                                                                seed,
-                                                                g_seq,
-                                                                len_ROI,
-                                                                set_mut)
-
-        mutations_tot_2 = copy(mutations_tot)
-        leafs = get_leafs(Tree)
-        paths_tot = []
-        for l in leafs
-            yen_k = yen_k_shortest_paths(Tree, 1, l)
-            path = yen_k.paths[1]
-            push!(paths_tot, path)
+    mutations_tot_2 = copy(mutations_tot)
+    leafs = get_leafs(tree)
+    paths_tot = []
+    for l in leafs
+        yen_k = yen_k_shortest_paths(tree, 1, l)
+        path = yen_k.paths[1]
+        push!(paths_tot, path)
+    end
+    paths_tot
+    
+    for i in 1:length(mutations_tot_2.Sample)
+        sample = mutations_tot_2.Sample[i]
+        if sample ∉ leafs
+            ls = leafs[sample .∈ paths_tot]
+            mutations_tot_2.Sample[i] = ls
         end
-        paths_tot
-
-        for i in 1:length(mutations_tot_2.Sample)
-            sample = mutations_tot_2.Sample[i]
-            if sample ∉ leafs
-                ls = leafs[sample .∈ paths_tot]
-                mutations_tot_2.Sample[i] = ls
-            end
-        end
-        return g_seq, fasta_samples, position_used, mutations_tot_2
+    end
+    return g_seq, fasta_samples, position_used, mutations_tot_2
 end
 
-function experiment_ISA(Tree::AbstractMetaGraph,
+
+function experiment_ISA(tree::AbstractMetaGraph,
                         neural_mut_rate::Float64,
                         seed::MersenneTwister,
                         path::String,
                         set_mut::Vector{Any};
                         frequency_dna::Vector{Any} = [])
 
-        ## load reference genome
-        g_seq = LongDNA{4}()
-        #g_seq_e = LongDNASeq()
-        open(FASTA.Reader, path) do reader
-            for record in reader
-                g_seq = FASTX.sequence(record)
-            end
+    ## load reference genome
+    g_seq = LongDNA{4}()
+    ## g_seq_e = LongDNASeq()
+    open(FASTA.Reader, path) do reader
+        for record in reader
+            g_seq = FASTX.sequence(record)
         end
+    end
 
-        len_ROI = length(g_seq)
+    len_ROI = length(g_seq)
 
-        g_seq, fasta_samples, position_used, mutations_tot =
-                                        Molecular_evolution_ISA(Tree,
-                                                                neural_mut_rate,
-                                                                seed,
-                                                                g_seq,
-                                                                len_ROI,
-                                                                set_mut)
-        mutations_tot_2 = copy(mutations_tot)
-        leafs = get_leafs(Tree)
-        paths_tot = []
-        for l in leafs
-            yen_k = yen_k_shortest_paths(Tree, 1, l)
-            path = yen_k.paths[1]
-            push!(paths_tot, path)
+    g_seq, fasta_samples, position_used, mutations_tot =
+        Molecular_evolution_ISA(tree,
+                                neural_mut_rate,
+                                seed,
+                                g_seq,
+                                len_ROI,
+                                set_mut)
+    mutations_tot_2 = copy(mutations_tot)
+    leafs = get_leafs(tree)
+    paths_tot = []
+    for l in leafs
+        yen_k = yen_k_shortest_paths(tree, 1, l)
+        path = yen_k.paths[1]
+        push!(paths_tot, path)
+    end
+    paths_tot
+
+    for i in 1:length(mutations_tot_2.Sample)
+        sample = mutations_tot_2.Sample[i]
+        if sample ∉ leafs
+            ls = leafs[sample .∈ paths_tot]
+            mutations_tot_2.Sample[i] = ls
         end
-        paths_tot
-
-        for i in 1:length(mutations_tot_2.Sample)
-            sample = mutations_tot_2.Sample[i]
-            if sample ∉ leafs
-                ls = leafs[sample .∈ paths_tot]
-                mutations_tot_2.Sample[i] = ls
-            end
-        end
-        return g_seq, fasta_samples, position_used, mutations_tot_2
+    end
+    return g_seq, fasta_samples, position_used, mutations_tot_2
 end
 
 
