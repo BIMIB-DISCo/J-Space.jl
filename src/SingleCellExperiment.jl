@@ -369,7 +369,7 @@ function experiment_ISA(tree::AbstractMetaGraph,
     ## g_seq_e = LongDNASeq()
     open(FASTA.Reader, path) do reader
         for record in reader
-            g_seq = FASTX.sequence(record)
+            g_seq = LongSequence(LongDNA{4}(String(FASTX.sequence(record)))) # FASTX.sequence(record)
         end
     end
 
@@ -447,17 +447,17 @@ function genomic_evolution(Seq_f::LongSequence,
     len_father = length(sequence_father)
     len_num_mut_driver = num_mut_driver
 
-    As = findall(x -> x == 'A', string(sequence_father))
+    As = findall(x -> x == 'A', sequence_father)
     n_A = length(As)
 
     ## We must change the above (and below) like the line below.
     ## num_A = count(x -> x == 'A', string(sequence_father))
     
-    Cs = findall(x -> x == 'C', string(sequence_father))
+    Cs = findall(x -> x == 'C', sequence_father)
     n_C = length(Cs)
-    Gs = findall(x -> x == 'G', string(sequence_father))
+    Gs = findall(x -> x == 'G', sequence_father)
     n_G = length(Gs)
-    Ts = findall(x -> x == 'T', string(sequence_father))
+    Ts = findall(x -> x == 'T', sequence_father)
     n_T = length(Ts)
     curr_time = 0
 
@@ -746,13 +746,13 @@ function genomic_evolution(Seq_f::LongSequence,
 
         ## Update values.
         
-        As = findall(x -> x == 'A', string(sequence_father))
+        As = findall(x -> x == 'A', sequence_father)
         n_A = length(As)
-        Cs = findall(x -> x == 'C', string(sequence_father))
+        Cs = findall(x -> x == 'C', sequence_father)
         n_C = length(Cs)
-        Gs = findall(x -> x == 'G', string(sequence_father))
+        Gs = findall(x -> x == 'G', sequence_father)
         n_G = length(Gs)
-        Ts = findall(x -> x == 'T', string(sequence_father))
+        Ts = findall(x -> x == 'T', sequence_father)
         n_T = length(Ts)
     end
 
@@ -1079,7 +1079,7 @@ function experiment_noISA(Tree::AbstractMetaGraph,
         ## load reference genome
         open(FASTA.Reader, path) do reader
             for record in reader
-                Ref = FASTX.sequence(record)
+                Ref = LongSequence(LongDNA{4}(String(FASTX.sequence(record)))) # FASTX.sequence(record)
             end
         end
 
@@ -1804,13 +1804,14 @@ function genomic_evolution_SNV(Seq_f::LongSequence,
     sequence_father = copy(Seq_f)
     len_num_mut_driver = num_mut_driver
 
-    As = findall(x -> x == 'A', string(sequence_father))
+    # tolto String(sequence_father)
+    As = findall(x -> x == 'A', sequence_father)
     n_A = length(As)
-    Cs = findall(x -> x == 'C', string(sequence_father))
+    Cs = findall(x -> x == 'C', sequence_father)
     n_C = length(Cs)
-    Gs = findall(x -> x == 'G', string(sequence_father))
+    Gs = findall(x -> x == 'G', sequence_father)
     n_G = length(Gs)
-    Ts = findall(x -> x == 'T', string(sequence_father))
+    Ts = findall(x -> x == 'T', sequence_father)
     n_T = length(Ts)
 
     curr_time = 0

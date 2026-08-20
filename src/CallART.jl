@@ -57,7 +57,7 @@ function check_input(paired_end, mate_pair, mean_fragsize, std_fragsize)
     return control
 end
 
-function call_ART(command::String, path_fasta::String ,path_fileout::String)
+function call_ART(command::String, path_fasta::String, path_fileout::String)
     com = split(command)
     ind_ss = findall(x -> x == "-ss", com)
     next = 0
@@ -69,7 +69,15 @@ function call_ART(command::String, path_fasta::String ,path_fileout::String)
         for file in readdir(path_fasta)
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta"
-                path_ref = path_fasta*file
+                # Costruisco il path correttamente
+                # path_ref = joinpath(path_fasta, file)
+
+                # e trasformo il path relativo in assoluto
+                # PRIMA di fare cd()
+                # path_ref = abspath(path_ref)
+
+                path_ref = abspath(joinpath(path_fasta, file))
+
                 i = ["-i", path_ref]
                 new_com = com[1:ind_ss+1]
                 append!(new_com, i)
@@ -85,7 +93,18 @@ function call_ART(command::String, path_fasta::String ,path_fileout::String)
         for file in readdir(path_fasta)
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta"
-                path_ref = path_fasta*file
+                # Costruisco il path correttamente
+                # path_ref = joinpath(path_fasta, file)
+
+                # IMPORTANTISSIMO:
+                # trasformo il path relativo in assoluto
+                # PRIMA di fare cd()
+                # path_ref = abspath(path_ref)
+                # path_ref = path_fasta*file
+
+                # path_ref = joinpath(path_fasta, file) 
+
+                path_ref = abspath(joinpath(path_fasta, file))
                 i = ["-i", path_ref]
                 new_com = com[1:ind_ss+1]
                 append!(new_com, i)
@@ -164,7 +183,8 @@ function call_ART(profile::String,
         for file in readdir(path_fasta)       # Scorro tutti i file
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
-                path_ref = path_fasta*file
+                # path_ref = path_fasta*file
+                path_ref = abspath(joinpath(path_fasta, file))
                 i = ["-i", path_ref]
                 outfile_prefix = f[1]*"_"
                 o = ["-o", outfile_prefix]
@@ -179,7 +199,8 @@ function call_ART(profile::String,
         for file in readdir(path_fasta)
             f = hcat(split.(file, ".")...)[1, :]
             if length(f) > 1 && f[2] == "fasta" && f[1] != "reference"
-                path_ref = path_fasta*file
+                # path_ref = path_fasta*file
+                path_ref = abspath(joinpath(path_fasta, file))
                 i = ["-i", path_ref]
                 outfile_prefix = f[1]*"_"
                 o = ["-o", outfile_prefix]

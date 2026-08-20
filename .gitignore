@@ -1,3 +1,19 @@
 *~
 .juliahistory
 Manifest.toml
+
+
+# Config and parameters toml file to change based on the type of target simulation
+Config.toml
+Parameters.toml
+
+
+# File di output di J-Space
+Plot/
+fileoutput/
+
+*.aln
+*.fq
+*.sam
+*.fasta
+

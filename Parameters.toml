@@ -8,7 +8,7 @@ N_starting_cells = 1
 # ***
 # Otherwise matrix adjacency
 # ***#
-matrix_adjacency = "./utility/Example_adj_matrix.txt"
+matrix_adjacency = "./test/data/Example_adj_matrix.txt"
 
 [[Dynamic]]
 Model = "contact"
@@ -23,7 +23,7 @@ t_bottleneck = [50.0,150.0]
 ratio_bottleneck = [0.8,0.8]
 [[Sampling]]
 Random_sampling = 1
-num_cell = 10
+num_cell = 100 # to adapt based on the dimension of the adj_matrix used
 #***
 # If Random_sampling = 0
 # ***#
